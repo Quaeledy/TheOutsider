@@ -13,30 +13,39 @@ using System.Globalization;
 using TheOutsider.Player_Hooks;
 using System.Runtime.CompilerServices;
 using MonoMod;
+using BepInEx.Logging;
+using MonoMod.RuntimeDetour;
+using System.Reflection;
 
 namespace TheOutsider.World_Hooks
 {
     public class RoomHooks
     {
+
         public static void Init()
         {
             On.RoomCamera.Update += RoomCamera_Update;
+            //On.Room.ctor += Room_ctor;
             On.Room.Update += Room_Update;
             On.DynamicSoundLoop.Update += DynamicSoundLoop_Update;
             On.WaterFall.DrawSprites += WaterFall_DrawSprites;
             On.DaddyLongLegs.Update += DaddyLongLegs_Update;
             On.DaddyCorruption.Update += DaddyCorruption_Update;
             On.AbstractCreature.Update += AbstractCreature_Update;
-
-
+            On.RainCycle.ctor += RainCycle_ctor;
+            /*
+            Hook hook = new Hook(
+                typeof(RainWorldGame.SetupValues).GetProperty("disableRain", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(RoomHooks).GetMethod("DisableRain", BindingFlags.Static | BindingFlags.Public));*/
         }
 
         public static void RoomCamera_Update(On.RoomCamera.orig_Update orig, RoomCamera self)
         {
             orig(self);
 
-            if (self.game.session.characterStats.name.value == "Outsider")
+            if (self.game.StoryCharacter != null && self.game.StoryCharacter == Plugin.SlugName && !self.room.IsGateRoom())
             {
+                //Plugin.Log("RoomCamera_Update");
                 if (self.game.world.region.name == "CC")
                 {
                     self.currentPalette.darkness = 0.6f;
@@ -86,6 +95,7 @@ namespace TheOutsider.World_Hooks
                 }
                 if (self.game.world.region.name == "SB")
                 {
+                    //Plugin.Log("RoomCamera_Update 1");
                     self.currentPalette.darkness = 0.5f;
                     self.effect_darkness = 0.5f;
                     self.effect_desaturation = 0.45f;
@@ -120,25 +130,30 @@ namespace TheOutsider.World_Hooks
         public static void Room_Update(On.Room.orig_Update orig, Room self)
         {
             orig(self);
-
-            if (self.game.session.characterStats.name.value == "Outsider")
+            
+            if (self.game.StoryCharacter != null && self.game.StoryCharacter == Plugin.SlugName)
             {
-                if (self.game.world.region.name == "CC")
+                //除海岸线、沉没巨构无雪
+                if (self.game.world.region.name != "MS" && self.game.world.region.name != "SL")
                 {
                     self.snow = false;
                     self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
+                }
+                else//停雨的尝试
+                {
+                    self.world.rainCycle.dayNightCounter = 0;
+                }
+                //尘土设置
+                if (self.game.world.region.name == "CC")
+                {
                     self.roomSettings.Grime = float.Parse("0.7", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "CL")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.9", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "DS")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.5", NumberStyles.Any, CultureInfo.InvariantCulture);
                     //没水了
                     if (self.waterObject != null && !self.IsGateRoom())
@@ -156,54 +171,38 @@ namespace TheOutsider.World_Hooks
                 }
                 if (self.game.world.region.name == "GW")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.9", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "HI")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.9", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "LF")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.7", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "MS")
                 {
-                    //沉没巨构有雪
                     self.roomSettings.Grime = float.Parse("0.1", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "SB")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.3", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "SI")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.3", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "SL")
                 {
-                    //海岸线有雪
                     self.roomSettings.Grime = float.Parse("0.1", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "SU")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.5", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
                 if (self.game.world.region.name == "VS")
                 {
-                    self.snow = false;
-                    self.roomSettings.DangerType = new RoomRain.DangerType("None", false);
                     self.roomSettings.Grime = float.Parse("0.7", NumberStyles.Any, CultureInfo.InvariantCulture);
                 }
             }
@@ -213,7 +212,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self);
 
-            if (self.owner.room.game.session.characterStats.name.value == "Outsider")
+            if (self.owner.room.game.StoryCharacter != null && self.owner.room.game.StoryCharacter == Plugin.SlugName)
             {
                 if (self.owner.room.world.region.name == "DS" && self.owner.room.waterObject != null && !self.owner.room.IsGateRoom())
                 {
@@ -278,11 +277,6 @@ namespace TheOutsider.World_Hooks
                 self.effectColor = new Color(0.3f, 0f, 1f);
                 self.eyeColor = self.effectColor;
             }
-            else
-            {
-                self.effectColor = new Color(0f, 0f, 1f);
-                self.eyeColor = self.effectColor;
-            }
         }
 
         public static void DaddyCorruption_Update(On.DaddyCorruption.orig_Update orig, DaddyCorruption self, bool eu)
@@ -315,5 +309,51 @@ namespace TheOutsider.World_Hooks
                 self.Hypothermia = Mathf.Lerp(self.Hypothermia, 3f, Mathf.InverseLerp(0f, -600f, self.world.rainCycle.AmountLeft));
             }
         }
+        /*
+        public static void Room_ctor(On.Room.orig_ctor orig, Room self, RainWorldGame game, World world, AbstractRoom abstractRoom)
+        {
+            orig(self, game, world, abstractRoom);
+
+            if (self.game.session.characterStats.name.value == "Outsider")
+            {
+
+            }
+
+            if (self.fluorescentButterfliesfliesRoomAi != null)
+            {
+                self.fluorescentButterfliesfliesRoomAi.Update(self.game.evenUpdate);
+            }
+        }
+        */
+        
+        //禁用避难所故障
+        public static void RainCycle_ctor(On.RainCycle.orig_ctor orig, RainCycle self, World world, float minutes)
+        {
+            bool DisablePrecycles = MoreSlugcats.MoreSlugcats.cfgDisablePrecycles.Value;
+
+            if (world.game.StoryCharacter != null && world.game.StoryCharacter == Plugin.SlugName)
+            {
+                MoreSlugcats.MoreSlugcats.cfgDisablePrecycles.Value = false;
+            }
+
+            orig(self, world, minutes);
+
+            if (world.game.StoryCharacter != null && world.game.StoryCharacter == Plugin.SlugName)
+            {
+                MoreSlugcats.MoreSlugcats.cfgDisablePrecycles.Value = DisablePrecycles;
+            }
+        }
+        
+        public static bool DisableRain(Func<RainWorldGame, bool> orig, RainWorldGame self)
+        {
+            if (self.world.game.StoryCharacter == Plugin.SlugName)
+            {
+                return true;
+            }
+
+            return orig(self);
+        }
+
+        //public FluorescentButterfliesRoomAI fluorescentButterfliesfliesRoomAi;
     }
 }

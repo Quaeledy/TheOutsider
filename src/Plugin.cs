@@ -3,26 +3,19 @@ using System.Security.Permissions;
 using System.Security;
 using System;
 using UnityEngine;
-using System.Linq;
-using System.Reflection;
-using MonoMod.RuntimeDetour;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using MoreSlugcats;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
-using UnityEngine.Rendering;
-using System.Xml;
 using SlugBase.Features;
-using static SlugBase.Features.FeatureTypes;
-using static UnityEngine.UIElements.UxmlAttributeDescription;
 using SlugBase.DataTypes;
-using Fisobs.Core;
-using System.IO;
-using static System.Net.Mime.MediaTypeNames;
 using TheOutsider.World_Hooks;
 using TheOutsider.Player_Hooks;
+using TheOutsider.PlayerGraphics_Hooks;
 using TheOutsider.Oracle_Hooks;
+using TheOutsider.CustomLore.CustomOracle;
+using TheOutsider.CustomLore.CustomDream;
+using TheOutsider.CustomLore.CustomCreature;
+using TheOutsider.CustomOracleTx;
+using TheOutsider.CustomDreamTx;
+using TheOutsider.Menu_Hooks;
 
 [module: UnverifiableCode]
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -31,11 +24,12 @@ using TheOutsider.Oracle_Hooks;
 
 namespace TheOutsider
 {
-    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.1.2")]
+    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.8")]
     public class Plugin : BaseUnityPlugin
     {
         static public readonly string MOD_ID = "Quaeledy.outsider";
-        static public readonly string Name = "Outsider";
+        static public SlugcatStats.Name SlugName = new SlugcatStats.Name("Outsider");
+        private bool IsInit;
 
         // Add hooks
         public void OnEnable()
@@ -43,46 +37,52 @@ namespace TheOutsider
             //On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             // Put your custom hooks here!
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit);
+            CreatureTemplateType.RegisterValues();
         }
 
-        public static readonly PlayerFeature<bool> MothOutsider = FeatureTypes.PlayerBool("TheOutsider/mothoutsider");
-        public static readonly PlayerFeature<float> WingSpeed = FeatureTypes.PlayerFloat("TheOutsider/wingsspeed");
-        public static readonly PlayerFeature<float> UpFlytime = FeatureTypes.PlayerFloat("TheOutsider/upflytime");
+        public static readonly PlayerFeature<bool> IsOutsider = FeatureTypes.PlayerBool("TheOutsider/is_outsider");
         public static readonly PlayerColor AntennaeColor = new PlayerColor("Antennae");
-        public static readonly PlayerColor StripeColor = new PlayerColor("Stripes");
+        public static readonly PlayerColor LepidoticWingColor = new PlayerColor("LepidoticWing");
+        public static readonly PlayerColor SpeckleColor = new PlayerColor("Speckles");
+        public static readonly PlayerColor FlareColor = new PlayerColor("FlaringLight");
+        public static OptionsMenu optionsMenuInstance;
         
-        private bool IsInit;
 
         private void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
         {
             orig.Invoke(self);
+
+            if (IsInit) return;
+            IsInit = true;
+            
             try
             {
-                if (IsInit) return;
-                IsInit = true;
+                //Remix配置菜单
+                optionsMenuInstance = new OptionsMenu(this);
+                MachineConnector.SetRegisteredOI(MOD_ID, optionsMenuInstance);
 
-                Futile.atlasManager.LoadAtlas("atlases/mothwings");
-                Futile.atlasManager.LoadAtlas("atlases/mothantennaehead");
-                Futile.atlasManager.LoadAtlas("atlases/mothcathands");
-
+                //需要注册的变量
                 MothEnums.RegisterValues();
 
+                //我的hook们
                 PlayerHooks.Init();
                 PlayerGraphicsHooks.Init();
                 FoodHooks.Init();
+                WorldHooks.Init();
+                HUDHooks.Init();
                 RoomHooks.Init();
-                
-                _hooks = new List<HookBase>()
-                {
-                    HUDHooks.Instance(Logger),
-                    RegionMergeFix.Instance(Logger),
-                    CLOracleHooks.Instance(Logger),
-                    SLOracleHooks.Instance(Logger)
-                };
-                
-                foreach (var feature in _hooks)
-                    feature.OnModsInit(self);
-                
+                RegionHooks.Init();
+                CLOracleHooks.Init();
+                SLOracleHooks.Init();
+
+                /*
+                SceneHooks.Init();
+                IntroRollHooks.Init();
+
+                //基于EmgTx的内容
+                CustomDreamRx.ApplyTreatment( new OutsiderDream());
+                CustomOracleRx.ApplyTreatment(new AMOracleRegistry());
+                */
                 Debug.Log($"Plugin {Plugin.MOD_ID} is loaded!");
             }
             catch (Exception ex)
@@ -92,8 +92,16 @@ namespace TheOutsider
             }
         }
 
-        static private List<HookBase> _hooks;
 
+        public static void Log(string m)
+        {
+            Debug.Log("[Outsider] " + m);
+        }
+
+        public static void Log(string f, params object[] args)
+        {
+            Debug.Log("[Outsider] " + string.Format(f, args));
+        }
 
         // Load any resources, such as sprites or sounds
         private void LoadResources(RainWorld rainWorld)
@@ -101,3 +109,7 @@ namespace TheOutsider
         }
     }
 }
+
+/* json文件内容
+"intro_slideshow": "Outsider_Intro",
+*/

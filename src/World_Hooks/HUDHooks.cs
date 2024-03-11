@@ -13,32 +13,21 @@ using BepInEx.Logging;
 
 namespace TheOutsider.World_Hooks
 {
-    class HUDHooks : HookBase
+    class HUDHooks
     {
-        HUDHooks(ManualLogSource log) : base(log)
-        {
-        }
-
-        static public HUDHooks Instance(ManualLogSource log = null)
-        {
-            if (_Instance == null)
-                _Instance = new HUDHooks(log);
-            return _Instance;
-        }
-
-        public override void OnModsInit(RainWorld rainWorld)
+        public static void Init()
         {
             On.HUD.RainMeter.Update += RainMeter_Update;
-            On.HUD.FoodMeter.Update += FoodMeter_Update;
+            On.HUD.FoodMeter.QuarterPipShower.Update += QuarterPipShower_Update;
             On.MoreSlugcats.HypothermiaMeter.Update += HypothermiaMeter_Update;
 
             On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
             On.HUD.HUD.Update += HUD_Update;
         }
 
-        public void RainMeter_Update(On.HUD.RainMeter.orig_Update orig, RainMeter self)
+        public static void RainMeter_Update(On.HUD.RainMeter.orig_Update orig, RainMeter self)
         {
-            if (!(self.hud.owner is Player) || (self.hud.owner as Player).abstractCreature.world.game.session.characterStats.name.value != "Outsider")
+            if (!(self.hud.owner is Player) || (self.hud.owner as Player).abstractCreature.world.game.session.characterStats.name != Plugin.SlugName)
             {
                 orig(self);
             }
@@ -129,14 +118,47 @@ namespace TheOutsider.World_Hooks
                 }
             }
         }
-
-        public void FoodMeter_Update(On.HUD.FoodMeter.orig_Update orig, FoodMeter self)
+        
+        // 减1/4饱食度动画修复
+        public static void QuarterPipShower_Update(On.HUD.FoodMeter.QuarterPipShower.orig_Update orig, FoodMeter.QuarterPipShower self)
         {
-            //等待完成：非整数饱食显示
-            orig(self);
-            if (!(self.hud.owner is Player) || (self.hud.owner as Player).abstractCreature.world.game.session.characterStats.name.value != "Outsider")
+            if ((self.owner.hud.owner is Player) && (self.owner.hud.owner as Player).abstractCreature.world.game.session.characterStats.name == Plugin.SlugName)
             {
-                return;
+                PlayerHooks.PlayerData.TryGetValue(self.owner.hud.owner as Player, out var player);
+                if(player.shouldResetDisplayQuarterFood)
+                {
+                    self.displayQuarterFood = 4;
+                    self.quarterPipDelay = 40;
+                    player.shouldResetDisplayQuarterFood = false;
+                    return;
+                }
+            }
+            orig(self);
+            if ((self.owner.hud.owner is Player) && (self.owner.hud.owner as Player).abstractCreature.world.game.session.characterStats.name == Plugin.SlugName)
+            {
+                if ((self.owner.IsPupFoodMeter ?
+                (self.owner.pup.State as PlayerNPCState).quarterFoodPoints :
+                (self.owner.hud.owner as Player).playerState.quarterFoodPoints) < self.displayQuarterFood)
+                {
+                    self.owner.visibleCounter = 80;
+                    if (self.owner.fade < 0.5f)
+                    {
+                        self.quarterPipDelay = 45;
+                        return;
+                    }
+                    if (self.quarterPipDelay > 0)
+                    {
+                        self.quarterPipDelay--;
+                        return;
+                    }
+                    self.quarterPipDelay = 20;
+                    self.displayQuarterFood--;
+                    self.lightUp = 1f;
+                    if (self.owner.showCount < self.owner.circles.Count)
+                    {
+                        self.owner.circles[self.owner.showCount].QuarterCirclePlop();
+                    }
+                }
             }
         }
 
@@ -144,12 +166,12 @@ namespace TheOutsider.World_Hooks
         {
             orig(self);
 
-            if (!(self.hud.owner is Player) || (self.hud.owner as Player).abstractCreature.world.game.session.characterStats.name.value != "Outsider")
+            if (!(self.hud.owner is Player) || (self.hud.owner as Player).abstractCreature.world.game.session.characterStats.name != Plugin.SlugName)
             {
                 return;
             }
 
-            //在海岸线\沉没巨构之外隐藏寒冷条
+            //在海岸线、沉没巨构之外隐藏寒冷条
             if((self.hud.owner as Player).abstractCreature.world.region.name != "SL" && (self.hud.owner as Player).abstractCreature.world.region.name != "MS")
             {
                 for (int i = 0; i < self.circles.Length; i++)
@@ -165,20 +187,20 @@ namespace TheOutsider.World_Hooks
                 }
             }
         }
-
-        public void HUD_Update(On.HUD.HUD.orig_Update orig, HUD.HUD self)
+        
+        public static void HUD_Update(On.HUD.HUD.orig_Update orig, HUD.HUD self)
         {
             orig(self);
             if (outsiderHud != null)
                 outsiderHud.Update();
         }
 
-        private void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
+        private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
             orig(self, cam);
             
             //判断是否为蛾猫
-            if (self.owner is Player && (self.owner as Player).abstractCreature.world.game.session.characterStats.name.value == "Outsider")
+            if (self.owner is Player && (self.owner as Player).abstractCreature.world.game.session.characterStats.name == Plugin.SlugName)
             {
                 if (outsiderHud != null)
                     outsiderHud.Destroy();
@@ -187,9 +209,7 @@ namespace TheOutsider.World_Hooks
             }
         }
 
-        static private HUDHooks _Instance;
-
-        OutsiderMessionHud outsiderHud;
+        public static OutsiderMessionHud outsiderHud;
     }
 
     class OutsiderMessionHud
@@ -241,9 +261,9 @@ namespace TheOutsider.World_Hooks
             _hud = null;
         }
 
-        bool introText1 = false;
-        bool introText2 = false;
-        bool introText3 = false;
+        static bool introText1 = false;
+        static bool introText2 = false;
+        static bool introText3 = false;
         MissionHud _hud;
         HUD.HUD owner;
     }

@@ -8,8 +8,7 @@
     ".NETFramework,Version=v4.8": []
   },
   "packageFolders": {
-    "C:\\Users\\86186\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\LX\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -17,14 +16,11 @@
       "projectUniqueName": "D:\\收藏\\雨世界\\Mod制作\\代码\\TheOutsider\\src\\TheOutsider.csproj",
       "projectName": "TheOutsider",
       "projectPath": "D:\\收藏\\雨世界\\Mod制作\\代码\\TheOutsider\\src\\TheOutsider.csproj",
-      "packagesPath": "C:\\Users\\86186\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\LX\\.nuget\\packages\\",
       "outputPath": "D:\\收藏\\雨世界\\Mod制作\\代码\\TheOutsider\\src\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\86186\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\LX\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -49,7 +45,7 @@
     "frameworks": {
       "net48": {
         "targetAlias": "net48",
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.203\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -6,9 +6,71 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <Reference Include="../lib/*.dll">
-            <Private>false</Private>
+        <Reference Include="..\lib\0Harmony.dll">
+          <Private>false</Private>
         </Reference>
+        <Reference Include="..\lib\Assembly-CSharp-firstpass.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\BepInEx.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\HOOKS-Assembly-CSharp.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\Mono.Cecil.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\Mono.Cecil.Rocks.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\MonoMod.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\MonoMod.RuntimeDetour.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\MonoMod.Utils.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\SlugBase.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\UnityEngine.AssetBundleModule.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\UnityEngine.CoreModule.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\UnityEngine.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\UnityEngine.InputLegacyModule.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="..\lib\UnityEngine.UIElementsModule.dll">
+          <Private>false</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+        </Reference>
+        <Reference Include="Fisobs">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2920541687\plugins\Fisobs.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.AudioModule">
+          <HintPath>..\lib\UnityEngine.AudioModule.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Remove="World_Hooks\Creature\**" />
+      <EmbeddedResource Remove="World_Hooks\Creature\**" />
+      <None Remove="World_Hooks\Creature\**" />
+      <Reference Remove="World_Hooks\Creature\**" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="CustomLore\CustomObject\" />
     </ItemGroup>
     
     <Target Name="GenerateMod" AfterTargets="PostBuildEvent">

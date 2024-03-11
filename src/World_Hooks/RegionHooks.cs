@@ -11,23 +11,16 @@ using System.Text.RegularExpressions;
 
 namespace TheOutsider.World_Hooks
 {
-    class RegionMergeFix : HookBase
+    class RegionHooks
     {
-        RegionMergeFix(ManualLogSource log) : base(log)
+        public static void Init()
         {
-            On.ModManager.ModMerger.WriteMergedFile += ModMerger_WriteMergedFile;
-            On.ModManager.ModMerger.ExecutePendingMerge += ModMerger_ExecutePendingMerge;
+            /*On.ModManager.ModMerger.WriteMergedFile += ModMerger_WriteMergedFile;
+            On.ModManager.ModMerger.ExecutePendingMerge += ModMerger_ExecutePendingMerge;*/
             On.SlugcatStats.getSlugcatStoryRegions += SlugcatStats_getSlugcatStoryRegions;
             On.Region.GetProperRegionAcronym += Region_GetProperRegionAcronym;
         }
-
-        static public RegionMergeFix Instance(ManualLogSource log = null)
-        {
-            if (_instance == null)
-                _instance = new RegionMergeFix(log);
-            return _instance;
-        }
-
+        /*
         private void ModMerger_WriteMergedFile(On.ModManager.ModMerger.orig_WriteMergedFile orig, ModManager.Mod sourceMod, string sourcePath, string[] mergeLines)
         {
             if (sourceMod.id == Plugin.MOD_ID)
@@ -246,16 +239,13 @@ namespace TheOutsider.World_Hooks
 
             orig(self, applyer);
         }
-
+        */
         public static string[] SlugcatStats_getSlugcatStoryRegions(On.SlugcatStats.orig_getSlugcatStoryRegions orig, SlugcatStats.Name i)
         {
-            if(i.value != "Outsider")
+            string[] result = orig(i);
+            if (i.value == "Outsider")
             {
-                return (orig(i));
-            }
-            else
-            {
-                return new string[]
+                result = new string[]
                 {
                     "CC",
                     "CL",
@@ -263,7 +253,7 @@ namespace TheOutsider.World_Hooks
                     "GW",
                     "HI",
                     "LF",
-                    "MS",
+                    //"MS",//把这个注释是因为朝圣者成就跳过了沉没巨构，导致算出来的回响少一个，因此会在见了回响存档时导致游戏崩溃
                     "SB",
                     "SI",
                     "SL",
@@ -271,6 +261,7 @@ namespace TheOutsider.World_Hooks
                     "VS",
                 };
             }
+            return result;
         }
 
         public static string Region_GetProperRegionAcronym(On.Region.orig_GetProperRegionAcronym orig, SlugcatStats.Name character, string baseAcronym)
@@ -340,6 +331,6 @@ namespace TheOutsider.World_Hooks
             }
         }
 
-        static RegionMergeFix _instance;
+        static RegionHooks _instance;
     }
 }

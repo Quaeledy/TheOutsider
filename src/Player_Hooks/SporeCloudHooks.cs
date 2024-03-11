@@ -13,36 +13,33 @@ namespace TheOutsider.Player_Hooks
 {
     public class SporeCloudHooks
     {
+        static bool init = false;
+
         public static void Update(On.SporeCloud.orig_Update orig, SporeCloud self, bool eu)
         {
             orig(self, eu);
-
-            if (!PlayerHooks.PlayerData.TryGetValue(PlayerEx.playerSelf, out var player) || !player.IsMoth)
+            
+            if (!Plugin.optionsMenuInstance.immuneSporeCloud.Value)
             {
-                return;
-            }
-
-            if (!self.nonToxic && self.checkInsectsDelay > -1)
-            {
-                self.checkInsectsDelay--;
-                if (self.checkInsectsDelay < 1)
+                if (!self.nonToxic && self.checkInsectsDelay > -1)
                 {
-                    self.checkInsectsDelay = 20;
-                    for (int i = 0; i < self.room.abstractRoom.creatures.Count; i++)
+                    self.checkInsectsDelay--;
+                    if (self.checkInsectsDelay < 1)
                     {
-                        if (self.room.abstractRoom.creatures[i].realizedCreature != null)
+                        self.checkInsectsDelay = 20;
+                        for (int i = 0; i < self.room.abstractRoom.creatures.Count; i++)
                         {
-                            if (self.room.abstractRoom.creatures[i].realizedCreature == PlayerEx.playerSelf as Creature)
+                            if (self.room.abstractRoom.creatures[i].realizedCreature != null)
                             {
-                                if (Custom.DistLess(self.pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, self.rad + self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.rad + 20f))
+                                if (self.room.abstractRoom.creatures[i].realizedCreature is Player && (self.room.abstractRoom.creatures[i].realizedCreature as Player).slugcatStats.name == Plugin.SlugName)
                                 {
-                                    if (Random.value < self.life)
+                                    if (Custom.DistLess(self.pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, self.rad + self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.rad + 20f))
                                     {
-                                        self.room.abstractRoom.creatures[i].realizedCreature.Die();
-                                    }
-                                    else
-                                    {
-                                        self.room.abstractRoom.creatures[i].realizedCreature.Stun(Random.Range(10, 120));
+                                        if (!init)
+                                        {
+                                            self.room.abstractRoom.creatures[i].realizedCreature.Die();
+                                            init = true;
+                                        }
                                     }
                                 }
                             }

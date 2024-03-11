@@ -1,9 +1,13 @@
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\TheOutsider.dll
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\TheOutsider.pdb
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\PUBLIC-Assembly-CSharp.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\UnityEngine.AudioModule.dll
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.csproj.AssemblyReference.cache
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.GeneratedMSBuildEditorConfig.editorconfig
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.AssemblyInfoInputs.cache
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.AssemblyInfo.cs
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.csproj.CoreCompileInputs.cache
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.csproj.CopyComplete
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.dll
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.pdb
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\Fisobs.dll

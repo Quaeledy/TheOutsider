@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using TheOutsider.Player_Hooks;
 using UnityEngine;
 using RWCustom;
+using System.Runtime.CompilerServices;
 
 namespace TheOutsider
 {
     public class Texts : UpdatableAndDeletable
     {
+
         public Texts(Room room, Message[] list)
         {
             this.room = room;
@@ -24,7 +26,7 @@ namespace TheOutsider
         {
             base.Update(eu);
 
-            if (!PlayerHooks.PlayerData.TryGetValue(PlayerEx.playerSelf, out var player) || !player.IsMoth)
+            if (room.game.session.characterStats.name != Plugin.SlugName)
             {
                 return;
             }
@@ -72,7 +74,7 @@ namespace TheOutsider
         public IntroText1(Room room): base(room, new Message[] 
             { 
                 Message.NewMessage("While in the air, tap jump to flutter.", 120, 180),
-                Message.NewMessage("[Please do not see echoes in the first rain cycle. This will prevent your game from being saved.]", 120, 180)
+                //Message.NewMessage("[Please do not see echoes in the first rain cycle. This will prevent your game from being saved.]", 120, 180)
             })
 
         {

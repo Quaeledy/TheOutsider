@@ -12,20 +12,9 @@ using Random = UnityEngine.Random;
 
 namespace TheOutsider.Oracle_Hooks
 {
-    class SLOracleHooks : HookBase
+    class SLOracleHooks
     {
-        SLOracleHooks(ManualLogSource log) : base(log)
-        {
-        }
-
-        static public SLOracleHooks Instance(ManualLogSource log = null)
-        {
-            if (_instance == null)
-                _instance = new SLOracleHooks(log);
-            return _instance;
-        }
-
-        public override void OnModsInit(RainWorld rainWorld)
+        public static void Init()
         {
             On.SLOracleBehaviorHasMark.Update += SLOracleBehaviorHasMark_Update;
             On.SLOracleBehaviorHasMark.InitateConversation += SLOracleBehaviorHasMark_InitateConversation;
@@ -35,15 +24,13 @@ namespace TheOutsider.Oracle_Hooks
         }
 
 
-        private void SLOracleBehaviorHasMark_Update(On.SLOracleBehaviorHasMark.orig_Update orig, SLOracleBehaviorHasMark self, bool eu)
+        public static void SLOracleBehaviorHasMark_Update(On.SLOracleBehaviorHasMark.orig_Update orig, SLOracleBehaviorHasMark self, bool eu)
         {
             orig(self, eu);
-
-            if (!PlayerHooks.PlayerData.TryGetValue(PlayerEx.playerSelf, out var player) || !player.IsMoth)
+            if (self.oracle.room.world.game.session.characterStats.name != Plugin.SlugName)
             {
                 return;
             }
-
             if (self.player != null && self.hasNoticedPlayer)
             {
                 if (self.sayHelloDelay < 0)
@@ -64,9 +51,9 @@ namespace TheOutsider.Oracle_Hooks
             }
         }
 
-        private void SLOracleBehaviorHasMark_InitateConversation(On.SLOracleBehaviorHasMark.orig_InitateConversation orig, SLOracleBehaviorHasMark self)
+        public static void SLOracleBehaviorHasMark_InitateConversation(On.SLOracleBehaviorHasMark.orig_InitateConversation orig, SLOracleBehaviorHasMark self)
         {
-            if (!PlayerHooks.PlayerData.TryGetValue(PlayerEx.playerSelf, out var player) || !player.IsMoth)
+            if (self.player.abstractCreature.Room.world.game.session.characterStats.name != Plugin.SlugName)
             {
                 orig(self);
             }
@@ -119,9 +106,9 @@ namespace TheOutsider.Oracle_Hooks
             }
         }
 
-        public bool RainWorldGame_IsMoonActive(On.RainWorldGame.orig_IsMoonActive orig, RainWorldGame self)
+        public static bool RainWorldGame_IsMoonActive(On.RainWorldGame.orig_IsMoonActive orig, RainWorldGame self)
         {
-            if(self.session.characterStats.name.value != "Outsider")
+            if(self.session.characterStats.name != Plugin.SlugName)
             {
                 return(orig(self));
             }
@@ -131,9 +118,9 @@ namespace TheOutsider.Oracle_Hooks
             }
         }
 
-        public bool RainWorldGame_IsMoonHeartActive(On.RainWorldGame.orig_IsMoonHeartActive orig, RainWorldGame self)
+        public static bool RainWorldGame_IsMoonHeartActive(On.RainWorldGame.orig_IsMoonHeartActive orig, RainWorldGame self)
         {
-            if (self.session.characterStats.name.value != "Outsider")
+            if (self.session.characterStats.name != Plugin.SlugName)
             {
                 return(orig(self));
             }
@@ -143,17 +130,14 @@ namespace TheOutsider.Oracle_Hooks
             }
         }
 
-        private void SaveState_ctor(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
+        private static void SaveState_ctor(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
         {
             orig(self, saveStateNumber, progression);
-            if (saveStateNumber.value == "Outsider")
+            if (saveStateNumber == Plugin.SlugName)
             {
                 self.miscWorldSaveData.SLOracleState.neuronsLeft = 7;
                 self.miscWorldSaveData.moonGivenRobe = true;
             }
         }
-
-        static private SLOracleHooks _instance;
-        private bool init = false;
     }
 }
