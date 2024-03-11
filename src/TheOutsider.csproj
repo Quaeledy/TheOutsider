@@ -10,7 +10,7 @@
           <Private>false</Private>
         </Reference>
         <Reference Include="..\lib\Assembly-CSharp-firstpass.dll">
-          <Private>false</Private>
+          <Private>False</Private>
         </Reference>
         <Reference Include="..\lib\BepInEx.dll">
           <Private>false</Private>
@@ -53,12 +53,15 @@
         </Reference>
         <Reference Include="Assembly-CSharp">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="Fisobs">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2920541687\plugins\Fisobs.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.AudioModule">
           <HintPath>..\lib\UnityEngine.AudioModule.dll</HintPath>
+          <Private>False</Private>
         </Reference>
     </ItemGroup>
     
@@ -72,17 +75,5 @@
     <ItemGroup>
       <Folder Include="CustomLore\CustomObject\" />
     </ItemGroup>
-    
-    <Target Name="GenerateMod" AfterTargets="PostBuildEvent">
-		<ItemGroup>
-			<RemovePlugins Include="../mod/plugins/*.dll" />
-		</ItemGroup>
-		<ItemGroup>
-			<CopyPlugins Include="$(TargetPath)" />
-		</ItemGroup>
-		
-        <Delete Files="@(RemovePlugins)" />
-        <Copy SourceFiles="@(CopyPlugins)" DestinationFolder="../mod/plugins/" />
-    </Target>
     
 </Project>

@@ -28,11 +28,12 @@ namespace TheOutsider.Player_Hooks
         public static readonly MenuScene.SceneID Dream_Sleep_Outsider1 = new MenuScene.SceneID("Dream_Sleep_Outsider1", false);
         public static readonly MenuScene.SceneID Dream_Sleep_Outsider2 = new MenuScene.SceneID("Dream_Sleep_Outsider2", false);
         */
+        /*
         private static void DreamsState_StaticEndOfCycleProgress(On.DreamsState.orig_StaticEndOfCycleProgress orig, SaveState saveState, string currentRegion, string denPosition, ref int cyclesSinceLastDream, ref int cyclesSinceLastFamilyDream, ref int cyclesSinceLastGuideDream, ref int inGWOrSHCounter, ref DreamsState.DreamID upcomingDream, ref DreamsState.DreamID eventDream, ref bool everSleptInSB, ref bool everSleptInSB_S01, ref bool guideHasShownHimselfToPlayer, ref int guideThread, ref bool guideHasShownMoonThisRound, ref int familyThread)
         {
             orig(saveState, currentRegion, denPosition, ref cyclesSinceLastDream, ref cyclesSinceLastFamilyDream, ref cyclesSinceLastGuideDream, ref inGWOrSHCounter, ref upcomingDream, ref eventDream, ref everSleptInSB, ref everSleptInSB_S01, ref guideHasShownHimselfToPlayer, ref guideThread, ref guideHasShownMoonThisRound, ref familyThread);
 
-            if (!PlayerHooks.PlayerData.TryGetValue(PlayerEx.playerSelf, out var player) || !player.IsMoth)
+            if (!PlayerHooks.PlayerData.TryGetValue(PlayerEx.playerRef, out var player) || !player.isMoth)
             {
                 return;
             }
@@ -74,6 +75,8 @@ namespace TheOutsider.Player_Hooks
                 return;
             }
         }
+        
+        */
         /*
         public static MenuScene.SceneID DreamScreen_SceneFromDream(On.Menu.DreamScreen.orig_SceneFromDream orig, DreamScreen self, DreamsState.DreamID dreamID)
         {
