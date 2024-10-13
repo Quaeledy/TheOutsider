@@ -70,6 +70,8 @@ namespace TheOutsider
         public int FlareSprite;
         public int swallowtailSprite;
         public int speckleSprite;
+        //手臂替代贴图
+        public int handWingSprite;
 
         //身体部件
         public GenericBodyPart[] wing;
@@ -84,7 +86,7 @@ namespace TheOutsider
         public readonly float swallowTailWidth = 0.4f;
         public float tailTimeAdd;
 
-        public DynamicSoundLoop flyingBuzzSound;
+        //public DynamicSoundLoop flyingBuzzSound;
 
         //梦境相关
         //public DreamStateOverride stateOverride;
@@ -100,12 +102,12 @@ namespace TheOutsider
             }
 
             playerRef = new WeakReference<Player>(player);
-
+            /*
             flyingBuzzSound = new ChunkDynamicSoundLoop(player.bodyChunks[0]);
             flyingBuzzSound.sound = MothEnums.MothBuzz;
             flyingBuzzSound.Pitch = 1f;
             flyingBuzzSound.Volume = 1f;
-
+            */
             wingSpeed = 10;
             upFlightTime = 30;
 

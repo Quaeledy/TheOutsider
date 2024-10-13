@@ -2,11 +2,6 @@
 using MonoMod.Cil;
 using RWCustom;
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
@@ -17,9 +12,10 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using SlugBase.Features;
 using System.Drawing;
+using TheOutsider;
 using TheOutsider.Player_Hooks;
-using SlugBase.DataTypes;
-using Rewired.UI.ControlMapper;
+using System.Numerics;
+using IL.ScavengerCosmetic;
 
 namespace TheOutsider.PlayerGraphics_Hooks
 {
@@ -86,6 +82,13 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         foregroundContainer.RemoveChild(sprite);
                         midgroundContainer.AddChild(sprite);
                     }
+                    //翼手
+                    if (Plugin.optionsMenuInstance.handWing.Value)
+                    {
+                        var sprite = sLeaser.sprites[player.handWingSprite + i];
+                        foregroundContainer.RemoveChild(sprite);
+                        midgroundContainer.AddChild(sprite);
+                    }
                 }
             }
         }
@@ -100,7 +103,6 @@ namespace TheOutsider.PlayerGraphics_Hooks
             }
 
             player.wingSprite = sLeaser.sprites.Length;
-
             Array.Resize(ref sLeaser.sprites, player.wingSprite + 6);
 
             wingAtlas = Futile.atlasManager.LoadAtlas("atlases/mothwings");
@@ -160,6 +162,41 @@ namespace TheOutsider.PlayerGraphics_Hooks
                     }
                 }
             }
+
+
+            //翼手
+            if (Plugin.optionsMenuInstance.handWing.Value)
+            {
+                player.handWingSprite = sLeaser.sprites.Length;
+                Array.Resize(ref sLeaser.sprites, player.handWingSprite + 2);
+                //0 为左手， 1 为右手（与翅膀相反）
+                for (int i = 0; i < 2; i++)
+                {
+                    var hand = sLeaser.sprites[6 - i];
+                    var handWing = sLeaser.sprites[player.handWingSprite + i];
+                    TriangleMesh.Triangle[] tris = new TriangleMesh.Triangle[]
+                        {
+                            new TriangleMesh.Triangle(0, 1, 2),
+                            new TriangleMesh.Triangle(0, 2, 3),
+                            new TriangleMesh.Triangle(0, 3, 4),
+                            new TriangleMesh.Triangle(0, 4, 5)
+                        };
+                    TriangleMesh triangleMesh = new TriangleMesh(hand._element.name, tris, true, true);
+
+                    triangleMesh.UVvertices[0] = 0.2f * hand._element.uvTopLeft + 0.8f * hand._element.uvTopRight;
+                    triangleMesh.UVvertices[2] = hand._element.uvTopRight;
+                    triangleMesh.UVvertices[3] = hand._element.uvBottomRight;
+                    triangleMesh.UVvertices[5] = 0.2f * hand._element.uvBottomLeft + 0.8f * hand._element.uvBottomRight;
+                    triangleMesh.UVvertices[1] = Vector2.Lerp(triangleMesh.UVvertices[0], triangleMesh.UVvertices[2], 0.5f);
+                    triangleMesh.UVvertices[4] = Vector2.Lerp(triangleMesh.UVvertices[3], triangleMesh.UVvertices[5], 0.5f);
+
+                    triangleMesh.alpha = hand.alpha;
+
+                    sLeaser.sprites[player.handWingSprite + i] = triangleMesh;
+                    //sLeaser.sprites[player.handWingSprite + i].anchorX = 0.9f;
+                }
+            }
+            
             self.AddToContainer(sLeaser, rCam, null);
         }
         
@@ -311,8 +348,8 @@ namespace TheOutsider.PlayerGraphics_Hooks
             if (Plugin.optionsMenuInstance.handWing.Value && player.flutterTimeAdd > 0)
             {
                 //0 为左手， 1 为右手（与翅膀相反）
-                self.hands[1].pos = Vector2.Lerp(player.wing[18 * 0 + 1].pos, player.wing[18 * 0 + 2].pos, 0.5f);
-                self.hands[0].pos = Vector2.Lerp(player.wing[18 * 1 + 1].pos, player.wing[18 * 1 + 2].pos, 0.5f);
+                self.hands[1].pos = Vector2.Lerp(Vector2.Lerp(player.wing[18 * 0 + 1].pos, player.wing[18 * 0 + 2].pos, 0.6f), Vector2.Lerp(player.wing[18 * 0 + 4].pos, player.wing[18 * 0 + 3].pos, 0.6f), 0.5f);
+                self.hands[0].pos = Vector2.Lerp(Vector2.Lerp(player.wing[18 * 1 + 1].pos, player.wing[18 * 1 + 2].pos, 0.6f), Vector2.Lerp(player.wing[18 * 1 + 4].pos, player.wing[18 * 1 + 3].pos, 0.6f), 0.5f); ;
                 self.hands[1].mode = Limb.Mode.HuntRelativePosition;
                 self.hands[0].mode = Limb.Mode.HuntRelativePosition;
             }
@@ -531,65 +568,71 @@ namespace TheOutsider.PlayerGraphics_Hooks
                             sLeaser.sprites[player.WingSprite(i, j)].isVisible = true;
                 }
             }
+            //设置图层
+            //俯冲
+            if (bodyRotation < -1.6f || bodyRotation > 1.6f)
+            {
+                sLeaser.sprites[player.WingSprite(1, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
+                sLeaser.sprites[player.WingSprite(1, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 1)]);
+                for (int i = 0; i < 2; i++)
+                {
+                    sLeaser.sprites[player.WingSprite(i, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
+                    sLeaser.sprites[player.WingSprite(i, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(i, 1)]);
+                    sLeaser.sprites[player.WingSprite(i, 2)].isVisible = false;
+                }
+            }
+            //侧飞
+            else if (player.isFlying && (bodyRotation < -0.8f || (bodyRotation < -0.3f && player.flutterTimeAdd <= player.upFlightTime)))
+            {
+                sLeaser.sprites[player.WingSprite(1, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
+                sLeaser.sprites[player.WingSprite(1, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 1)]);
+                sLeaser.sprites[player.WingSprite(1, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 0)]);
+                sLeaser.sprites[player.WingSprite(1, 2)].isVisible = true;
+            }
+            else if (player.isFlying && (bodyRotation > 0.8f || (bodyRotation > 0.3f && player.flutterTimeAdd <= player.upFlightTime)))
+            {
+                sLeaser.sprites[player.WingSprite(0, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
+                sLeaser.sprites[player.WingSprite(0, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 1)]);
+                sLeaser.sprites[player.WingSprite(0, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 0)]);
+                sLeaser.sprites[player.WingSprite(0, 2)].isVisible = true;
+            }
+            //侧身
+            else if (!player.isFlying && bodyRotation < -0.3f && bodyRotation > -1f)
+            {
+                sLeaser.sprites[player.WingSprite(1, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
+                sLeaser.sprites[player.WingSprite(1, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 1)]);
+                sLeaser.sprites[player.WingSprite(1, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 0)]);
+                sLeaser.sprites[player.WingSprite(1, 2)].isVisible = true;
+            }
+            else if (!player.isFlying && bodyRotation > 0.3f && bodyRotation < 1f)
+            {
+                sLeaser.sprites[player.WingSprite(0, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
+                sLeaser.sprites[player.WingSprite(0, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 1)]);
+                sLeaser.sprites[player.WingSprite(0, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 0)]);
+                sLeaser.sprites[player.WingSprite(0, 2)].isVisible = true;
+            }
+            //平飞
             else
             {
-                //设置图层
-                //俯冲
-                if (bodyRotation < -1.6f || bodyRotation > 1.6f)
+                for (int i = 0; i < 2; i++)
                 {
-                    sLeaser.sprites[player.WingSprite(1, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
-                    sLeaser.sprites[player.WingSprite(1, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 1)]);
-                    for (int i = 0; i < 2; i++)
+                    //让翅膀移到身体后
+                    for (int j = 0; j < 3; j++)
                     {
-                        sLeaser.sprites[player.WingSprite(i, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
-                        sLeaser.sprites[player.WingSprite(i, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(i, 1)]);
-                        sLeaser.sprites[player.WingSprite(i, 2)].isVisible = false;
+                        sLeaser.sprites[player.WingSprite(i, j)].MoveBehindOtherNode(sLeaser.sprites[0]);
                     }
+                    //让外层翅膀移到内层翅膀后
+                    sLeaser.sprites[player.WingSprite(i, 1)].MoveBehindOtherNode(sLeaser.sprites[player.WingSprite(i, 0)]);
+                    sLeaser.sprites[player.WingSprite(i, 2)].isVisible = true;
                 }
-                //侧飞
-                else if (player.isFlying && (bodyRotation < -0.8f || (bodyRotation < -0.3f && player.flutterTimeAdd <= player.upFlightTime)))
+            }
+            //翼手
+            if (Plugin.optionsMenuInstance.handWing.Value)
+            {
+                //让手移到翅膀前
+                for (int i = 0; i < 2; i++)
                 {
-                    sLeaser.sprites[player.WingSprite(1, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
-                    sLeaser.sprites[player.WingSprite(1, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 1)]);
-                    sLeaser.sprites[player.WingSprite(1, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 0)]);
-                    sLeaser.sprites[player.WingSprite(1, 2)].isVisible = true;
-                }
-                else if (player.isFlying && (bodyRotation > 0.8f || (bodyRotation > 0.3f && player.flutterTimeAdd <= player.upFlightTime)))
-                {
-                    sLeaser.sprites[player.WingSprite(0, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
-                    sLeaser.sprites[player.WingSprite(0, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 1)]);
-                    sLeaser.sprites[player.WingSprite(0, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 0)]);
-                    sLeaser.sprites[player.WingSprite(0, 2)].isVisible = true;
-                }
-                //侧身
-                else if (!player.isFlying && bodyRotation < -0.3f && bodyRotation > -1f)
-                {
-                    sLeaser.sprites[player.WingSprite(1, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
-                    sLeaser.sprites[player.WingSprite(1, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 1)]);
-                    sLeaser.sprites[player.WingSprite(1, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(1, 0)]);
-                    sLeaser.sprites[player.WingSprite(1, 2)].isVisible = true;
-                }
-                else if (!player.isFlying && bodyRotation > 0.3f && bodyRotation < 1f)
-                {
-                    sLeaser.sprites[player.WingSprite(0, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
-                    sLeaser.sprites[player.WingSprite(0, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 1)]);
-                    sLeaser.sprites[player.WingSprite(0, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(0, 0)]);
-                    sLeaser.sprites[player.WingSprite(0, 2)].isVisible = true;
-                }
-                //平飞
-                else
-                {
-                    for (int i = 0; i < 2; i++)
-                    {
-                        //让翅膀移到身体后
-                        for (int j = 0; j < 3; j++)
-                        {
-                            sLeaser.sprites[player.WingSprite(i, j)].MoveBehindOtherNode(sLeaser.sprites[0]);
-                        }
-                        //让外层翅膀移到内层翅膀后
-                        sLeaser.sprites[player.WingSprite(i, 1)].MoveBehindOtherNode(sLeaser.sprites[player.WingSprite(i, 0)]);
-                        sLeaser.sprites[player.WingSprite(i, 2)].isVisible = true;
-                    }
+                    sLeaser.sprites[player.handWingSprite + i].MoveInFrontOfOtherNode(sLeaser.sprites[player.WingSprite(i, 2)]);
                 }
             }
         }
@@ -670,6 +713,59 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 if (player.isFlying)
                 {
                     sLeaser.sprites[4].SetPosition(sLeaser.sprites[4].GetPosition().x, sLeaser.sprites[4].GetPosition().y + 4f * Mathf.Abs(Mathf.Sin(bodyRotation)));
+                }
+
+                //翼手
+                if (Plugin.optionsMenuInstance.handWing.Value)
+                {
+                    //0 为左手， 1 为右手（与翅膀相反）
+                    var hand = sLeaser.sprites[6 - i];
+                    var handWing = sLeaser.sprites[player.handWingSprite + i] as TriangleMesh;
+                    var innerWing = sLeaser.sprites[player.WingSprite(i, 0)] as TriangleMesh;
+                    var outerWing = sLeaser.sprites[player.WingSprite(i, 1)] as TriangleMesh;
+                    handWing.color = hand.color;
+                    if (player.isFlying)
+                    {
+                        //手部的贴图扭曲
+                        string[] names = handWing._element.name.Split('_');
+                        string name = handWing._element.name.Replace(names[names.Length - 1], hand._element.name);
+                        int num = 12;
+                        float scale = 0.8f;
+                        if (int.TryParse(hand._element.name.Substring(hand._element.name.IndexOf("PlayerArm") + 9), out num))
+                        {
+                            scale = 0.9f - 0.008f * num;
+                        }
+                        if (handWing._element.atlas._elementsByName.ContainsKey(name))
+                        {
+                            hand.isVisible = false;
+                            handWing.isVisible = true;
+                            //更换贴图
+                            handWing._element = handWing._element.atlas._elementsByName[name];
+                            handWing.UVvertices[0] = Vector2.Lerp(handWing._element.uvTopLeft, handWing._element.uvTopRight, scale);
+                            handWing.UVvertices[2] = handWing._element.uvTopRight;
+                            handWing.UVvertices[3] = handWing._element.uvBottomRight;
+                            handWing.UVvertices[5] = Vector2.Lerp(handWing._element.uvBottomLeft, handWing._element.uvBottomRight, scale);
+                            handWing.UVvertices[1] = Vector2.Lerp(handWing.UVvertices[0], handWing.UVvertices[2], 0.5f);
+                            handWing.UVvertices[4] = Vector2.Lerp(handWing.UVvertices[3], handWing.UVvertices[5], 0.5f);
+                            //移动位置
+                            handWing.MoveVertice(0, sLeaser.sprites[0].GetPosition() + 2.0f * (innerWing.vertices[0] - sLeaser.sprites[0].GetPosition()) + 1.25f * dif * Custom.LerpMap(Mathf.Abs(bodyRotation), 0f, 3.1415f, 1f, 0f));
+                            handWing.MoveVertice(5, innerWing.vertices[0] + 2.0f * (innerWing.vertices[5] - innerWing.vertices[0]) - 0.5f * dif * Custom.LerpMap(Mathf.Abs(bodyRotation), 0f, 3.1415f, 1f, 0f));
+                            handWing.MoveVertice(1, handWing.vertices[0] + 1.3f * (innerWing.vertices[1] - innerWing.vertices[0]));//innerWing.vertices[1] - innerWing.vertices[0]: 1.5f * Wing.innerWing + Custom.RNV() * Random.value * 1f
+                            handWing.MoveVertice(2, handWing.vertices[1] + 4.0f * (innerWing.vertices[2] - innerWing.vertices[1]));//innerWing.vertices[2] - innerWing.vertices[1]: 0.5f * Wing.outerWing + Custom.RNV() * Random.value * 1f
+                            handWing.MoveVertice(4, handWing.vertices[5] + 2.5f * (outerWing.vertices[4] - outerWing.vertices[5]));//outerWing.vertices[4] - outerWing.vertices[5]: Wing.innerWing
+                            handWing.MoveVertice(3, handWing.vertices[4] + 2.5f * (innerWing.vertices[4] - innerWing.vertices[5]));//innerWing.vertices[4] - innerWing.vertices[5]: Wing.outerWing
+                        }
+                        else
+                        {
+                            hand.isVisible = true;
+                            handWing.isVisible = false;
+                        }
+                    }
+                    else if (player.flightTime == -1)
+                    {
+                        hand.isVisible = true;
+                        handWing.isVisible = false;
+                    }
                 }
             }
 

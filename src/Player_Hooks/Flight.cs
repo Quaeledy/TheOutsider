@@ -64,7 +64,7 @@ namespace TheOutsider.Player_Hooks
                 //如果正在飞行
                 if (player.isFlying)
                 {
-                    player.flyingBuzzSound.Volume = Mathf.Lerp(0.8f, 0.5f, player.flightTime / (4 * flightKickinDuration));
+                    //player.flyingBuzzSound.Volume = Mathf.Lerp(0.8f, 0.5f, player.flightTime / (4 * flightKickinDuration));
 
                     player.flightTime++;
 
@@ -101,7 +101,7 @@ namespace TheOutsider.Player_Hooks
                 }
                 else
                 {
-                    player.flyingBuzzSound.Volume = 0f;
+                    //player.flyingBuzzSound.Volume = 0f;
 
                     if (FlyKeyCode(self) && player.CanSustainFlight(self, player))
                     {
@@ -118,7 +118,7 @@ namespace TheOutsider.Player_Hooks
                 player.preventGrabs--;
             }
 
-            player.flyingBuzzSound.Update();
+            //player.flyingBuzzSound.Update();
 
 
             //player.MothSwallowTail(self.graphicsModule as PlayerGraphics);

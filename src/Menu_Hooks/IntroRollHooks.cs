@@ -7,7 +7,7 @@ using RWCustom;
 using MoreSlugcats;
 using BepInEx.Logging;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
+//using Debug = UnityEngine.Debug;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using Menu;

@@ -8,10 +8,9 @@ using RWCustom;
 using Expedition;
 using Random = UnityEngine.Random;
 using MoreSlugcats;
-using static MonoMod.InlineRT.MonoModRule;
 using System.Security.Permissions;
 using SlugBase.Features;
-using TheOutsider.EmgTx;
+//using TheOutsider.EmgTx;
 
 namespace TheOutsider.Player_Hooks
 {

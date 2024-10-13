@@ -399,3 +399,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /mod
+/Mod简介.docx
+/OutputPalettes - 快捷方式.lnk
+/try-convert.exe - 快捷方式.lnk

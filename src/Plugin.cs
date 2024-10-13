@@ -10,11 +10,12 @@ using TheOutsider.World_Hooks;
 using TheOutsider.Player_Hooks;
 using TheOutsider.PlayerGraphics_Hooks;
 using TheOutsider.Oracle_Hooks;
+/*
 using TheOutsider.CustomLore.CustomOracle;
 using TheOutsider.CustomLore.CustomDream;
 using TheOutsider.CustomLore.CustomCreature;
 using TheOutsider.CustomOracleTx;
-using TheOutsider.CustomDreamTx;
+using TheOutsider.CustomDreamTx;*/
 using TheOutsider.Menu_Hooks;
 
 [module: UnverifiableCode]
@@ -24,7 +25,7 @@ using TheOutsider.Menu_Hooks;
 
 namespace TheOutsider
 {
-    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.8")]
+    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.11")]
     public class Plugin : BaseUnityPlugin
     {
         static public readonly string MOD_ID = "Quaeledy.outsider";
@@ -37,7 +38,7 @@ namespace TheOutsider
             //On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             // Put your custom hooks here!
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit);
-            CreatureTemplateType.RegisterValues();
+            //CreatureTemplateType.RegisterValues();
         }
 
         public static readonly PlayerFeature<bool> IsOutsider = FeatureTypes.PlayerBool("TheOutsider/is_outsider");
@@ -95,12 +96,12 @@ namespace TheOutsider
 
         public static void Log(string m)
         {
-            Debug.Log("[Outsider] " + m);
+            UnityEngine.Debug.Log("[Outsider] " + m);
         }
 
         public static void Log(string f, params object[] args)
         {
-            Debug.Log("[Outsider] " + string.Format(f, args));
+            UnityEngine.Debug.Log("[Outsider] " + string.Format(f, args));
         }
 
         // Load any resources, such as sprites or sounds

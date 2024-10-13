@@ -6,74 +6,83 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <Reference Include="..\lib\0Harmony.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\Assembly-CSharp-firstpass.dll">
+        <Reference Include="Assembly-CSharp-firstpass">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
           <Private>False</Private>
         </Reference>
-        <Reference Include="..\lib\BepInEx.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\HOOKS-Assembly-CSharp.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\Mono.Cecil.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\Mono.Cecil.Rocks.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\MonoMod.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\MonoMod.RuntimeDetour.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\MonoMod.Utils.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\SlugBase.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\UnityEngine.AssetBundleModule.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\UnityEngine.CoreModule.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\UnityEngine.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\UnityEngine.InputLegacyModule.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="..\lib\UnityEngine.UIElementsModule.dll">
-          <Private>false</Private>
-        </Reference>
-        <Reference Include="Assembly-CSharp">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+        <Reference Include="BepInEx">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="Fisobs">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2920541687\plugins\Fisobs.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="HOOKS-Assembly-CSharp">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Mono.Cecil">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Mono.Cecil.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Mono.Cecil.Rocks">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Mono.Cecil.Rocks.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="MonoMod.Common">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.Common.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="MonoMod.RuntimeDetour">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.RuntimeDetour.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="MonoMod.Utils">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.Utils.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="SlugBase">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2933196558\newest\plugins\SlugBase.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Unity.Mathematics">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Unity.Mathematics.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="UnityEngine.AudioModule">
-          <HintPath>..\lib\UnityEngine.AudioModule.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
     </ItemGroup>
     
     <ItemGroup>
+      <Compile Remove="CustomLore\**" />
+      <Compile Remove="EmgTx\**" />
       <Compile Remove="World_Hooks\Creature\**" />
+      <EmbeddedResource Remove="CustomLore\**" />
+      <EmbeddedResource Remove="EmgTx\**" />
       <EmbeddedResource Remove="World_Hooks\Creature\**" />
+      <None Remove="CustomLore\**" />
+      <None Remove="EmgTx\**" />
       <None Remove="World_Hooks\Creature\**" />
       <Reference Remove="World_Hooks\Creature\**" />
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="CustomLore\CustomObject\" />
     </ItemGroup>
     
 </Project>
