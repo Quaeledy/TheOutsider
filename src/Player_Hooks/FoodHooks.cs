@@ -284,7 +284,7 @@ namespace TheOutsider.Player_Hooks
 
         public static void PlayerGraphics_Update_Swallow(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
         {
-            if (!PlayerHooks.PlayerData.TryGetValue(self.player, out var player) || !player.IsOutsider)
+            if (PlayerHooks.PlayerData.TryGetValue(self.player, out var player)
             {
                 orig(self);
             }

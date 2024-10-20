@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MoreSlugcats;
+using MonoMod.RuntimeDetour;
+using TheOutsider.World_Hooks;
 
 namespace TheOutsider.CustomLore.CustomCreature
 {
@@ -11,7 +14,8 @@ namespace TheOutsider.CustomLore.CustomCreature
     {
         public static void RegisterValues()
         {
-            Content.Register(new QuetzalcoatlCritob());
+            //Content.Register(new QuetzalcoatlCritob());
+            Content.Register(new MothPupCritob());
             /*
             Quetzalcoatl = new CreatureTemplate.Type("Quetzalcoatl", true);
             GuardQuetzalcoatl = new CreatureTemplate.Type("GuardQuetzalcoatl", true);
@@ -23,6 +27,8 @@ namespace TheOutsider.CustomLore.CustomCreature
             CoralMatrix = new CreatureTemplate.Type("CoralMatrix", true);
             FluorescentButterfly = new CreatureTemplate.Type("FluorescentButterfly", true);*/
         }
+
+
         /*
         public static void UnregisterValues()
         {

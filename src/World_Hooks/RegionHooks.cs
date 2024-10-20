@@ -243,7 +243,7 @@ namespace TheOutsider.World_Hooks
         public static string[] SlugcatStats_getSlugcatStoryRegions(On.SlugcatStats.orig_getSlugcatStoryRegions orig, SlugcatStats.Name i)
         {
             string[] result = orig(i);
-            if (i.value == "Outsider")
+            if (i.value == Plugin.SlugName.value)
             {
                 result = new string[]
                 {
@@ -266,7 +266,7 @@ namespace TheOutsider.World_Hooks
 
         public static string Region_GetProperRegionAcronym(On.Region.orig_GetProperRegionAcronym orig, SlugcatStats.Name character, string baseAcronym)
         {
-            if(character.value != "Outsider")
+            if(character.value != Plugin.SlugName.value)
             {
                 return(orig(character, baseAcronym));
             }

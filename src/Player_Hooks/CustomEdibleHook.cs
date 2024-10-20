@@ -117,9 +117,12 @@ namespace TheOutsider.Player_Hooks
                 c.Emit(OpCodes.Ldloc_S, (byte)13);
                 c.EmitDelegate<Func<Player, int, bool>>((self, index) =>
                 {
-                    if (CustomEdible.edibleDatas.ContainsKey(self.slugcatStats.name) &&
+                    if ((CustomEdible.edibleDatas.ContainsKey(self.slugcatStats.name) &&
                         CustomEdible.edibleDatas[self.slugcatStats.name].edibleDatas.Any(i =>
-                            i.forbidType == self.grasps[index].grabbed.abstractPhysicalObject.type))
+                            i.forbidType == self.grasps[index].grabbed.abstractPhysicalObject.type)) ||
+                        (AdditionalConditions(self) != null && 
+                        CustomEdible.edibleDatas[AdditionalConditions(self)].edibleDatas.Any(i =>
+                            i.forbidType == self.grasps[index].grabbed.abstractPhysicalObject.type)))
                         return false;
                     return true;
                 });
@@ -138,7 +141,7 @@ namespace TheOutsider.Player_Hooks
             }
         }
 
-        static bool EdibleForCat(Player player, int index)
+        private static bool EdibleForCat(Player player, int index)
         {
             if (!CustomEdible.edibleDatas.ContainsKey(player.slugcatStats.name))
                 return false;
@@ -153,6 +156,14 @@ namespace TheOutsider.Player_Hooks
 
             return false;
         }
+
+        private static SlugcatStats.Name? AdditionalConditions(Player player)
+        {
+            if(PlayerHooks.PlayerData.TryGetValue(player, out var playerEX))
+                return Plugin.SlugName;
+            return null;
+        }
+
         private static void Player_BiteEdibleObject(On.Player.orig_BiteEdibleObject orig, Player self, bool eu)
         {
             bool canBitOther = self.grasps.All(i => !(i?.grabbed is IPlayerEdible));
@@ -194,7 +205,6 @@ namespace TheOutsider.Player_Hooks
                 }
             }
         }
-
     }
 }
 

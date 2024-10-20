@@ -12,13 +12,13 @@ using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using TheOutsider.Player_Hooks;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
+using CoralBrain;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -45,72 +45,72 @@ namespace TheOutsider.Player_Hooks
             /*
             if (player.CanFly)
             {*/
-                if (self.animation == Player.AnimationIndex.HangFromBeam || self.animation == Player.AnimationIndex.SurfaceSwim)
+            if (self.animation == Player.AnimationIndex.HangFromBeam || self.animation == Player.AnimationIndex.SurfaceSwim)
+            {
+                player.preventFlight = 15;
+            }
+            else if (self.bodyMode == Player.BodyModeIndex.WallClimb)
+            {
+                player.preventFlight = 10;//下次试试 8，或者更少
+            }
+            else if (player.preventFlight > 0)
+            {
+                player.preventFlight--;
+            }
+
+            //设置加速度
+            FlightAcceleration(self, player);
+
+            //如果正在飞行
+            if (player.isFlying)
+            {
+                //player.flyingBuzzSound.Volume = Mathf.Lerp(0.8f, 0.5f, player.flightTime / (4 * flightKickinDuration));
+
+                player.flightTime++;
+
+                if (flightGravity < 0.9f && player.flightTime >= 0.5f * player.upFlightTime)
                 {
-                    player.preventFlight = 15;
+                    flightGravity += 0.05f * (player.flightTime - 0.5f * player.upFlightTime);
                 }
-                else if (self.bodyMode == Player.BodyModeIndex.WallClimb)
+
+                self.AerobicIncrease(0.08f);
+
+                self.gravity = Mathf.Lerp(normalGravity, flightGravity, player.flightTime / flightKickinDuration);
+                self.airFriction = Mathf.Lerp(normalAirFriction, flightAirFriction, player.flightTime / flightKickinDuration);
+
+                PlayerState playerState = self.abstractCreature.world.game.Players.Count == 1 ?
+                                  self.playerState :
+                                  self.abstractCreature.world.game.Players[0].state as PlayerState;
+
+                if (FlyKeyCode(self) && player.flightTime >= player.upFlightTime && (self.FoodInStomach > 0 || playerState.quarterFoodPoints > 0 || Plugin.optionsMenuInstance.infiniteFlight.Value))
                 {
-                    player.preventFlight = 10;//下次试试 8，或者更少
-                }
-                else if (player.preventFlight > 0)
-                {
-                    player.preventFlight--;
-                }
-
-                //设置加速度
-                FlightAcceleration(self, player);
-
-                //如果正在飞行
-                if (player.isFlying)
-                {
-                    //player.flyingBuzzSound.Volume = Mathf.Lerp(0.8f, 0.5f, player.flightTime / (4 * flightKickinDuration));
-
-                    player.flightTime++;
-
-                    if (flightGravity < 0.9f && player.flightTime >= 0.5f * player.upFlightTime)
+                    //消耗饱食度飞行
+                    if (!Plugin.optionsMenuInstance.infiniteFlight.Value)
                     {
-                        flightGravity += 0.05f * (player.flightTime - 0.5f * player.upFlightTime);
+                        FoodConsumption(self, player);
                     }
-
-                    self.AerobicIncrease(0.08f);
-
-                    self.gravity = Mathf.Lerp(normalGravity, flightGravity, player.flightTime / flightKickinDuration);
-                    self.airFriction = Mathf.Lerp(normalAirFriction, flightAirFriction, player.flightTime / flightKickinDuration);
-
-                    PlayerState playerState = self.abstractCreature.world.game.Players.Count == 1 ?
-                                      self.playerState :
-                                      self.abstractCreature.world.game.Players[0].state as PlayerState;
-
-                    if (FlyKeyCode(self) && player.flightTime >= player.upFlightTime && (self.FoodInStomach > 0 || playerState.quarterFoodPoints > 0 || Plugin.optionsMenuInstance.infiniteFlight.Value))
+                    else
                     {
-                        //消耗饱食度飞行
-                        if (!Plugin.optionsMenuInstance.infiniteFlight.Value)
-                        {
-                            FoodConsumption(self, player);
-                        }
-                        else
-                        {
-                            player.flightTime = 0;
-                            player.flyEnergy += 50f;
-                        }
+                        player.flightTime = 0;
+                        player.flyEnergy += 50f;
                     }
-                    
-                    //飞行速度
-                    FlightSpeed(self, player);
                 }
-                else
+
+                //飞行速度
+                FlightSpeed(self, player);
+            }
+            else
+            {
+                //player.flyingBuzzSound.Volume = 0f;
+
+                if (FlyKeyCode(self) && player.CanSustainFlight(self, player))
                 {
-                    //player.flyingBuzzSound.Volume = 0f;
-
-                    if (FlyKeyCode(self) && player.CanSustainFlight(self, player))
-                    {
-                        player.InitiateFlight(self, player);
-                    }
-
-                    self.airFriction = normalAirFriction;
-                    self.gravity = normalGravity;
+                    player.InitiateFlight(self, player);
                 }
+
+                self.airFriction = normalAirFriction;
+                self.gravity = normalGravity;
+            }
             //}
 
             if (player.preventGrabs > 0)
@@ -160,7 +160,7 @@ namespace TheOutsider.Player_Hooks
         private static void FoodConsumption(Player self, PlayerEx player)
         {
 
-            PlayerState playerState = self.abstractCreature.world.game.Players.Count == 1 ?
+            PlayerState playerState = self.abstractCreature.world.game.Players.Count == 1 || player.isMothNPC ?
                                       self.playerState :
                                       self.abstractCreature.world.game.Players[0].state as PlayerState;
 

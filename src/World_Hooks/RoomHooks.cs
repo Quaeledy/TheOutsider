@@ -225,7 +225,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self);
 
-            if(self.room.game.session.characterStats.name.value == "Outsider")
+            if(self.room.game.session.characterStats.name == Plugin.SlugName)
             {
                 if(self.room.world.region.name == "DS" && self.room.waterObject != null)
                 {
@@ -240,7 +240,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self);
 
-            if (self.water.room.game.session.characterStats.name.value == "Outsider")
+            if (self.water.room.game.session.characterStats.name == Plugin.SlugName)
             {
                 if (self.water.room.game.world.region.name == "DS")
                     self.amount = 0;
@@ -251,7 +251,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
 
-            if (self.room.game.session.characterStats.name.value == "Outsider")
+            if (self.room.game.session.characterStats.name == Plugin.SlugName)
             {
                 if (self.room.world.region.name == "DS" && !self.room.IsGateRoom())
                 {
@@ -267,7 +267,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self, eu);
 
-            if (!ModManager.MSC || self.room.world.game.session.characterStats.name.value != "Outsider")
+            if (!ModManager.MSC || self.room.world.game.session.characterStats.name.value != Plugin.SlugName.value)
             {
                 return;
             }
@@ -283,7 +283,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self, eu);
 
-            if (!ModManager.MSC || self.room.world.game.session.characterStats.name.value != "Outsider")
+            if (!ModManager.MSC || self.room.world.game.session.characterStats.name.value != Plugin.SlugName.value)
             {
                 return;
             }
@@ -295,7 +295,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self, time);
             
-            if (ModManager.MSC && self.realizedCreature == null && self.Hypothermia < 1f && self.world.game.IsStorySession && self.world.game.session.characterStats.name.value == "Outsider")
+            if (ModManager.MSC && self.realizedCreature == null && self.Hypothermia < 1f && self.world.game.IsStorySession && self.world.game.session.characterStats.name == Plugin.SlugName)
             {
                 if (self.world.region.name != "SL" && self.world.region.name != "MS")
                 {
@@ -314,7 +314,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self, game, world, abstractRoom);
 
-            if (self.game.session.characterStats.name.value == "Outsider")
+            if (self.game.session.characterStats.name == Plugin.SlugName)
             {
 
             }

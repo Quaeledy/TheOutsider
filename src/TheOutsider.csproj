@@ -14,6 +14,9 @@
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="EmgTx">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2991981689\newest\plugins\EmgTx.dll</HintPath>
+        </Reference>
         <Reference Include="Fisobs">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2920541687\plugins\Fisobs.dll</HintPath>
           <Private>False</Private>
@@ -75,12 +78,15 @@
     <ItemGroup>
       <Compile Remove="CustomLore\**" />
       <Compile Remove="EmgTx\**" />
+      <Compile Remove="MothPup\**" />
       <Compile Remove="World_Hooks\Creature\**" />
       <EmbeddedResource Remove="CustomLore\**" />
       <EmbeddedResource Remove="EmgTx\**" />
+      <EmbeddedResource Remove="MothPup\**" />
       <EmbeddedResource Remove="World_Hooks\Creature\**" />
       <None Remove="CustomLore\**" />
       <None Remove="EmgTx\**" />
+      <None Remove="MothPup\**" />
       <None Remove="World_Hooks\Creature\**" />
       <Reference Remove="World_Hooks\Creature\**" />
     </ItemGroup>

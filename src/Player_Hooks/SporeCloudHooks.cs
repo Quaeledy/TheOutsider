@@ -13,9 +13,7 @@ namespace TheOutsider.Player_Hooks
 {
     public class SporeCloudHooks
     {
-        static bool init = false;
-
-        public static void Update(On.SporeCloud.orig_Update orig, SporeCloud self, bool eu)
+        public static void SporeCloud_Update(On.SporeCloud.orig_Update orig, SporeCloud self, bool eu)
         {
             orig(self, eu);
             
@@ -31,14 +29,15 @@ namespace TheOutsider.Player_Hooks
                         {
                             if (self.room.abstractRoom.creatures[i].realizedCreature != null)
                             {
-                                if (self.room.abstractRoom.creatures[i].realizedCreature is Player && (self.room.abstractRoom.creatures[i].realizedCreature as Player).slugcatStats.name == Plugin.SlugName)
+                                if (self.room.abstractRoom.creatures[i].realizedCreature is Player && PlayerHooks.PlayerData.TryGetValue(self.room.abstractRoom.creatures[i].realizedCreature as Player, out var player))
                                 {
                                     if (Custom.DistLess(self.pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, self.rad + self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.rad + 20f))
                                     {
-                                        if (!init)
+                                        if (!player.deadForSporeCloud)
                                         {
                                             self.room.abstractRoom.creatures[i].realizedCreature.Die();
-                                            init = true;
+                                            player.deadForSporeCloudCount = 40;
+                                            player.deadForSporeCloud = true;
                                         }
                                     }
                                 }
@@ -47,6 +46,22 @@ namespace TheOutsider.Player_Hooks
                     }
                 }
             }
+        }
+
+
+        public static void Player_Update(On.Player.orig_UpdateMSC orig, Player self)
+        {
+            orig(self);
+
+            if (!PlayerHooks.PlayerData.TryGetValue(self, out var player) || !player.IsOutsider)
+            {
+                return;
+            }
+
+            if (player.deadForSporeCloudCount > 0)
+                player.deadForSporeCloudCount--;
+            else
+                player.deadForSporeCloud = false;
         }
     }
 }

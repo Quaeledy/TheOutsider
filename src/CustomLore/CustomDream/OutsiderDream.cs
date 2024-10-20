@@ -1,4 +1,4 @@
-﻿using TheOutsider.CustomDreamTx;
+﻿using CustomDreamTx;
 using UnityEngine;
 using System;
 using System.Collections.Generic;

@@ -7,28 +7,43 @@ using Random = UnityEngine.Random;
 using SlugBase.DataTypes;
 using BepInEx.Logging;
 using System.Collections.Generic;
+using MoreSlugcats;
+using RWCustom;
 
 namespace TheOutsider
 {
     public class PlayerEx
     {
-        public static WeakReference<Player> playerRef;
+        public WeakReference<Player> playerRef;
         //public WeakReference<PlayerGraphics> iGraphicsRef; 
         
-        public readonly bool IsOutsider;
-        public readonly bool isOutsider;
+        public bool IsOutsider
+        {
+            get
+            {
+                if (playerRef.TryGetTarget(out Player player))
+                    return player.SlugCatClass == Plugin.SlugName || player.SlugCatClass == Plugin.MothPup || isMothNPC;
+                else
+                    return false;
+            }
+        }
+
+        public bool isMothNPC;
 
         
         public float flutterTimeAdd;
         public readonly float wingSpeed;
         public readonly float upFlightTime;
-        //public bool CanFly => wingSpeed > 0;
         public int preventGrabs;
         public bool isFlying;
         public int flightTime;
         public int preventFlight;
         public int lastTail;
         public bool shouldResetDisplayQuarterFood;
+
+        //烟雾果毒性
+        public bool deadForSporeCloud;
+        public int deadForSporeCloudCount;
 
         //加速度
         public float ax;
@@ -76,13 +91,13 @@ namespace TheOutsider
         //身体部件
         public GenericBodyPart[] wing;
         public GenericBodyPart[] antennae;
-        public TailSegment[] swallowtail;
+        public TailSegment[,] swallowtail;
 
         public Vector2 lastAntennaePos;
 
         public int tailN;
         public readonly float swallowTailSpacing = 6f;
-        public readonly float MaxLength = 9f;
+        public readonly float MaxLength = 10f;
         public readonly float swallowTailWidth = 0.4f;
         public float tailTimeAdd;
 
@@ -93,15 +108,13 @@ namespace TheOutsider
 
         public PlayerEx(Player player)
         {
-            IsOutsider = Plugin.IsOutsider.TryGet(player, out isOutsider);
-
+            playerRef = new WeakReference<Player>(player);
+            if (player.isNPC)
+                isMothNPC = true;
 
             if (!IsOutsider)
-            {
                 return;
-            }
-
-            playerRef = new WeakReference<Player>(player);
+            
             /*
             flyingBuzzSound = new ChunkDynamicSoundLoop(player.bodyChunks[0]);
             flyingBuzzSound.sound = MothEnums.MothBuzz;
@@ -111,7 +124,7 @@ namespace TheOutsider
             wingSpeed = 10;
             upFlightTime = 30;
 
-            if (player.playerState.isPup)
+            if (player.playerState.isPup || player.isSlugpup)
             {
                 wingLength = 10f;
                 wingWidth = 14f;
@@ -123,6 +136,69 @@ namespace TheOutsider
                 wingWidth = 20f;
                 antennaeLength = 0.3f;
             }
+        }
+
+        public Color GetBodyColor()
+        {
+            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
+                return new Color(40f / 255f, 102f / 255f, 141f / 255f);
+            if (PlayerColor.Body.GetColor(player.graphicsModule as PlayerGraphics) != null)
+                return (Color)PlayerColor.Body.GetColor(player.graphicsModule as PlayerGraphics);
+            return new Color(40f / 255f, 102f / 255f, 141f / 255f);
+        }
+
+        public Color GetEyesColor()
+        {
+            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
+            {
+                if (player.isNPC && Custom.RGB2HSL(player.ShortCutColor()).z < 0.5f)
+                    return new Color(255f / 255f, 255f / 255f, 255f / 255f);
+                else
+                    return new Color(1f / 255f, 1f / 255f, 1f / 255f);
+            }
+            if (PlayerColor.Eyes.GetColor(player.graphicsModule as PlayerGraphics) != null)
+                return (Color)PlayerColor.Eyes.GetColor(player.graphicsModule as PlayerGraphics);
+
+            if (player.isNPC && Custom.RGB2HSL(player.ShortCutColor()).z < 0.5f)
+                return new Color(255f / 255f, 255f / 255f, 255f / 255f);
+            else
+                return new Color(1f / 255f, 1f / 255f, 1f / 255f);
+        }
+
+        public Color GetAntennaeColor()
+        {
+            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
+                return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+            if (Plugin.AntennaeColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
+                return (Color)Plugin.AntennaeColor.GetColor(player.graphicsModule as PlayerGraphics);
+            return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+        }
+
+        public Color GetLepidoticWingColor()
+        {
+            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
+                return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+            if (Plugin.LepidoticWingColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
+                return (Color)Plugin.LepidoticWingColor.GetColor(player.graphicsModule as PlayerGraphics);
+            return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+        }
+
+        public Color GetSpeckleColor()
+        {
+            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
+                return new Color(106f / 255f, 191f / 255f, 229f / 255f);
+            if (Plugin.SpeckleColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
+                return (Color)Plugin.SpeckleColor.GetColor(player.graphicsModule as PlayerGraphics);
+            return new Color(106f / 255f, 191f / 255f, 229f / 255f);
+        }
+
+        public Color GetFlareColor()
+        {
+            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
+                return new Color(106f / 255f, 191f / 255f, 229f / 255f);
+            if (Plugin.FlareColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
+                return (Color)Plugin.FlareColor.GetColor(player.graphicsModule as PlayerGraphics);
+            return new Color(106f / 255f, 191f / 255f, 229f / 255f);
         }
 
         #region 飞行相关
@@ -184,7 +260,7 @@ namespace TheOutsider
         #region 尾巴相关
         public void MothSwallowTail(PlayerGraphics self)
         {
-            bool isPup = self.player.playerState.isPup;
+            bool isPup = self.player.playerState.isPup || self.player.isSlugpup;
 
             if (isPup)
             {
@@ -195,25 +271,25 @@ namespace TheOutsider
                 tailN = 7;
             }
 
-            swallowtail = new TailSegment[2 * tailN];
+            swallowtail = new TailSegment[2, tailN];
             for (int i = 0; i < 2; i++)
             {
                 if (isPup)
                 {
-                    swallowtail[i * 4 + 0] = new TailSegment(self, 5f, 4f * (isPup ? 0.8f : 1f), null, 0.85f, 1f, 3f, true);
-                    swallowtail[i * 4 + 1] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 4 + 0], 0.55f, 1f, 0.5f, true);
-                    swallowtail[i * 4 + 2] = new TailSegment(self, 7f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 4 + 1], 0.55f, 1f, 0.5f, true);
-                    swallowtail[i * 4 + 3] = new TailSegment(self, 6f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 4 + 2], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 0] = new TailSegment(self, 5f, 4f * (isPup ? 0.8f : 1f), null, 0.85f, 1f, 3f, true);
+                    swallowtail[i, 1] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 0], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 2] = new TailSegment(self, 7f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 1], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 3] = new TailSegment(self, 6f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 2], 0.55f, 1f, 0.5f, true);
                 }
                 else
                 {
-                    swallowtail[i * 7 + 0] = new TailSegment(self, 5f, 4f * (isPup ? 0.8f : 1f), null, 0.85f, 1f, 3f, true);
-                    swallowtail[i * 7 + 1] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 7 + 0], 0.55f, 1f, 0.5f, true);
-                    swallowtail[i * 7 + 2] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 7 + 1], 0.55f, 1f, 0.5f, true);
-                    swallowtail[i * 7 + 3] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 7 + 2], 0.55f, 1f, 0.5f, true);
-                    swallowtail[i * 7 + 4] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 7 + 3], 0.55f, 1f, 0.5f, true);
-                    swallowtail[i * 7 + 5] = new TailSegment(self, 7f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 7 + 4], 0.55f, 1f, 0.5f, true);
-                    swallowtail[i * 7 + 6] = new TailSegment(self, 6f, 7f * (isPup ? 0.8f : 1f), swallowtail[i * 7 + 5], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 0] = new TailSegment(self, 5f, 4f * (isPup ? 0.8f : 1f), null, 0.85f, 1f, 3f, true);
+                    swallowtail[i, 1] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 0], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 2] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 1], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 3] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 2], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 4] = new TailSegment(self, 3f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 3], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 5] = new TailSegment(self, 7f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 4], 0.55f, 1f, 0.5f, true);
+                    swallowtail[i, 6] = new TailSegment(self, 6f, 7f * (isPup ? 0.8f : 1f), swallowtail[i, 5], 0.55f, 1f, 0.5f, true);
                 }
             }
         }
@@ -227,6 +303,21 @@ namespace TheOutsider
             {
                 antennae[i] = new GenericBodyPart(self, 1f, 0.5f, 0.9f, self.player.bodyChunks[0]);
             }
+        }
+        #endregion
+
+        #region 猫崽相关
+        public static bool PlayerNPCShouldBeMoth(Player player)
+        {
+            if (player.abstractCreature != null && 
+                player.abstractCreature.world != null && 
+                player.abstractCreature.world.game != null && 
+                player.abstractCreature.world.game.IsStorySession &&
+                (player.abstractCreature.world.game.session.characterStats.name == Plugin.SlugName || player.abstractCreature.world.region.name == "OSAM"))
+            {
+                return true;
+            }
+            return false;
         }
         #endregion
         /*

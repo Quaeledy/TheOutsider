@@ -19,6 +19,7 @@ using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
+using Noise;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -32,15 +33,32 @@ namespace TheOutsider.Player_Hooks
             On.Player.UpdateMSC += Flight.Player_Fly;
             On.Player.UpdateMSC += Flare.Player_Flare;
             On.Player.Jump += JumpHooks.Player_Jump;
-            On.SporeCloud.Update += SporeCloudHooks.Update;
+            On.SporeCloud.Update += SporeCloudHooks.SporeCloud_Update;
+            On.Player.UpdateMSC += SporeCloudHooks.Player_Update;
+            On.Player.NewRoom += Player_NewRoom;
         }
 
         #region Player
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
+            /*
+            if (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))
+                self.SlugCatClass = Plugin.MothPup;*/
+            if ((self.SlugCatClass == Plugin.SlugName || (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))) && 
+                !PlayerData.TryGetValue(self, out _))
+                PlayerData.Add(self, new PlayerEx(self));
+        }
 
-            PlayerData.Add(self, new PlayerEx(self));
+        private static void Player_NewRoom(On.Player.orig_NewRoom orig, Player self, Room newRoom)
+        {
+            orig(self, newRoom);
+
+            if (PlayerData.TryGetValue(self, out var player))
+            {
+                if (self.AI != null)
+                    self.AI.NewRoom(newRoom);
+            }
         }
         #endregion
     }
