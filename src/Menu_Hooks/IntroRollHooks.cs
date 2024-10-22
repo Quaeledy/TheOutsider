@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RWCustom;
-using MoreSlugcats;
-using BepInEx.Logging;
-using UnityEngine;
+﻿using Mono.Cecil.Cil;
 //using Debug = UnityEngine.Debug;
 using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using Menu;
+using System;
 
 namespace TheOutsider.Menu_Hooks
 {
@@ -25,7 +16,7 @@ namespace TheOutsider.Menu_Hooks
         public static ILCursor text;
         public static bool logged;
 
-        public static void IntroRoll_ctorIL(ILContext il) 
+        public static void IntroRoll_ctorIL(ILContext il)
         {
             try
             {

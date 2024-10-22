@@ -1,16 +1,6 @@
-﻿using BepInEx.Logging;
+﻿using MoreSlugcats;
 using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TheOutsider.Oracle_Hooks;
-using UnityEngine;
-using MoreSlugcats;
-using RWCustom;
 using Random = UnityEngine.Random;
-using TheOutsider.Player_Hooks;
 
 namespace TheOutsider.Oracle_Hooks
 {
@@ -22,7 +12,7 @@ namespace TheOutsider.Oracle_Hooks
             On.MoreSlugcats.CLOracleBehavior.InitateConversation += CLOracleBehavior_InitateConversation;
             On.MoreSlugcats.CLOracleBehavior.InterruptRain += CLOracleBehavior_InterruptRain;
         }
-        
+
         public static void CLOracleBehavior_Update(On.MoreSlugcats.CLOracleBehavior.orig_Update orig, CLOracleBehavior self, bool eu)
         {
             if (self.oracle.room.world.game.session.characterStats.name == Plugin.SlugName)
@@ -57,7 +47,7 @@ namespace TheOutsider.Oracle_Hooks
 
             orig(self, eu);
         }
-        
+
         public static void CLOracleBehavior_InitateConversation(On.MoreSlugcats.CLOracleBehavior.orig_InitateConversation orig, CLOracleBehavior self)
         {
             if (self.player.abstractCreature.Room.world.game.session.characterStats.name != Plugin.SlugName)
@@ -114,7 +104,7 @@ namespace TheOutsider.Oracle_Hooks
                         self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad++;
                         return;
                     }
-                    
+
                     else
                     {
                         if (Random.value < 0.15f)

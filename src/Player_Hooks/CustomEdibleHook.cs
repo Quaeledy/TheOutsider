@@ -1,10 +1,8 @@
-﻿using MonoMod.Cil;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace TheOutsider.Player_Hooks
@@ -79,11 +77,19 @@ namespace TheOutsider.Player_Hooks
 
         public static Dictionary<SlugcatStats.Name, CustomEdibleData> edibleDatas =
             new Dictionary<SlugcatStats.Name, CustomEdibleData>();
+
+        public static SlugcatStats.Name? AdditionalConditions(Player player)
+        {
+            if (PlayerHooks.PlayerData.TryGetValue(player, out var playerEX))
+                return Plugin.SlugName;
+            return null;
+        }
     }
 
     static class CustomEdibleHook
     {
-        static bool isLoaded;
+        private static bool isLoaded;
+
         public static void OnModInit()
         {
             if (!isLoaded)
@@ -118,10 +124,11 @@ namespace TheOutsider.Player_Hooks
                 c.EmitDelegate<Func<Player, int, bool>>((self, index) =>
                 {
                     if ((CustomEdible.edibleDatas.ContainsKey(self.slugcatStats.name) &&
-                        CustomEdible.edibleDatas[self.slugcatStats.name].edibleDatas.Any(i =>
+                         CustomEdible.edibleDatas[self.slugcatStats.name].edibleDatas.Any(i =>
                             i.forbidType == self.grasps[index].grabbed.abstractPhysicalObject.type)) ||
-                        (AdditionalConditions(self) != null && 
-                        CustomEdible.edibleDatas[AdditionalConditions(self)].edibleDatas.Any(i =>
+                        (CustomEdible.AdditionalConditions(self) != null &&
+                         CustomEdible.edibleDatas.ContainsKey(CustomEdible.AdditionalConditions(self)) &&
+                         CustomEdible.edibleDatas[CustomEdible.AdditionalConditions(self)].edibleDatas.Any(i =>
                             i.forbidType == self.grasps[index].grabbed.abstractPhysicalObject.type)))
                         return false;
                     return true;
@@ -143,25 +150,22 @@ namespace TheOutsider.Player_Hooks
 
         private static bool EdibleForCat(Player player, int index)
         {
-            if (!CustomEdible.edibleDatas.ContainsKey(player.slugcatStats.name))
+            if (!(CustomEdible.edibleDatas.ContainsKey(player.slugcatStats.name) ||
+                 (CustomEdible.AdditionalConditions(player) != null && CustomEdible.edibleDatas.ContainsKey(CustomEdible.AdditionalConditions(player)))))
                 return false;
             var grasp = player.grasps[index];
 
             if (grasp != null)
             {
-                if (CustomEdible.edibleDatas[player.slugcatStats.name].edibleDatas.
-                    Any(i => i.edibleType == grasp.grabbed.abstractPhysicalObject.type))
+                if ((CustomEdible.edibleDatas.ContainsKey(player.slugcatStats.name) &&
+                     CustomEdible.edibleDatas[player.slugcatStats.name].edibleDatas.Any(i => i.edibleType == grasp.grabbed.abstractPhysicalObject.type)) ||
+                    (CustomEdible.AdditionalConditions(player) != null &&
+                     CustomEdible.edibleDatas.ContainsKey(CustomEdible.AdditionalConditions(player)) &&
+                     CustomEdible.edibleDatas[CustomEdible.AdditionalConditions(player)].edibleDatas.Any(i => i.edibleType == grasp.grabbed.abstractPhysicalObject.type)))
                     return true;
             }
 
             return false;
-        }
-
-        private static SlugcatStats.Name? AdditionalConditions(Player player)
-        {
-            if(PlayerHooks.PlayerData.TryGetValue(player, out var playerEX))
-                return Plugin.SlugName;
-            return null;
         }
 
         private static void Player_BiteEdibleObject(On.Player.orig_BiteEdibleObject orig, Player self, bool eu)
@@ -172,35 +176,54 @@ namespace TheOutsider.Player_Hooks
             {
                 for (int i = 0; i < 2; i++)
                 {
-                    if (self.grasps[i] != null && CustomEdible.edibleDatas.ContainsKey(self.slugcatStats.name) &&
-                        CustomEdible.edibleDatas[self.slugcatStats.name].edibleDatas.
-                            Any(d => d.edibleType == self.grasps[i].grabbed.abstractPhysicalObject.type))
+                    if (self.grasps[i] != null && self.grasps[i].grabbed != null &&
+                        ((CustomEdible.edibleDatas.ContainsKey(self.slugcatStats.name) &&
+                         CustomEdible.edibleDatas[self.slugcatStats.name].edibleDatas.
+                            Any(d => d.edibleType == self.grasps[i].grabbed.abstractPhysicalObject.type)) ||
+                        (CustomEdible.AdditionalConditions(self) != null &&
+                         CustomEdible.edibleDatas.ContainsKey(CustomEdible.AdditionalConditions(self)) &&
+                         CustomEdible.edibleDatas[CustomEdible.AdditionalConditions(self)].edibleDatas.
+                            Any(d => d.edibleType == self.grasps[i].grabbed.abstractPhysicalObject.type))))
                     {
-                        var data = CustomEdible.edibleDatas[self.slugcatStats.name].edibleDatas.
-                            First(d => d.edibleType == self.grasps[i].grabbed.abstractPhysicalObject.type);
-                        if (self.SessionRecord != null)
-                        {
-                            self.SessionRecord.AddEat(self.grasps[i].grabbed);
-                        }
-                        (self.graphicsModule as PlayerGraphics)?.BiteFly(i);
-                        self.AddFood(data.food);
-                        for (int j = 0; j < data.qFood; j++)
-                            self.AddQuarterFood();
                         var obj = self.grasps[i].grabbed;
-                        #region 此处加入离群者特有效果
-                        //吃鞭炮草回复寒冷值
-                        if (obj.abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant)
+                        var slugName = CustomEdible.edibleDatas.ContainsKey(self.slugcatStats.name) ? self.slugcatStats.name : CustomEdible.AdditionalConditions(self);
+                        var data = CustomEdible.edibleDatas[slugName].edibleDatas.First(d => d.edibleType == obj.abstractPhysicalObject.type);
+                        bool eaten = (FoodHooks.PhysicalObjectData.TryGetValue(obj, out var physicalObject) && physicalObject.bitesLeft <= 1) ||
+                                    !FoodHooks.PhysicalObjectData.TryGetValue(obj, out _);
+                        if (eaten)
                         {
-                            self.Hypothermia = Mathf.Min(0, self.Hypothermia - 0.3f);
+                            if (self.SessionRecord != null)
+                                self.SessionRecord.AddEat(obj);
                         }
-                        //吃烟雾果会死
-                        else if (obj.abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.PuffBall && !Plugin.optionsMenuInstance.immuneSporeCloud.Value)
+                        if (self.graphicsModule as PlayerGraphics != null)
+                            (self.graphicsModule as PlayerGraphics).BiteFly(i);
+                        if (FoodHooks.PhysicalObjectData.TryGetValue(obj, out physicalObject))
                         {
-                            self.Die();
+                            physicalObject.bitesLeft--;
+                            self.room.PlaySound(SoundID.Slugcat_Bite_Dangle_Fruit, self.grasps[i].grabbed.firstChunk.pos);
                         }
-                        #endregion
-                        self.grasps[i].Release();
-                        obj.Destroy();
+                        if (eaten)
+                        {
+                            self.AddFood(data.food);
+                            for (int j = 0; j < data.qFood; j++)
+                                self.AddQuarterFood();
+                            #region 此处加入离群者特有效果
+                            //吃鞭炮草回复寒冷值
+                            if (obj.abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant)
+                            {
+                                self.Hypothermia = Mathf.Min(0, self.Hypothermia - 0.3f);
+                            }
+                            //吃烟雾果会死
+                            else if (obj.abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.PuffBall && !Plugin.optionsMenuInstance.immuneSporeCloud.Value)
+                            {
+                                self.Die();
+                            }
+                            #endregion
+                            self.room.PlaySound(SoundID.Slugcat_Eat_Dangle_Fruit, self.grasps[i].grabbed.firstChunk.pos);
+                            self.grasps[i].Release();
+                            obj.Destroy();
+                        }
+                        break;
                     }
                 }
             }

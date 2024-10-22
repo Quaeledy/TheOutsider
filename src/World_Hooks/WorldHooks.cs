@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RWCustom;
-using MoreSlugcats;
-using BepInEx.Logging;
-using UnityEngine;
+﻿using Mono.Cecil.Cil;
 //using Debug = UnityEngine.Debug;
 using MonoMod.Cil;
-using Mono.Cecil.Cil;
+using MoreSlugcats;
+using RWCustom;
+using System;
 
 namespace TheOutsider.World_Hooks
 {
@@ -27,7 +21,7 @@ namespace TheOutsider.World_Hooks
             {
                 ILCursor c = new ILCursor(il);
                 //使轮到非圣徒线的海岸线、沉没巨构回响不会直接返回
-                for(int k = 0; k < 2; k++)
+                for (int k = 0; k < 2; k++)
                 {
                     if (c.TryGotoNext(MoveType.After,
                    (i) => i.MatchLdfld<StoryGameSession>("saveStateNumber"),
@@ -54,8 +48,8 @@ namespace TheOutsider.World_Hooks
                     c.Emit(OpCodes.Ldarg_0);
                     c.EmitDelegate<Func<bool, World, bool>>((shouldSpawnGhost, self) =>
                     {
-                        if (self.game.StoryCharacter != null && 
-                            self.game.StoryCharacter == Plugin.SlugName && 
+                        if (self.game.StoryCharacter != null &&
+                            self.game.StoryCharacter == Plugin.SlugName &&
                             Custom.rainWorld.progression.currentSaveState.cycleNumber == 0)
                         {
                             shouldSpawnGhost = false;

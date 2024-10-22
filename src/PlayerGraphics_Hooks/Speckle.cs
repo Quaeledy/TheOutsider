@@ -1,23 +1,8 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using RWCustom;
+﻿using RWCustom;
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
-using Color = UnityEngine.Color;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using SlugBase.Features;
-using System.Drawing;
 using TheOutsider.Player_Hooks;
+using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
 
 namespace TheOutsider.PlayerGraphics_Hooks
 {

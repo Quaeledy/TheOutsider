@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BepInEx.Logging;
+using HUD;
+using MoreSlugcats;
+using RWCustom;
+using System;
 using TheOutsider.Player_Hooks;
 using UnityEngine;
-using RWCustom;
-using MoreSlugcats;
-using HUD;
-using System.Reflection;
-using BepInEx.Logging;
-using JollyCoop;
-using JollyCoop.JollyHUD;
-using JollyCoop.JollyMenu;
-using SlugBase.Features;
-using System.Runtime.CompilerServices;
 
 namespace TheOutsider.HUD_Hooks
 {

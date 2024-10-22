@@ -1,3 +1,5 @@
 is_global = true
 build_property.RootNamespace = TheOutsider
 build_property.ProjectDir = D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 

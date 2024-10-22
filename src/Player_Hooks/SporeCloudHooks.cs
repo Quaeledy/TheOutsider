@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using MoreSlugcats;
-using RWCustom;
-using Expedition;
-using Random = UnityEngine.Random;
+﻿using RWCustom;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -16,7 +7,7 @@ namespace TheOutsider.Player_Hooks
         public static void SporeCloud_Update(On.SporeCloud.orig_Update orig, SporeCloud self, bool eu)
         {
             orig(self, eu);
-            
+
             if (!Plugin.optionsMenuInstance.immuneSporeCloud.Value)
             {
                 if (!self.nonToxic && self.checkInsectsDelay > -1)
@@ -53,15 +44,13 @@ namespace TheOutsider.Player_Hooks
         {
             orig(self);
 
-            if (!PlayerHooks.PlayerData.TryGetValue(self, out var player) || !player.IsOutsider)
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
-                return;
+                if (player.deadForSporeCloudCount > 0)
+                    player.deadForSporeCloudCount--;
+                else
+                    player.deadForSporeCloud = false;
             }
-
-            if (player.deadForSporeCloudCount > 0)
-                player.deadForSporeCloudCount--;
-            else
-                player.deadForSporeCloud = false;
         }
     }
 }

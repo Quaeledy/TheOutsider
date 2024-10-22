@@ -1,21 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RWCustom;
-using DevInterface;
-using UnityEngine;
-using Random = UnityEngine.Random;
-using MoreSlugcats;
-using Expedition;
 using System.Globalization;
-using TheOutsider.Player_Hooks;
-using System.Runtime.CompilerServices;
-using MonoMod;
-using BepInEx.Logging;
-using MonoMod.RuntimeDetour;
-using System.Reflection;
+using UnityEngine;
 
 namespace TheOutsider.World_Hooks
 {
@@ -64,7 +49,7 @@ namespace TheOutsider.World_Hooks
                     self.effect_darkness = 0.7f;
                     self.effect_desaturation = 0.45f;
                     //没水了
-                    if(self.waterLight != null && !self.room.IsGateRoom())
+                    if (self.waterLight != null && !self.room.IsGateRoom())
                     {
                         self.waterLight.sprite.isVisible = false;
                     }
@@ -130,7 +115,7 @@ namespace TheOutsider.World_Hooks
         public static void Room_Update(On.Room.orig_Update orig, Room self)
         {
             orig(self);
-            
+
             if (self.game.StoryCharacter != null && self.game.StoryCharacter == Plugin.SlugName)
             {
                 //除海岸线、沉没巨构无雪
@@ -262,7 +247,7 @@ namespace TheOutsider.World_Hooks
                 }
             }
         }
-        
+
         public static void DaddyLongLegs_Update(On.DaddyLongLegs.orig_Update orig, DaddyLongLegs self, bool eu)
         {
             orig(self, eu);
@@ -294,7 +279,7 @@ namespace TheOutsider.World_Hooks
         public static void AbstractCreature_Update(On.AbstractCreature.orig_Update orig, AbstractCreature self, int time)
         {
             orig(self, time);
-            
+
             if (ModManager.MSC && self.realizedCreature == null && self.Hypothermia < 1f && self.world.game.IsStorySession && self.world.game.session.characterStats.name == Plugin.SlugName)
             {
                 if (self.world.region.name != "SL" && self.world.region.name != "MS")
@@ -325,7 +310,7 @@ namespace TheOutsider.World_Hooks
             }
         }
         */
-        
+
         //禁用避难所故障
         public static void RainCycle_ctor(On.RainCycle.orig_ctor orig, RainCycle self, World world, float minutes)
         {
@@ -343,7 +328,7 @@ namespace TheOutsider.World_Hooks
                 MoreSlugcats.MoreSlugcats.cfgDisablePrecycles.Value = DisablePrecycles;
             }
         }
-        
+
         public static bool DisableRain(Func<RainWorldGame, bool> orig, RainWorldGame self)
         {
             if (self.world.game.StoryCharacter == Plugin.SlugName)

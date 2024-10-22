@@ -1,27 +1,6 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using RWCustom;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Runtime.CompilerServices;
+﻿using TheOutsider.Player_Hooks;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
-using Color = UnityEngine.Color;
 using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using SlugBase.Features;
-using System.Drawing;
-using TheOutsider.Player_Hooks;
-using System.Security.Permissions;
-using System.Security;
-using System.ComponentModel;
-using IL;
 
 namespace TheOutsider.PlayerGraphics_Hooks
 {
@@ -41,7 +20,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
         private static void PlayerGraphics_Reset(On.PlayerGraphics.orig_Reset orig, PlayerGraphics self)
         {
             orig(self);
-            
+
             if (PlayerHooks.PlayerData.TryGetValue(self.player, out var player))
             {
                 //防止拉丝

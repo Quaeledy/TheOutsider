@@ -1,16 +1,4 @@
-﻿using BepInEx.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TheOutsider.Player_Hooks;
-using RWCustom;
-using MoreSlugcats;
-using UnityEngine;
-using Random = UnityEngine.Random;
-
-namespace TheOutsider.Oracle_Hooks
+﻿namespace TheOutsider.Oracle_Hooks
 {
     class SLOracleHooks
     {
@@ -108,13 +96,13 @@ namespace TheOutsider.Oracle_Hooks
 
         public static bool RainWorldGame_IsMoonActive(On.RainWorldGame.orig_IsMoonActive orig, RainWorldGame self)
         {
-            if(self.session.characterStats.name != Plugin.SlugName)
+            if (self.session.characterStats.name != Plugin.SlugName)
             {
-                return(orig(self));
+                return (orig(self));
             }
             else
             {
-                return(!self.GetStorySession.saveState.deathPersistentSaveData.ripMoon && self.GetStorySession.saveState.miscWorldSaveData.SLOracleState.neuronsLeft > 0);
+                return (!self.GetStorySession.saveState.deathPersistentSaveData.ripMoon && self.GetStorySession.saveState.miscWorldSaveData.SLOracleState.neuronsLeft > 0);
             }
         }
 
@@ -122,7 +110,7 @@ namespace TheOutsider.Oracle_Hooks
         {
             if (self.session.characterStats.name != Plugin.SlugName)
             {
-                return(orig(self));
+                return (orig(self));
             }
             else
             {

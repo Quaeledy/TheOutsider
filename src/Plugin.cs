@@ -1,15 +1,9 @@
 ﻿using BepInEx;
-using System.Security.Permissions;
-using System.Security;
-using System;
-using UnityEngine;
-using System.Collections.Generic;
-using SlugBase.Features;
 using SlugBase.DataTypes;
-using TheOutsider.World_Hooks;
-using TheOutsider.Player_Hooks;
-using TheOutsider.PlayerGraphics_Hooks;
-using TheOutsider.Oracle_Hooks;
+using System;
+using System.Security;
+using System.Security.Permissions;
+using TheOutsider.HUD_Hooks;
 /*
 using TheOutsider.CustomLore.CustomOracle;
 using TheOutsider.CustomLore.CustomDream;
@@ -17,8 +11,10 @@ using TheOutsider.CustomLore.CustomCreature;
 using TheOutsider.CustomOracleTx;
 using TheOutsider.CustomDreamTx;*/
 using TheOutsider.Menu_Hooks;
-using TheOutsider.HUD_Hooks;
-//using TheOutsider.MothPup;
+using TheOutsider.Oracle_Hooks;
+using TheOutsider.Player_Hooks;
+using TheOutsider.PlayerGraphics_Hooks;
+using TheOutsider.World_Hooks;
 
 [module: UnverifiableCode]
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -49,7 +45,6 @@ namespace TheOutsider
         public static readonly PlayerColor SpeckleColor = new PlayerColor("Speckles");
         public static readonly PlayerColor FlareColor = new PlayerColor("FlaringLight");
         public static OptionsMenu optionsMenuInstance;
-        
 
         private void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
         {
@@ -57,7 +52,7 @@ namespace TheOutsider
 
             if (IsInit) return;
             IsInit = true;
-            
+
             try
             {
                 //Remix配置菜单
@@ -69,7 +64,7 @@ namespace TheOutsider
                 //CreatureTemplateType.RegisterValues();
 
                 //我的hook们
-                PlayerHooks.Init();
+                Player_Hooks.PlayerHooks.Init();
                 PlayerGraphicsHooks.Init();
                 FoodHooks.Init();
                 WorldHooks.Init();
@@ -80,7 +75,10 @@ namespace TheOutsider
                 SLOracleHooks.Init();
                 HUDHooks.Init();
                 JollyCoopHooks.Init();
-                //MothPupHooks.Init();
+                //蛾猫崽相关
+                MothPup_Hooks.PlayerHooks.Init();
+                MothPup_Hooks.SlugNPCAIHooks.Init();
+                MothPup_Hooks.OtherHooks.Init();
                 /*
                 SlugpupGraphics.Init();
                 SlugpupStuff.Init();*/
@@ -93,24 +91,13 @@ namespace TheOutsider
                 CustomOracleRx.ApplyTreatment(new AMOracleRegistry());
                 */
 
-                Debug.Log($"Plugin {Plugin.MOD_ID} is loaded!");
+                UnityEngine.Debug.Log($"Plugin {Plugin.MOD_ID} is loaded!");
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex);
+                UnityEngine.Debug.LogException(ex);
                 throw;
             }
-        }
-
-
-        public static void Log(string m)
-        {
-            UnityEngine.Debug.Log("[Outsider] " + m);
-        }
-
-        public static void Log(string f, params object[] args)
-        {
-            UnityEngine.Debug.Log("[Outsider] " + string.Format(f, args));
         }
 
         // Load any resources, such as sprites or sounds
@@ -121,8 +108,19 @@ namespace TheOutsider
             Futile.atlasManager.LoadAtlas("atlases/mothwings");
             Futile.atlasManager.LoadAtlas("atlases/OutsiderGuidanceSlugcat");
             Futile.atlasManager.LoadAtlas("atlases/Kill_Slugcat_Outsider");
-            Futile.atlasManager.LoadAtlas("icon_Quetzalcoatl");
-            Futile.atlasManager.LoadAtlas("icon_MothPup");
+            Futile.atlasManager.LoadAtlas("atlases/icon_Quetzalcoatl");
+            Futile.atlasManager.LoadAtlas("atlases/icon_MothPup");
+            Log("Load Resources!");
+        }
+
+        public static void Log(string m)
+        {
+            UnityEngine.Debug.Log("[Outsider] " + m);
+        }
+
+        public static void Log(string f, params object[] args)
+        {
+            UnityEngine.Debug.Log("[Outsider] " + string.Format(f, args));
         }
     }
 }

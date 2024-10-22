@@ -1,23 +1,9 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using RWCustom;
+﻿using RWCustom;
 using System;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
-using Color = UnityEngine.Color;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using SlugBase.Features;
-using System.Drawing;
-using TheOutsider;
 using TheOutsider.Player_Hooks;
-using System.Numerics;
-using IL.ScavengerCosmetic;
-using UnityEngineInternal;
-using BepInEx;
+using UnityEngine;
+using Random = UnityEngine.Random;
+using Vector2 = UnityEngine.Vector2;
 
 namespace TheOutsider.PlayerGraphics_Hooks
 {
@@ -193,7 +179,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 self.AddToContainer(sLeaser, rCam, null);
             }
         }
-        
+
         private static void PlayerGraphics_ctor(On.PlayerGraphics.orig_ctor orig, PlayerGraphics self, PhysicalObject ow)
         {
             orig(self, ow);
@@ -233,13 +219,13 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 //飞行展开翅膀
                 if (player.isFlying)
                 {
+                    innerRotationMin = Custom.LerpMap(self.owner.EffectiveRoomGravity, 0.9f, 0.5f, -70f, -20f);
+                    innerRotationMax = Custom.LerpMap(self.owner.EffectiveRoomGravity, 0.9f, 0.5f, 50f, 20f);
+                    outerRotationMin = Custom.LerpMap(self.owner.EffectiveRoomGravity, 0.9f, 0.5f, -70f, -20f);
+                    outerRotationMax = Custom.LerpMap(self.owner.EffectiveRoomGravity, 0.9f, 0.5f, 50f, 20f);
                     if (player.flightTime == 0)
                     {
                         player.flutterTimeAdd = 0f;
-                        innerRotationMin = Custom.LerpMap(self.player.room.gravity, 0.9f, 0.5f, -70f, -20f);
-                        innerRotationMax = Custom.LerpMap(self.player.room.gravity, 0.9f, 0.5f, 50f, 20f);
-                        outerRotationMin = Custom.LerpMap(self.player.room.gravity, 0.9f, 0.5f, -70f, -20f);
-                        outerRotationMax = Custom.LerpMap(self.player.room.gravity, 0.9f, 0.5f, 50f, -20f);
                         /*
                         if (self.player.room.gravity <= 0.5f)
                         {
@@ -261,7 +247,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         }*/
                     }
                     //无重力时扑腾翅膀
-                    else if (self.player.room.gravity <= 0.5 && self.player.Consious && !self.player.Stunned)
+                    else if (self.owner.EffectiveRoomGravity <= 0.5 && self.player.Consious && !self.player.Stunned)
                     {
                         player.flutterTimeAdd += 1f;
                         if (player.flutterTimeAdd >= player.upFlightTime)
@@ -364,7 +350,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
             //左和右决定是否镜像
             innerWing = i == 0 ? innerWing : 2 * Vector2.Dot(innerWing, (dif).normalized) * (dif).normalized - innerWing;
             outerWing = i == 0 ? outerWing : 2 * Vector2.Dot(outerWing, (dif).normalized) * (dif).normalized - outerWing;
-            
+
             //细节修正
             innerRotation = Mathf.Atan2(innerWing.x, innerWing.y);
             float drift = Mathf.Lerp(0, innerRotation, 2 * Mathf.Abs(Mathf.Sin(bodyRotation)));
@@ -393,7 +379,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 innerWing = Vector2.Lerp(innerWing, 2 * Vector2.Dot(innerWing, (dif).normalized) * (dif).normalized - innerWing, driftScale);
                 outerWing = Vector2.Lerp(outerWing, 2 * Vector2.Dot(outerWing, (dif).normalized) * (dif).normalized - outerWing, driftScale);
             }
-            
+
             //俯冲
             if (Mathf.Abs(bodyRotation) > 90f / 180f * 3.1415926f)
             {
@@ -492,7 +478,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 }
                 t = player.upFlightTime - t;
                 foldScale = Mathf.Clamp01((player.upFlightTime - player.flutterTimeAdd) / player.upFlightTime);
-                
+
                 //内层翅膀旋转角度
                 flutterRotation = Mathf.Cos(t + 0.5f + player.upFlightTime);
                 flutterRotation = Mathf.Abs(flutterRotation);
@@ -511,7 +497,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
 
                 //设置骨架
                 WingAnimation(player, dif, bodyRotation, innerRotation, outerRotation, i);
-                
+
                 //设置位置
                 for (int j = 0; j < 3; j++)
                 {

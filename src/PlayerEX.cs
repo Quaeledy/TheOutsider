@@ -1,14 +1,10 @@
-﻿using SlugBase.Features;
-using SlugBase;
-using System.Linq;
+﻿using RWCustom;
+using SlugBase.DataTypes;
 using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
-using SlugBase.DataTypes;
-using BepInEx.Logging;
-using System.Collections.Generic;
-using MoreSlugcats;
-using RWCustom;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 namespace TheOutsider
 {
@@ -16,7 +12,7 @@ namespace TheOutsider
     {
         public WeakReference<Player> playerRef;
         //public WeakReference<PlayerGraphics> iGraphicsRef; 
-        
+
         public bool IsOutsider
         {
             get
@@ -28,9 +24,18 @@ namespace TheOutsider
             }
         }
 
-        public bool isMothNPC;
+        public static readonly Color BlueGreen = new Color(40f / 255f, 102f / 255f, 141f / 255f);
+        public static readonly Color LightGreen = new Color(106f / 255f, 229f / 255f, 191f / 255f);
+        public static readonly Color LightBlue = new Color(106f / 255f, 229f / 255f, 191f / 255f);
 
-        
+        #region 猫崽相关
+        public bool isMothNPC;
+        public bool wantsToRegurgitate;
+        public bool regurgitating;
+        public bool wantsToSwallowObject;
+        public bool swallowing;
+        #endregion
+        #region 飞行相关
         public float flutterTimeAdd;
         public readonly float wingSpeed;
         public readonly float upFlightTime;
@@ -38,13 +43,6 @@ namespace TheOutsider
         public bool isFlying;
         public int flightTime;
         public int preventFlight;
-        public int lastTail;
-        public bool shouldResetDisplayQuarterFood;
-
-        //烟雾果毒性
-        public bool deadForSporeCloud;
-        public int deadForSporeCloudCount;
-
         //加速度
         public float ax;
         public float ay;
@@ -53,12 +51,14 @@ namespace TheOutsider
         //姿势
         public bool spreadWings;
         public bool foldUpWings;
-        //翅膀长度及宽度
-        public float wingLength;
-        public float wingWidth;
-        //触须长度
-        public float antennaeLength;
-
+        #endregion
+        #region 进食和毒性相关
+        public bool shouldResetDisplayQuarterFood;
+        //烟雾果毒性
+        public bool deadForSporeCloud;
+        public int deadForSporeCloudCount;
+        #endregion
+        #region 闪光相关
         //闪光相关
         public bool charged;
         public LightSource light;
@@ -78,7 +78,8 @@ namespace TheOutsider
                 return Mathf.Pow(Mathf.Sin(burning * 3.1415927f), 0.4f);
             }
         }
-
+        #endregion
+        #region 外观相关
         //图像
         public int wingSprite;
         public int antennaeSprite;
@@ -87,6 +88,12 @@ namespace TheOutsider
         public int speckleSprite;
         //手臂替代贴图
         public int handWingSprite;
+
+        //翅膀长度及宽度
+        public float wingLength;
+        public float wingWidth;
+        //触须长度
+        public float antennaeLength;
 
         //身体部件
         public GenericBodyPart[] wing;
@@ -100,7 +107,7 @@ namespace TheOutsider
         public readonly float MaxLength = 10f;
         public readonly float swallowTailWidth = 0.4f;
         public float tailTimeAdd;
-
+        #endregion
         //public DynamicSoundLoop flyingBuzzSound;
 
         //梦境相关
@@ -110,11 +117,13 @@ namespace TheOutsider
         {
             playerRef = new WeakReference<Player>(player);
             if (player.isNPC)
+            {
                 isMothNPC = true;
+            }
 
             if (!IsOutsider)
                 return;
-            
+
             /*
             flyingBuzzSound = new ChunkDynamicSoundLoop(player.bodyChunks[0]);
             flyingBuzzSound.sound = MothEnums.MothBuzz;
@@ -140,11 +149,15 @@ namespace TheOutsider
 
         public Color GetBodyColor()
         {
-            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
-                return new Color(40f / 255f, 102f / 255f, 141f / 255f);
+            if (!playerRef.TryGetTarget(out Player player))
+                return BlueGreen;
+            if (player.isNPC)
+                return player.ShortCutColor();
+            if (player.graphicsModule == null)
+                return BlueGreen;
             if (PlayerColor.Body.GetColor(player.graphicsModule as PlayerGraphics) != null)
                 return (Color)PlayerColor.Body.GetColor(player.graphicsModule as PlayerGraphics);
-            return new Color(40f / 255f, 102f / 255f, 141f / 255f);
+            return BlueGreen;
         }
 
         public Color GetEyesColor()
@@ -168,37 +181,105 @@ namespace TheOutsider
         public Color GetAntennaeColor()
         {
             if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
-                return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+                return LightGreen;
             if (Plugin.AntennaeColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
                 return (Color)Plugin.AntennaeColor.GetColor(player.graphicsModule as PlayerGraphics);
-            return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+            return AntennaeColorLerp(GetBodyColor());
         }
 
         public Color GetLepidoticWingColor()
         {
             if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
-                return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+                return LightGreen;
             if (Plugin.LepidoticWingColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
                 return (Color)Plugin.LepidoticWingColor.GetColor(player.graphicsModule as PlayerGraphics);
-            return new Color(106f / 255f, 229f / 255f, 191f / 255f);
+            return AntennaeColorLerp(GetBodyColor());
         }
 
         public Color GetSpeckleColor()
         {
             if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
-                return new Color(106f / 255f, 191f / 255f, 229f / 255f);
+                return LightBlue;
             if (Plugin.SpeckleColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
                 return (Color)Plugin.SpeckleColor.GetColor(player.graphicsModule as PlayerGraphics);
-            return new Color(106f / 255f, 191f / 255f, 229f / 255f);
+            return SpeckleColorLerp(GetBodyColor());
         }
 
         public Color GetFlareColor()
         {
             if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
-                return new Color(106f / 255f, 191f / 255f, 229f / 255f);
+                return LightBlue;
             if (Plugin.FlareColor.GetColor(player.graphicsModule as PlayerGraphics) != null)
                 return (Color)Plugin.FlareColor.GetColor(player.graphicsModule as PlayerGraphics);
-            return new Color(106f / 255f, 191f / 255f, 229f / 255f);
+            return SpeckleColorLerp(GetBodyColor());
+        }
+
+        public Color AntennaeColorLerp(Color bodyColor)
+        {
+            Vector3 defaultColor = Custom.RGB2HSL(LightGreen);
+            Vector3 presetColor1 = Custom.RGB2HSL(new Color(135f / 255f, 231f / 255f, 234f / 255f));
+            Vector3 presetColor2 = Custom.RGB2HSL(new Color(255f / 255f, 115f / 255f, 115f / 255f));
+            Vector3 presetColor3 = Custom.RGB2HSL(new Color(46f / 255f, 20f / 255f, 79f / 255f));
+            Vector3 presetColor4 = Custom.RGB2HSL(new Color(255f / 255f, 255f / 255f, 115f / 255f));
+
+            Vector3 color = ColorLerp(bodyColor, defaultColor, presetColor1, presetColor2, presetColor3, presetColor4);
+            if (playerRef.TryGetTarget(out Player player) && player.isNPC)
+            {
+                Random.InitState(player.abstractCreature.ID.number);
+                color.x = (color.x + 0.1f * (Random.value - 0.5f)) % 1f;
+            }
+            return Custom.HSL2RGB(color.x, color.y, color.z);
+        }
+
+        public Color SpeckleColorLerp(Color bodyColor)
+        {
+            Vector3 defaultColor = Custom.RGB2HSL(LightBlue);
+            Vector3 presetColor1 = Custom.RGB2HSL(new Color(135f / 255f, 231f / 255f, 234f / 255f));
+            Vector3 presetColor2 = Custom.RGB2HSL(new Color(241f / 255f, 255f / 255f, 146f / 255f));
+            Vector3 presetColor3 = Custom.RGB2HSL(new Color(255f / 255f, 174f / 255f, 175f / 255f));
+            Vector3 presetColor4 = Custom.RGB2HSL(new Color(191f / 255f, 160f / 255f, 255f / 255f));
+
+            Vector3 color = ColorLerp(bodyColor, defaultColor, presetColor1, presetColor2, presetColor3, presetColor4);
+            if (playerRef.TryGetTarget(out Player player) && player.isNPC)
+            {
+                Random.InitState(player.abstractCreature.ID.number);
+                color.x = (color.x + 0.1f * (Random.value - 0.5f)) % 1f;
+            }
+            return Custom.HSL2RGB(color.x, color.y, color.z);
+        }
+
+        public Vector3 ColorLerp(Color bodyColor, Vector3 defaultColor, Vector3 presetColor1, Vector3 presetColor2, Vector3 presetColor3, Vector3 presetColor4)
+        {
+            Vector3 bodyColorHSL = Custom.RGB2HSL(bodyColor);
+            Vector3 defaultBodyColor = Custom.RGB2HSL(BlueGreen);
+            Vector3 presetBodyColor1 = Custom.RGB2HSL(new Color(240f / 255f, 240f / 255f, 255f / 255f));
+            Vector3 presetBodyColor2 = Custom.RGB2HSL(new Color(255f / 255f, 255f / 255f, 115f / 255f));
+            Vector3 presetBodyColor3 = Custom.RGB2HSL(new Color(255f / 255f, 115f / 255f, 115f / 255f));
+            Vector3 presetBodyColor4 = Custom.RGB2HSL(new Color(46f / 255f, 20f / 255f, 79f / 255f));
+            if (bodyColorHSL == defaultBodyColor)
+                return defaultColor;
+            if (bodyColorHSL == presetBodyColor1)
+                return presetColor1;
+            if (bodyColorHSL == presetBodyColor2)
+                return presetColor2;
+            if (bodyColorHSL == presetBodyColor3)
+                return presetColor3;
+            if (bodyColorHSL == presetBodyColor4)
+                return presetColor4;
+            float distReciprocal = 1f / Vector3.Distance(bodyColorHSL, defaultBodyColor);
+            float distReciprocal1 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor1);
+            float distReciprocal2 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor2);
+            float distReciprocal3 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor3);
+            float distReciprocal4 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor4);
+            float distReciprocalAdd = distReciprocal + distReciprocal1 + distReciprocal2 + distReciprocal3 + distReciprocal4;
+
+            Vector3 color = 1f / distReciprocalAdd *
+                            (distReciprocal * defaultColor +
+                             distReciprocal1 * presetColor1 +
+                             distReciprocal2 * presetColor2 +
+                             distReciprocal3 * presetColor3 +
+                             distReciprocal4 * presetColor4);
+            return color;
         }
 
         #region 飞行相关
@@ -244,7 +325,7 @@ namespace TheOutsider
             return wingSprite + side + wing + wing;
         }
         #endregion
-        
+
         #region 翅膀相关
         public void MothWing(PlayerGraphics self)
         {
@@ -256,7 +337,7 @@ namespace TheOutsider
 
         }
         #endregion
-        
+
         #region 尾巴相关
         public void MothSwallowTail(PlayerGraphics self)
         {
@@ -309,9 +390,9 @@ namespace TheOutsider
         #region 猫崽相关
         public static bool PlayerNPCShouldBeMoth(Player player)
         {
-            if (player.abstractCreature != null && 
-                player.abstractCreature.world != null && 
-                player.abstractCreature.world.game != null && 
+            if (player.abstractCreature != null &&
+                player.abstractCreature.world != null &&
+                player.abstractCreature.world.game != null &&
                 player.abstractCreature.world.game.IsStorySession &&
                 (player.abstractCreature.world.game.session.characterStats.name == Plugin.SlugName || player.abstractCreature.world.region.name == "OSAM"))
             {

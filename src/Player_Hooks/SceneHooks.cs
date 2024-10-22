@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Menu;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using Menu;
-using SlugBase.Features;
-using SlugBase.Assets;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -92,7 +85,7 @@ namespace TheOutsider.Player_Hooks
             return MenuScene.SceneID.Empty;
         }
         */
-        
+
         private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
         {
             orig(self);

@@ -1,20 +1,11 @@
-﻿using System;
+﻿using JollyCoop.JollyHUD;
+using JollyCoop.JollyMenu;
+using RWCustom;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using TheOutsider.Player_Hooks;
 using UnityEngine;
-using RWCustom;
-using MoreSlugcats;
-using HUD;
-using System.Reflection;
-using BepInEx.Logging;
-using JollyCoop;
-using JollyCoop.JollyHUD;
-using JollyCoop.JollyMenu;
-using SlugBase.Features;
-using System.Runtime.CompilerServices;
 
 namespace TheOutsider.HUD_Hooks
 {
@@ -124,13 +115,13 @@ namespace TheOutsider.HUD_Hooks
             }
 
             orig(self, timeStacker);
-            
+
             if (self.PlayerState.creature != null && OutsiderJollyOffRoomData.TryGetValue(self.PlayerState.creature, out var jollyOffRoom))
             {
                 jollyOffRoom.Draw(timeStacker);
             }
         }
-        
+
         private static void JollyPlayerSpecificHud_JollyOffRoom_ClearSprites(On.JollyCoop.JollyHUD.JollyPlayerSpecificHud.JollyOffRoom.orig_ClearSprites orig, JollyPlayerSpecificHud.JollyOffRoom self)
         {
             orig(self);
@@ -306,7 +297,7 @@ namespace TheOutsider.HUD_Hooks
 
         public OutsiderJollyOffRoom(int i, JollyPlayerSpecificHud.JollyOffRoom jollyOffRoom)
         {
-            jollyOffRoomRef = new WeakReference<JollyPlayerSpecificHud.JollyOffRoom> (jollyOffRoom);
+            jollyOffRoomRef = new WeakReference<JollyPlayerSpecificHud.JollyOffRoom>(jollyOffRoom);
             setColor = false;
             this.i = i;
 

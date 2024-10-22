@@ -20,7 +20,7 @@ namespace TheOutsider.MothPup
         public static bool isMothPup(this Player self)
         {
             bool state = false;
-            if (self.playerState.TryGetPupState(out var pupNPCState))
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && self.isNPC)
             {
                 state = pupNPCState.Variant == SlugpupStuff.VariantName.MothPup;
             }

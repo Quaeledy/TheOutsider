@@ -1,15 +1,7 @@
 ﻿using MoreSlugcats;
-using MoreSlugcats;
-using UnityEngine;
 using RWCustom;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Reflection.Emit;
-using System.Numerics;
+using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
 
 namespace TheOutsider.MothPup

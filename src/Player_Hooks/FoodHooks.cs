@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MoreSlugcats;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using RWCustom;
-using Expedition;
-using Random = UnityEngine.Random;
-using MoreSlugcats;
-using System.Security.Permissions;
-using SlugBase.Features;
+using System.Runtime.CompilerServices;
 //using TheOutsider.EmgTx;
 
 namespace TheOutsider.Player_Hooks
 {
     public class FoodHooks
     {
+        public static ConditionalWeakTable<PhysicalObject, PhysicalObjectEx> PhysicalObjectData = new();
+        public static readonly SlugNPCAI.Food MothFood = new SlugNPCAI.Food("MothFood", true);
         public static void Init()
         {
             //check if rotund world is enabled (our mass increases if we are full)
             try
             {
-
+                On.PhysicalObject.ctor += PhysicalObject_ctor;
                 CustomEdible.Register(new CustomEdibleData(Plugin.SlugName,
                     new CustomEdibleData.FoodData[]{
                         //可以食用
@@ -43,7 +37,6 @@ namespace TheOutsider.Player_Hooks
             {
                 Debug.LogException(e);
             }
-
             /*
             On.Player.SwallowObject += Player_SwallowObject;
             On.Player.GrabUpdate += Player_GrabUpdate;
@@ -53,11 +46,20 @@ namespace TheOutsider.Player_Hooks
             //On.SlugcatHand.Update += SlugcatHand_Update;
             */
         }
+        private static void PhysicalObject_ctor(On.PhysicalObject.orig_ctor orig, PhysicalObject self, AbstractPhysicalObject abstractPhysicalObject)
+        {
+            orig(self, abstractPhysicalObject);
+            if (CustomEdible.edibleDatas.ContainsKey(Plugin.SlugName) &&
+                CustomEdible.edibleDatas[Plugin.SlugName].edibleDatas.Any(d => d.edibleType == self.abstractPhysicalObject.type) &&
+                !PhysicalObjectData.TryGetValue(self, out _))
+                PhysicalObjectData.Add(self, new PhysicalObjectEx(self));
+        }
+
         /*
         public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player self, int grasp)
         {
             //如果是蛾猫
-            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && player.IsOutsider)
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
                 if (grasp < 0 || (self as Creature).grasps[grasp] == null)
                 {
@@ -119,7 +121,7 @@ namespace TheOutsider.Player_Hooks
         {
             orig(self, eu);
 
-            if (!PlayerHooks.PlayerData.TryGetValue(self, out var player) || !player.IsOutsider)
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player)
             {
                 return;
             }
@@ -248,7 +250,7 @@ namespace TheOutsider.Player_Hooks
 
         public static void Player_GrabUpdate_Rotund(On.Player.orig_GrabUpdate orig, Player self, bool eu)
         {
-            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && player.IsOutsider)
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
                 //给下面的条件判断定义一下是不是素食
                 bool[] isFood = new bool[2];
@@ -319,5 +321,15 @@ namespace TheOutsider.Player_Hooks
                 }
             }
         }*/
+    }
+
+    public class PhysicalObjectEx
+    {
+        public int bitesLeft;
+
+        public PhysicalObjectEx(PhysicalObject self)
+        {
+            bitesLeft = 3;
+        }
     }
 }

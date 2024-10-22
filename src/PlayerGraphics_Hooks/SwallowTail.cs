@@ -1,30 +1,10 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using RWCustom;
+﻿using RWCustom;
 using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
-using Color = UnityEngine.Color;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-using System.Collections.Generic;
-using JetBrains.Annotations;
-using SlugBase.Features;
-using System.Drawing;
 using TheOutsider.Player_Hooks;
-using SlugBase.DataTypes;
-using UnityEngineInternal;
-using IL;
-using On;
-using Unity.Mathematics;
-using BepInEx;
-using RewiredConsts;
+using UnityEngine;
+using Color = UnityEngine.Color;
+using Random = UnityEngine.Random;
+using Vector2 = UnityEngine.Vector2;
 
 namespace TheOutsider.PlayerGraphics_Hooks
 {
@@ -281,7 +261,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 }
             }
 
-            
+
         }
 
         //设置图层
@@ -312,7 +292,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 for (int i = 0; i < 2; i++)
                 {
                     //让凤尾移到身体后
-                        sLeaser.sprites[player.swallowtailSprite + i].MoveBehindOtherNode(sLeaser.sprites[0]);
+                    sLeaser.sprites[player.swallowtailSprite + i].MoveBehindOtherNode(sLeaser.sprites[0]);
                 }
             }
         }
@@ -320,7 +300,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
         private static void PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            
+
             if (PlayerHooks.PlayerData.TryGetValue(self.player, out var player))
             {
                 Vector2 bodyPos = sLeaser.sprites[0].GetPosition();

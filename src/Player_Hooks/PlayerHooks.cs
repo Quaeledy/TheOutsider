@@ -1,25 +1,4 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MoreSlugcats;
-using RWCustom;
-using SlugBase;
-using SlugBase.DataTypes;
-using SlugBase.Features;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using TheOutsider.Player_Hooks;
-using UnityEngine;
-using UnityEngine.UIElements;
-using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-using Noise;
+﻿using System.Runtime.CompilerServices;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -45,7 +24,7 @@ namespace TheOutsider.Player_Hooks
             /*
             if (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))
                 self.SlugCatClass = Plugin.MothPup;*/
-            if ((self.SlugCatClass == Plugin.SlugName || (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))) && 
+            if ((self.SlugCatClass == Plugin.SlugName || (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))) &&
                 !PlayerData.TryGetValue(self, out _))
                 PlayerData.Add(self, new PlayerEx(self));
         }

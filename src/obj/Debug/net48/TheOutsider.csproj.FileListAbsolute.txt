@@ -7,6 +7,7 @@ D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.AssemblyInfoInputs.cache
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.AssemblyInfo.cs
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.csproj.CoreCompileInputs.cache
-D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.csproj.CopyComplete
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.sourcelink.json
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsi.21E4EEEE.Up2Date
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.dll
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.pdb

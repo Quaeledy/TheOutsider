@@ -1,13 +1,4 @@
-﻿using BepInEx.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MoreSlugcats;
-using RWCustom;
-using System.Text.RegularExpressions;
+﻿using System.IO;
 
 namespace TheOutsider.World_Hooks
 {
@@ -266,9 +257,9 @@ namespace TheOutsider.World_Hooks
 
         public static string Region_GetProperRegionAcronym(On.Region.orig_GetProperRegionAcronym orig, SlugcatStats.Name character, string baseAcronym)
         {
-            if(character.value != Plugin.SlugName.value)
+            if (character.value != Plugin.SlugName.value)
             {
-                return(orig(character, baseAcronym));
+                return (orig(character, baseAcronym));
             }
             else
             {

@@ -1,24 +1,4 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MoreSlugcats;
-using RWCustom;
-using SlugBase;
-using SlugBase.DataTypes;
-using SlugBase.Features;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using UnityEngine;
-using UnityEngine.UIElements;
-using Debug = UnityEngine.Debug;
-using Random = UnityEngine.Random;
-using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
-using CoralBrain;
+﻿using UnityEngine;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -35,105 +15,97 @@ namespace TheOutsider.Player_Hooks
         public static void Player_Fly(On.Player.orig_UpdateMSC orig, Player self)
         {
             orig(self);
-
-            if (!PlayerHooks.PlayerData.TryGetValue(self, out var player) || !player.IsOutsider)
+            
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
-                return;
-            }
-
-            //如果可以飞行
-            /*
-            if (player.CanFly)
-            {*/
-            if (self.animation == Player.AnimationIndex.HangFromBeam || self.animation == Player.AnimationIndex.SurfaceSwim)
-            {
-                player.preventFlight = 15;
-            }
-            else if (self.bodyMode == Player.BodyModeIndex.WallClimb)
-            {
-                player.preventFlight = 10;//下次试试 8，或者更少
-            }
-            else if (player.preventFlight > 0)
-            {
-                player.preventFlight--;
-            }
-
-            //设置加速度
-            FlightAcceleration(self, player);
-
-            //如果正在飞行
-            if (player.isFlying)
-            {
-                //player.flyingBuzzSound.Volume = Mathf.Lerp(0.8f, 0.5f, player.flightTime / (4 * flightKickinDuration));
-
-                player.flightTime++;
-
-                if (flightGravity < 0.9f && player.flightTime >= 0.5f * player.upFlightTime)
+                if (self.animation == Player.AnimationIndex.HangFromBeam || self.animation == Player.AnimationIndex.SurfaceSwim)
                 {
-                    flightGravity += 0.05f * (player.flightTime - 0.5f * player.upFlightTime);
+                    player.preventFlight = 15;
+                }
+                else if (self.bodyMode == Player.BodyModeIndex.WallClimb)
+                {
+                    player.preventFlight = 10;//下次试试 8，或者更少
+                }
+                else if (player.preventFlight > 0)
+                {
+                    player.preventFlight--;
                 }
 
-                self.AerobicIncrease(0.08f);
+                //设置加速度
+                FlightAcceleration(self, player);
 
-                self.gravity = Mathf.Lerp(normalGravity, flightGravity, player.flightTime / flightKickinDuration);
-                self.airFriction = Mathf.Lerp(normalAirFriction, flightAirFriction, player.flightTime / flightKickinDuration);
-
-                PlayerState playerState = self.abstractCreature.world.game.Players.Count == 1 ?
-                                  self.playerState :
-                                  self.abstractCreature.world.game.Players[0].state as PlayerState;
-
-                if (FlyKeyCode(self) && player.flightTime >= player.upFlightTime && (self.FoodInStomach > 0 || playerState.quarterFoodPoints > 0 || Plugin.optionsMenuInstance.infiniteFlight.Value))
+                //如果正在飞行
+                if (player.isFlying)
                 {
-                    //消耗饱食度飞行
-                    if (!Plugin.optionsMenuInstance.infiniteFlight.Value)
+                    //player.flyingBuzzSound.Volume = Mathf.Lerp(0.8f, 0.5f, player.flightTime / (4 * flightKickinDuration));
+
+                    player.flightTime++;
+
+                    if (flightGravity < 0.9f && player.flightTime >= 0.5f * player.upFlightTime)
                     {
-                        FoodConsumption(self, player);
+                        flightGravity += 0.05f * (player.flightTime - 0.5f * player.upFlightTime);
                     }
-                    else
+
+                    self.AerobicIncrease(0.08f);
+
+                    self.gravity = Mathf.Lerp(normalGravity, flightGravity, player.flightTime / flightKickinDuration);
+                    self.airFriction = Mathf.Lerp(normalAirFriction, flightAirFriction, player.flightTime / flightKickinDuration);
+
+                    PlayerState playerState = self.abstractCreature.world.game.Players.Count == 1 ?
+                                      self.playerState :
+                                      self.abstractCreature.world.game.Players[0].state as PlayerState;
+
+                    if (FlyKeyCode(self) && player.flightTime >= player.upFlightTime && (self.FoodInStomach > 0 || playerState.quarterFoodPoints > 0 || Plugin.optionsMenuInstance.infiniteFlight.Value))
                     {
-                        player.flightTime = 0;
-                        player.flyEnergy += 50f;
+                        //消耗饱食度飞行
+                        if (!Plugin.optionsMenuInstance.infiniteFlight.Value &&
+                            !(self.grabbedBy != null && self.grabbedBy.Count > 0 && self.grabbedBy[0].grabbed is Player) &&
+                            !(self.onBack != null))
+                        {
+                            FoodConsumption(self, player);
+                        }
+                        else
+                        {
+                            player.flightTime = 0;
+                            player.flyEnergy += 50f;
+                        }
                     }
+
+                    //飞行速度
+                    FlightSpeed(self, player);
                 }
-
-                //飞行速度
-                FlightSpeed(self, player);
-            }
-            else
-            {
-                //player.flyingBuzzSound.Volume = 0f;
-
-                if (FlyKeyCode(self) && player.CanSustainFlight(self, player))
+                else
                 {
-                    player.InitiateFlight(self, player);
+                    //player.flyingBuzzSound.Volume = 0f;
+
+                    if (FlyKeyCode(self) && player.CanSustainFlight(self, player))
+                    {
+                        player.InitiateFlight(self, player);
+                    }
+
+                    self.airFriction = normalAirFriction;
+                    self.gravity = normalGravity;
                 }
 
-                self.airFriction = normalAirFriction;
-                self.gravity = normalGravity;
+                if (player.preventGrabs > 0)
+                {
+                    player.preventGrabs--;
+                }
+
+                //player.flyingBuzzSound.Update();
             }
-            //}
-
-            if (player.preventGrabs > 0)
-            {
-                player.preventGrabs--;
-            }
-
-            //player.flyingBuzzSound.Update();
-
-
-            //player.MothSwallowTail(self.graphicsModule as PlayerGraphics);
         }
 
         //调整姿势
         public static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
         {
-            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && player.IsOutsider && player.isFlying)
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && player.isFlying)
             {
                 self.bodyMode = Player.BodyModeIndex.Default;
                 self.animation = Player.AnimationIndex.None;
 
                 orig(self, eu);
-                
+
                 if (!player.CanSustainFlight(self, player))
                 {
                     player.StopFlight();
@@ -385,7 +357,7 @@ namespace TheOutsider.Player_Hooks
         //自定义飞行按键
         private static bool FlyKeyCode(Player self)
         {
-            if (Plugin.optionsMenuInstance.flyKeyCode.Value == KeyCode.None)
+            if (Plugin.optionsMenuInstance.flyKeyCode.Value == KeyCode.None || self.isNPC)
             {
                 return self.wantToJump > 0;
             }

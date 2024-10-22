@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TheOutsider.Player_Hooks;
-using UnityEngine;
-using RWCustom;
-using System.Runtime.CompilerServices;
+﻿using RWCustom;
 
 namespace TheOutsider
 {
@@ -71,8 +63,8 @@ namespace TheOutsider
 
     class IntroText1 : Texts
     {
-        public IntroText1(Room room): base(room, new Message[] 
-            { 
+        public IntroText1(Room room) : base(room, new Message[]
+            {
                 Message.NewMessage("While in the air, tap jump to flutter.", 120, 180),
                 //Message.NewMessage("[Please do not see echoes in the first rain cycle. This will prevent your game from being saved.]", 120, 180)
             })

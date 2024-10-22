@@ -167,7 +167,7 @@ namespace TheOutsider.MothPup
         private static List<string> PlayerGraphics_DefaultBodyPartColorHex(On.PlayerGraphics.orig_DefaultBodyPartColorHex orig, SlugcatStats.Name slugcatID)
         {
             List<string> list = orig(slugcatID);
-            if (slugcatID == SlugpupStuff.VariantName.MothPup)
+            if (slugcatID == SlugpupStuff.Plugin.MothPup)
             {
                 list.Add("FFFFFF");
                 return list;
@@ -177,7 +177,7 @@ namespace TheOutsider.MothPup
         private static List<string> PlayerGraphics_ColoredBodyPartList(On.PlayerGraphics.orig_ColoredBodyPartList orig, SlugcatStats.Name slugcatID)
         {
             List<string> list = orig(slugcatID);
-            if (slugcatID == SlugpupStuff.VariantName.MothPup)
+            if (slugcatID == SlugpupStuff.Plugin.MothPup)
             {
                 list.Add("Gills");
                 return list;
