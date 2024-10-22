@@ -26,6 +26,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             Coral = new CreatureTemplate.Type("Coral", true);
             CoralMatrix = new CreatureTemplate.Type("CoralMatrix", true);
             FluorescentButterfly = new CreatureTemplate.Type("FluorescentButterfly", true);*/
+            Plugin.Log("CustomCreature RegisterValues!");
         }
 
 

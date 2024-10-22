@@ -6,8 +6,8 @@ using System.Security.Permissions;
 using TheOutsider.HUD_Hooks;
 /*
 using TheOutsider.CustomLore.CustomOracle;
-using TheOutsider.CustomLore.CustomDream;
-using TheOutsider.CustomLore.CustomCreature;
+using TheOutsider.CustomLore.CustomDream;*/
+using TheOutsider.CustomLore.CustomCreature;/*
 using TheOutsider.CustomOracleTx;
 using TheOutsider.CustomDreamTx;*/
 using TheOutsider.Menu_Hooks;
@@ -61,7 +61,7 @@ namespace TheOutsider
 
                 //需要注册的变量
                 MothEnums.RegisterValues();
-                //CreatureTemplateType.RegisterValues();
+                CreatureTemplateType.RegisterValues();
 
                 //我的hook们
                 Player_Hooks.PlayerHooks.Init();

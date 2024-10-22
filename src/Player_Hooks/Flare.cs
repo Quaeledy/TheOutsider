@@ -21,7 +21,8 @@ namespace TheOutsider.Player_Hooks
                     self.jumpBoost = 0f;
                     self.wantToJump = 0;
                     self.SubtractFood(1);
-                    player.charged = true;
+                    player.charged = true; 
+                    player.AIwantFlare = false;
                 }
                 //开始闪光
                 if (player.charged && player.burning == 0f)
@@ -44,15 +45,15 @@ namespace TheOutsider.Player_Hooks
                     player.lastFlickerDir = player.flickerDir;
                     player.flickerDir = Custom.DegToVec(Random.value * 360f) * 50f * player.LightIntensity;
                     player.lastFlashAlpha = player.flashAplha;
-                    player.flashAplha = Mathf.Pow(Random.value, 0.3f) * player.LightIntensity;
+                    player.flashAplha = Mathf.Pow(Random.value, 0.3f) * player.LightIntensity * Mathf.Lerp(1f, 0.5f, Custom.RGB2HSL(player.GetFlareColor()).z);
                     player.lastFlashRad = player.flashRad;
-                    player.flashRad = Mathf.Pow(Random.value, 0.3f) * player.LightIntensity * 200f * 16f;
+                    player.flashRad = Mathf.Pow(Random.value, 0.3f) * player.LightIntensity * player.burningRange / 3f * 16f;
                     for (int i = 0; i < self.room.abstractRoom.creatures.Count; i++)
                     {
                         if (self.room.abstractRoom.creatures[i].realizedCreature != null &&
-                            (Custom.DistLess(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, player.LightIntensity * 600f) ||
-                             Custom.DistLess(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, player.LightIntensity * 1600f) &&
-                             self.room.VisualContact(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos)))
+                            (Custom.DistLess(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, player.LightIntensity * player.burningRange) ||
+                             (Custom.DistLess(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, player.LightIntensity * player.burningRangeWithVisualContact) &&
+                             self.room.VisualContact(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos))))
                         {
                             //杀死小蜘蛛
                             if (self.room.abstractRoom.creatures[i].realizedCreature is Spider && !self.room.abstractRoom.creatures[i].realizedCreature.dead)
@@ -103,9 +104,14 @@ namespace TheOutsider.Player_Hooks
 
         private static bool FlareKeyCode(Player self)
         {
+            bool AIwantFlare = true;
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && self.isNPC)
+            {
+                AIwantFlare = player.AIwantFlare;
+            }
             if (Plugin.optionsMenuInstance.flareKeyCode.Value == KeyCode.None || self.isNPC)
             {
-                return self.wantToJump > 0 && self.input[0].pckp;
+                return self.wantToJump > 0 && self.input[0].pckp && AIwantFlare;
             }
             else
             {

@@ -1,6 +1,7 @@
 ﻿using RWCustom;
 using SlugBase.DataTypes;
 using System;
+using TheOutsider.CustomLore.CustomCreature;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
@@ -60,6 +61,7 @@ namespace TheOutsider
         #endregion
         #region 闪光相关
         //闪光相关
+        public bool AIwantFlare;
         public bool charged;
         public LightSource light;
         public Vector2 flickerDir;
@@ -71,6 +73,8 @@ namespace TheOutsider
         public float flashAplha;
         public float lastFlashAlpha;
         public float burning;
+        public float burningRange;
+        public float burningRangeWithVisualContact;
         public float LightIntensity
         {
             get
@@ -119,6 +123,7 @@ namespace TheOutsider
             if (player.isNPC)
             {
                 isMothNPC = true;
+                player.glowing = true;
             }
 
             if (!IsOutsider)
@@ -132,6 +137,9 @@ namespace TheOutsider
             */
             wingSpeed = 10;
             upFlightTime = 30;
+
+            burningRange = isMothNPC ? 300f: 600f;
+            burningRangeWithVisualContact = isMothNPC ? 800f : 1600f;
 
             if (player.playerState.isPup || player.isSlugpup)
             {
@@ -164,7 +172,7 @@ namespace TheOutsider
         {
             if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
             {
-                if (player.isNPC && Custom.RGB2HSL(player.ShortCutColor()).z < 0.5f)
+                if (player.isNPC && player.npcStats != null && player.npcStats.Dark)
                     return new Color(255f / 255f, 255f / 255f, 255f / 255f);
                 else
                     return new Color(1f / 255f, 1f / 255f, 1f / 255f);
@@ -172,7 +180,7 @@ namespace TheOutsider
             if (PlayerColor.Eyes.GetColor(player.graphicsModule as PlayerGraphics) != null)
                 return (Color)PlayerColor.Eyes.GetColor(player.graphicsModule as PlayerGraphics);
 
-            if (player.isNPC && Custom.RGB2HSL(player.ShortCutColor()).z < 0.5f)
+            if (player.isNPC && player.npcStats != null && player.npcStats.Dark)
                 return new Color(255f / 255f, 255f / 255f, 255f / 255f);
             else
                 return new Color(1f / 255f, 1f / 255f, 1f / 255f);
@@ -226,7 +234,7 @@ namespace TheOutsider
             if (playerRef.TryGetTarget(out Player player) && player.isNPC)
             {
                 Random.InitState(player.abstractCreature.ID.number);
-                color.x = (color.x + 0.1f * (Random.value - 0.5f)) % 1f;
+                color.x = (color.x + 0.2f * (Random.value - 0.5f)) % 1f;
             }
             return Custom.HSL2RGB(color.x, color.y, color.z);
         }
@@ -243,7 +251,7 @@ namespace TheOutsider
             if (playerRef.TryGetTarget(out Player player) && player.isNPC)
             {
                 Random.InitState(player.abstractCreature.ID.number);
-                color.x = (color.x + 0.1f * (Random.value - 0.5f)) % 1f;
+                color.x = (color.x + 0.2f * (Random.value - 0.5f)) % 1f;
             }
             return Custom.HSL2RGB(color.x, color.y, color.z);
         }
@@ -390,11 +398,22 @@ namespace TheOutsider
         #region 猫崽相关
         public static bool PlayerNPCShouldBeMoth(Player player)
         {
+            if (player.abstractCreature.creatureTemplate.type == MothPupCritob.MothPup)
+                return true;
             if (player.abstractCreature != null &&
                 player.abstractCreature.world != null &&
                 player.abstractCreature.world.game != null &&
                 player.abstractCreature.world.game.IsStorySession &&
                 (player.abstractCreature.world.game.session.characterStats.name == Plugin.SlugName || player.abstractCreature.world.region.name == "OSAM"))
+            {
+                return true;
+            }
+            return false;
+        }
+        public static bool PlayerNPCShouldBeMoth(World world)
+        {
+            if (world != null && world.game != null && world.game.IsStorySession &&
+               (world.game.session.characterStats.name == Plugin.SlugName || world.region.name == "OSAM"))
             {
                 return true;
             }

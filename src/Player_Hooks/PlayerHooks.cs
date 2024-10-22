@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using TheOutsider.CustomLore.CustomCreature;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -24,7 +25,7 @@ namespace TheOutsider.Player_Hooks
             /*
             if (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))
                 self.SlugCatClass = Plugin.MothPup;*/
-            if ((self.SlugCatClass == Plugin.SlugName || (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))) &&
+            if ((self.SlugCatClass == Plugin.SlugName || self.abstractCreature.creatureTemplate.type == MothPupCritob.MothPup) &&
                 !PlayerData.TryGetValue(self, out _))
                 PlayerData.Add(self, new PlayerEx(self));
         }

@@ -115,6 +115,14 @@ namespace TheOutsider.MothPup_Hooks
                     slugcatStats.poleClimbSpeedFac = 0.9f;
                     slugcatStats.corridorClimbSpeedFac = 0.9f;
                 }
+                if (Plugin.optionsMenuInstance.infiniteFlight.Value)
+                {
+                    self.cat.abstractCreature.creatureTemplate.canFly = true;
+                }
+
+                self.cat.abstractCreature.personality.energy = Mathf.Pow(Mathf.Clamp01(self.cat.abstractCreature.personality.energy + 0.1f), 0.5f);
+                self.cat.abstractCreature.personality.aggression = Mathf.Pow(Mathf.Clamp01(self.cat.abstractCreature.personality.aggression - 1f), 2f);
+                self.cat.abstractCreature.personality.sympathy = Mathf.Pow(Mathf.Clamp01(self.cat.abstractCreature.personality.sympathy + 0.1f), 0.5f);
             }
 
         }
@@ -141,14 +149,15 @@ namespace TheOutsider.MothPup_Hooks
                              self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 2)).AnyBeam ||
                              self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 3)).AnyBeam ||
                              self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 4)).AnyBeam ||
-                             Plugin.optionsMenuInstance.infiniteFlight.Value))
+                             Plugin.optionsMenuInstance.infiniteFlight.Value || 
+                             self.behaviorType == SlugNPCAI.BehaviorType.Fleeing))
                         {
-                            inputPackage.jmp = true;
-                            if (Plugin.optionsMenuInstance.infiniteFlight.Value)
-                                self.cat.wantToJump = 5;
+                            inputPackage.jmp = true;/*
+                            if (Plugin.optionsMenuInstance.infiniteFlight.Value || self.behaviorType == SlugNPCAI.BehaviorType.Fleeing)
+                                self.cat.wantToJump = 5;*/
                         }
                     }
-                    if (self.jumping && (!player.isFlying || Plugin.optionsMenuInstance.infiniteFlight.Value))
+                    if (self.jumping && (!player.isFlying || self.behaviorType == SlugNPCAI.BehaviorType.Fleeing || Plugin.optionsMenuInstance.infiniteFlight.Value))
                     {
                         if (self.forceJump == 3)
                         {
@@ -162,7 +171,7 @@ namespace TheOutsider.MothPup_Hooks
                 if (self.abstractAI.parent.pos.y <= self.abstractAI.destination.y)
                 {
                     if ((self.jumping || player.isFlying) && !self.OnAnyBeam() &&
-                        self.cat.room.GetTile(self.cat.abstractCreature.pos.Tile).horizontalBeam)
+                        self.cat.room.GetTile(self.cat.abstractCreature.pos.Tile).AnyBeam)
                     {
                         inputPackage.y = 1;
                     }
@@ -186,7 +195,7 @@ namespace TheOutsider.MothPup_Hooks
                             inputPackage.y = 1;
                     }
                 }
-
+                /*
                 if (self.cat.gourmandExhausted)
                 {
                     if (!self.OnAnyBeam())
@@ -200,7 +209,7 @@ namespace TheOutsider.MothPup_Hooks
                             self.cat.standing = false;
                         }
                     }
-                }
+                }*/
                 self.cat.input[0] = inputPackage;
             }
         }
@@ -211,7 +220,7 @@ namespace TheOutsider.MothPup_Hooks
             if (Player_Hooks.PlayerHooks.PlayerData.TryGetValue(self.cat, out var player) && player.isMothNPC)
             {
                 Player.InputPackage inputPackage = new Player.InputPackage(false, Options.ControlSetup.Preset.None, self.cat.input[0].x, self.cat.input[0].y, self.cat.input[0].jmp, self.cat.input[0].thrw, self.cat.input[0].pckp, self.cat.input[0].mp, self.cat.input[0].crouchToggle);
-                //TODO：受蜘蛛威胁时释放闪光
+                //受蜘蛛威胁时释放闪光
                 if (self.behaviorType == SlugNPCAI.BehaviorType.Fleeing || self.behaviorType == SlugNPCAI.BehaviorType.Attacking)
                 {
                     for (int i = 0; i < self.tracker.CreaturesCount; i++)
@@ -224,15 +233,17 @@ namespace TheOutsider.MothPup_Hooks
                                 int num = UnityEngine.Random.Range(0, realizedCreature.bodyChunks.Length - 1);
                                 if ((realizedCreature is Spider || realizedCreature is BigSpider ||
                                      realizedCreature is MirosBird || (realizedCreature is Vulture vulture && vulture.IsMiros)) &&
-                                    (Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.LightIntensity * 600f) ||
-                                     Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.LightIntensity * 1600f) &&
-                                     self.cat.room.VisualContact(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos)) &&
-                                     self.cat.FoodInStomach >= 1 && //self.cat.canJump > 0 &&
+                                    (Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.burningRange) ||
+                                     (Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.burningRangeWithVisualContact) &&
+                                     self.cat.room.VisualContact(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos))) &&
+                                     self.cat.FoodInStomach >= 1 && !Plugin.optionsMenuInstance.neverFlare.Value && //self.cat.canJump > 0 &&
                                      UnityEngine.Random.value < Mathf.Lerp(0.035f, 0.1f, Mathf.InverseLerp(0f, 1f, self.creature.personality.aggression)))
                                 {
                                     //self.cat.standing = true;
                                     inputPackage.jmp = true;
                                     inputPackage.pckp = true;
+                                    self.cat.wantToJump = 5;
+                                    player.AIwantFlare = true;
                                 }
                             }
                         }
@@ -396,6 +407,10 @@ namespace TheOutsider.MothPup_Hooks
         private static PathCost SlugNPCAI_TravelPreference(On.MoreSlugcats.SlugNPCAI.orig_TravelPreference orig, SlugNPCAI self, MovementConnection coord, PathCost cost)
         {
             PathCost origCost = orig(self, coord, cost);
+            if (Plugin.optionsMenuInstance.infiniteFlight.Value)
+            {
+                origCost = new PathCost(Mathf.Min(cost.resistance, 1f) + self.threatTracker.ThreatOfTile(coord.destinationCoord, true) * 100f, cost.legality); ;
+            }/*
             if (self.behaviorType != SlugNPCAI.BehaviorType.Fleeing)
             {
                 origCost = cost;
@@ -403,7 +418,7 @@ namespace TheOutsider.MothPup_Hooks
                 {
                     origCost += new PathCost(50f, PathCost.Legality.Unallowed);
                 }
-            }
+            }*/
             return origCost;
         }
 

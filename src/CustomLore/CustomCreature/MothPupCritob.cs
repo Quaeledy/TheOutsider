@@ -38,7 +38,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 DefaultRelationship = new(CreatureTemplate.Relationship.Type.Ignores, 0.5f),
                 HasAI = true,
                 InstantDeathDamage = 1,
-                Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC),
+                Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
                     OffScreen = new(1f, Allowed),
@@ -138,7 +138,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     self.IgnoredBy(template.type);
                 }
             }
-
+            /*
             self.IsInPack(MothPup, 0.5f);
             
             //原捕食，现忽略
@@ -183,26 +183,21 @@ namespace TheOutsider.CustomLore.CustomCreature
             self.HasDynamicRelationship(CreatureTemplate.Type.CicadaB, 1f);
             self.HasDynamicRelationship(CreatureTemplate.Type.JetFish, 1f);
             self.HasDynamicRelationship(CreatureTemplate.Type.Scavenger, 1f);
-            self.HasDynamicRelationship(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, 1f);
-            /*
-            StaticWorld.EstablishRelationship(CreatureTemplate.Type.CicadaA, MothPup, new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.SocialDependent, 1f));
-            StaticWorld.EstablishRelationship(CreatureTemplate.Type.CicadaB, MothPup, new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.SocialDependent, 1f));
-            StaticWorld.EstablishRelationship(CreatureTemplate.Type.JetFish, MothPup, new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.SocialDependent, 1f));
-            StaticWorld.EstablishRelationship(CreatureTemplate.Type.Scavenger, MothPup, new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.SocialDependent, 1f));*/
+            self.HasDynamicRelationship(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, 1f);*/
         }
 
         public override ArtificialIntelligence CreateRealizedAI(AbstractCreature acrit)
         {
-            return new MothPupAI(acrit, acrit.world);
+            return new SlugNPCAI(acrit, acrit.world);
         }
 
         public override Creature CreateRealizedCreature(AbstractCreature acrit)
         {
-            acrit.state = new MothPupState(acrit, 0);
+            acrit.state = new PlayerNPCState(acrit, 0);
             acrit.abstractAI = new SlugNPCAbstractAI(acrit.world, acrit);
             Player mothPup = new Player(acrit, acrit.world);
-            mothPup.SlugCatClass = Plugin.MothPup;
-            mothPup.glowing = true;
+            //mothPup.SlugCatClass = Plugin.MothPup;
+            //mothPup.glowing = true;
             return mothPup;
         }
 

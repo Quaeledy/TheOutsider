@@ -3,6 +3,7 @@ using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
 using System.Text.RegularExpressions;
+using TheOutsider.CustomLore.CustomCreature;
 using Custom = RWCustom.Custom;
 
 namespace TheOutsider.MothPup_Hooks
@@ -11,9 +12,10 @@ namespace TheOutsider.MothPup_Hooks
     {
         public static void Init()
         {
-            On.SlugcatStats.ctor += SlugcatStats_ctor;
-            On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;
+            //On.SlugcatStats.ctor += SlugcatStats_ctor;
+            //On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;
 
+            On.AbstractCreature.ctor += AbstractCreature_ctor;
             On.AImap.TileAccessibleToCreature_IntVector2_CreatureTemplate += AImap_TileAccessibleToCreature;
 
             IL.RegionState.AdaptRegionStateToWorld += IL_RegionState_AdaptRegionStateToWorld;
@@ -22,8 +24,8 @@ namespace TheOutsider.MothPup_Hooks
 
             //On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             //On.MoreSlugcats.PlayerNPCState.ctor += ;
-            On.MoreSlugcats.PlayerNPCState.ToString += PlayerNPCState_ToString;
-            On.MoreSlugcats.PlayerNPCState.LoadFromString += PlayerNPCState_LoadFromString;
+            //On.MoreSlugcats.PlayerNPCState.ToString += PlayerNPCState_ToString;
+            //On.MoreSlugcats.PlayerNPCState.LoadFromString += PlayerNPCState_LoadFromString;
             //On.AbstractCreature.setCustomFlags += AbstractCreature_setCustomFlags;
             //On.AbstractCreature.Move += AbstractCreature_Move;
         }
@@ -72,6 +74,14 @@ namespace TheOutsider.MothPup_Hooks
             }
         }
         */
+        private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature self, World world, CreatureTemplate creatureTemplate, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
+        {
+            orig(self, world, creatureTemplate, realizedCreature, pos, ID);
+            if (self.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && PlayerEx.PlayerNPCShouldBeMoth(world))
+            {
+                self.creatureTemplate = StaticWorld.GetCreatureTemplate(MothPupCritob.MothPup);
+            }
+        }
         private static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats self, SlugcatStats.Name slugcat, bool malnourished)
         {
             orig(self, slugcat, malnourished);
@@ -120,25 +130,18 @@ namespace TheOutsider.MothPup_Hooks
         private static bool AImap_TileAccessibleToCreature(On.AImap.orig_TileAccessibleToCreature_IntVector2_CreatureTemplate orig, AImap self, IntVector2 pos, CreatureTemplate crit)
         {
             bool result = orig(self, pos, crit);
-            if (crit.TopAncestor().type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC)
+            if (crit.type == MothPupCritob.MothPup)
             {
-                foreach (var creature in self.room.abstractRoom.creatures)
+                AItile aitile = self.getAItile(pos);
+                if (Plugin.optionsMenuInstance.infiniteFlight.Value)
                 {
-                    if (creature.creatureTemplate == crit && creature.realizedCreature != null && creature.realizedCreature is Player &&
-                        Player_Hooks.PlayerHooks.PlayerData.TryGetValue(creature.realizedCreature as Player, out var player) && player.isMothNPC)
-                    {
-                        AItile aitile = self.getAItile(pos);
-                        if (Plugin.optionsMenuInstance.infiniteFlight.Value)
-                        {
-                            result = result ||
-                                     StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.CicadaA).AccessibilityResistance(aitile.acc).Allowed;
-                        }
-                        else
-                        {
-                            result = result ||
-                                     StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite).AccessibilityResistance(aitile.acc).Allowed;
-                        }
-                    }
+                    result = result ||
+                             StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.CicadaA).AccessibilityResistance(aitile.acc).Allowed;
+                }
+                else
+                {
+                    result = result ||
+                             StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite).AccessibilityResistance(aitile.acc).Allowed;
                 }
             }
             return result;

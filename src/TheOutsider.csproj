@@ -18,8 +18,7 @@
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2991981689\newest\plugins\EmgTx.dll</HintPath>
         </Reference>
         <Reference Include="Fisobs">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2920541687\plugins\Fisobs.dll</HintPath>
-          <Private>False</Private>
+          <HintPath>..\lib\Fisobs.dll</HintPath>
         </Reference>
         <Reference Include="HOOKS-Assembly-CSharp">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
@@ -89,6 +88,13 @@
       <None Remove="MothPup\**" />
       <None Remove="World_Hooks\Creature\**" />
       <Reference Remove="World_Hooks\Creature\**" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Include="CustomLore\CustomCreature\CreatureTemplateType.cs" />
+      <Compile Include="CustomLore\CustomCreature\MothPupCritob.cs" />
+      <Compile Include="CustomLore\CustomCreature\MothPupIcon.cs" />
+      <Compile Include="CustomLore\CustomCreature\MothPupProperties.cs" />
     </ItemGroup>
     
 </Project>
