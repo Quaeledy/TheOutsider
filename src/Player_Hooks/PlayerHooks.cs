@@ -27,7 +27,14 @@ namespace TheOutsider.Player_Hooks
                 self.SlugCatClass = Plugin.MothPup;*/
             if ((self.SlugCatClass == Plugin.SlugName || self.abstractCreature.creatureTemplate.type == MothPupCritob.MothPup) &&
                 !PlayerData.TryGetValue(self, out _))
-                PlayerData.Add(self, new PlayerEx(self));
+            {
+                PlayerEx player = new PlayerEx(self);
+                PlayerData.Add(self, player);
+                if (player.isMothNPC)
+                {
+                    self.npcStats = new Player.NPCStats(self);
+                }
+            }
         }
 
         private static void Player_NewRoom(On.Player.orig_NewRoom orig, Player self, Room newRoom)

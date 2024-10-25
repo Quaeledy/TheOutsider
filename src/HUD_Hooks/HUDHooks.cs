@@ -119,13 +119,15 @@ namespace TheOutsider.HUD_Hooks
         {
             if (self.owner.hud.owner is Player && (self.owner.hud.owner as Player).abstractCreature.world.game.session.characterStats.name == Plugin.SlugName)
             {
-                PlayerHooks.PlayerData.TryGetValue(self.owner.hud.owner as Player, out var player);
-                if (player.shouldResetDisplayQuarterFood)
+                if (PlayerHooks.PlayerData.TryGetValue(self.owner.hud.owner as Player, out var player))
                 {
-                    self.displayQuarterFood = 4;
-                    self.quarterPipDelay = 40;
-                    player.shouldResetDisplayQuarterFood = false;
-                    return;
+                    if (player.shouldResetDisplayQuarterFood)
+                    {
+                        self.displayQuarterFood = 4;
+                        self.quarterPipDelay = 40;
+                        player.shouldResetDisplayQuarterFood = false;
+                        return;
+                    }
                 }
             }
             orig(self);

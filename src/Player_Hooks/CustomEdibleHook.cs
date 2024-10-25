@@ -108,7 +108,7 @@ namespace TheOutsider.Player_Hooks
                 ILCursor c = new ILCursor(il);
                 ILLabel label = c.DefineLabel();
                 ILLabel label2 = c.DefineLabel();
-                c.GotoNext(MoveType.Before, i => i.MatchLdarg(0),
+                c.TryGotoNext(MoveType.Before, i => i.MatchLdarg(0),
                                            i => i.MatchCall<Creature>("get_grasps"),
                                            i => i.MatchLdloc(13),
                                            i => i.MatchLdelemRef(),
@@ -134,11 +134,11 @@ namespace TheOutsider.Player_Hooks
                     return true;
                 });
                 c.Emit(OpCodes.Brfalse_S, label2);
-                c.GotoNext(MoveType.Before, i => i.MatchLdloc(13),
+                c.TryGotoNext(MoveType.Before, i => i.MatchLdloc(13),
                                             i => i.MatchStloc(6),
                                             i => i.MatchLdloc(13));
                 c.MarkLabel(label);
-                c.GotoNext(MoveType.After, i => i.MatchStloc(6));
+                c.TryGotoNext(MoveType.After, i => i.MatchStloc(6));
                 c.MarkLabel(label2);
 
             }

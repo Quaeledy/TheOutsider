@@ -19,7 +19,7 @@ namespace TheOutsider
             get
             {
                 if (playerRef.TryGetTarget(out Player player))
-                    return player.SlugCatClass == Plugin.SlugName || player.SlugCatClass == Plugin.MothPup || isMothNPC;
+                    return player.SlugCatClass == Plugin.SlugName || player.slugcatStats.name == Plugin.MothPup || isMothNPC;
                 else
                     return false;
             }
@@ -35,6 +35,7 @@ namespace TheOutsider
         public bool regurgitating;
         public bool wantsToSwallowObject;
         public bool swallowing;
+        public bool isColorVariation;
         #endregion
         #region 飞行相关
         public float flutterTimeAdd;
@@ -108,7 +109,7 @@ namespace TheOutsider
 
         public int tailN;
         public readonly float swallowTailSpacing = 6f;
-        public readonly float MaxLength = 10f;
+        public readonly float MaxLength = 15f;
         public readonly float swallowTailWidth = 0.4f;
         public float tailTimeAdd;
         #endregion
@@ -124,6 +125,11 @@ namespace TheOutsider
             {
                 isMothNPC = true;
                 player.glowing = true;
+                Random.InitState(player.abstractCreature.ID.number);
+                if (Random.value <= 0.15f) 
+                    isColorVariation = true;
+                else
+                    isColorVariation = false;
             }
 
             if (!IsOutsider)
@@ -170,9 +176,11 @@ namespace TheOutsider
 
         public Color GetEyesColor()
         {
-            if (!playerRef.TryGetTarget(out Player player) || player.graphicsModule == null)
+            if (!playerRef.TryGetTarget(out Player player))
+                return new Color(1f / 255f, 1f / 255f, 1f / 255f);
+            if (player.graphicsModule == null)
             {
-                if (player.isNPC && player.npcStats != null && player.npcStats.Dark)
+                if (player.isNPC && player.npcStats != null && player.npcStats.Dark && isColorVariation)
                     return new Color(255f / 255f, 255f / 255f, 255f / 255f);
                 else
                     return new Color(1f / 255f, 1f / 255f, 1f / 255f);
@@ -180,7 +188,7 @@ namespace TheOutsider
             if (PlayerColor.Eyes.GetColor(player.graphicsModule as PlayerGraphics) != null)
                 return (Color)PlayerColor.Eyes.GetColor(player.graphicsModule as PlayerGraphics);
 
-            if (player.isNPC && player.npcStats != null && player.npcStats.Dark)
+            if (player.isNPC && player.npcStats != null && player.npcStats.Dark && isColorVariation)
                 return new Color(255f / 255f, 255f / 255f, 255f / 255f);
             else
                 return new Color(1f / 255f, 1f / 255f, 1f / 255f);
@@ -233,8 +241,8 @@ namespace TheOutsider
             Vector3 color = ColorLerp(bodyColor, defaultColor, presetColor1, presetColor2, presetColor3, presetColor4);
             if (playerRef.TryGetTarget(out Player player) && player.isNPC)
             {
-                Random.InitState(player.abstractCreature.ID.number);
-                color.x = (color.x + 0.2f * (Random.value - 0.5f)) % 1f;
+                Random.InitState(player.abstractCreature.ID.number + 1);//不能用Random.InitState(player.abstractCreature.ID.number)，否则下一个随机数必<=0.15
+                color.x = (color.x + (Random.value - 0.5f) * (this.isColorVariation ? 2f : 0.2f) + 1f) % 1f;
             }
             return Custom.HSL2RGB(color.x, color.y, color.z);
         }
@@ -250,8 +258,8 @@ namespace TheOutsider
             Vector3 color = ColorLerp(bodyColor, defaultColor, presetColor1, presetColor2, presetColor3, presetColor4);
             if (playerRef.TryGetTarget(out Player player) && player.isNPC)
             {
-                Random.InitState(player.abstractCreature.ID.number);
-                color.x = (color.x + 0.2f * (Random.value - 0.5f)) % 1f;
+                Random.InitState(player.abstractCreature.ID.number + 1);
+                color.x = (color.x + (Random.value - 0.5f) * (this.isColorVariation ? 2f : 0.2f) + 1f) % 1f;
             }
             return Custom.HSL2RGB(color.x, color.y, color.z);
         }
@@ -274,19 +282,24 @@ namespace TheOutsider
                 return presetColor3;
             if (bodyColorHSL == presetBodyColor4)
                 return presetColor4;
-            float distReciprocal = 1f / Vector3.Distance(bodyColorHSL, defaultBodyColor);
-            float distReciprocal1 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor1);
-            float distReciprocal2 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor2);
-            float distReciprocal3 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor3);
-            float distReciprocal4 = 1f / Vector3.Distance(bodyColorHSL, presetBodyColor4);
-            float distReciprocalAdd = distReciprocal + distReciprocal1 + distReciprocal2 + distReciprocal3 + distReciprocal4;
+            float dist0 = Vector3.Distance(bodyColorHSL, defaultBodyColor);
+            float dist1 = Mathf.Abs(bodyColorHSL.z - presetBodyColor1.z);
+            float dist2 = Vector3.Distance(bodyColorHSL, presetBodyColor2);
+            float dist3 = Vector3.Distance(bodyColorHSL, presetBodyColor3);
+            float dist4 = Mathf.Abs(bodyColorHSL.z - presetBodyColor4.z);
+            float distMuti = dist0 * dist1 * dist2 * dist3 * dist4;
+            float distReciprocal0 = distMuti / Mathf.Pow(dist0, 2f);
+            float distReciprocal1 = distMuti / Mathf.Pow(dist1, 2f);
+            float distReciprocal2 = distMuti / Mathf.Pow(dist2, 2f);
+            float distReciprocal3 = distMuti / Mathf.Pow(dist3, 2f);
+            float distReciprocal4 = distMuti / Mathf.Pow(dist4, 2f);
+            float distReciprocalAdd = distReciprocal0 + distReciprocal1 + distReciprocal2 + distReciprocal3 + distReciprocal4;
 
-            Vector3 color = 1f / distReciprocalAdd *
-                            (distReciprocal * defaultColor +
+            Vector3 color = (distReciprocal0 * defaultColor +
                              distReciprocal1 * presetColor1 +
                              distReciprocal2 * presetColor2 +
                              distReciprocal3 * presetColor3 +
-                             distReciprocal4 * presetColor4);
+                             distReciprocal4 * presetColor4) / distReciprocalAdd;
             return color;
         }
 

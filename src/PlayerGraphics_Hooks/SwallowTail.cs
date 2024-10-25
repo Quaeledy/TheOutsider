@@ -144,9 +144,11 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 Vector2 hipsPos = Vector2.Lerp(self.owner.bodyChunks[1].pos, self.owner.bodyChunks[0].pos, 0.25f);
                 Vector2 bodyVel = Vector2.Lerp(self.player.bodyChunks[0].pos - self.player.bodyChunks[0].lastPos, self.player.bodyChunks[1].pos - self.player.bodyChunks[1].lastPos, 0.5f);
                 //通过身体角度判断移动
-                var moveDeg = Mathf.Clamp(Custom.AimFromOneVectorToAnother(Vector2.zero, (hipsPos - drawPos1).normalized), -22.5f, 22.5f);
+                float bodyAngle = Custom.VecToDeg(hipsPos - drawPos1);
+                float moveDeg = self.player.animation == Player.AnimationIndex.StandOnBeam ? 60f : 22.5f;
+                var moveScale = Mathf.Clamp(Custom.AimFromOneVectorToAnother(Vector2.zero, (hipsPos - drawPos1).normalized), -moveDeg, moveDeg);
                 //实际凤尾偏移
-                var nowSwallowTailSpacing = player.swallowTailSpacing * Custom.LerpMap(Mathf.Abs(moveDeg), 0, 10, 1f, 0.3f);
+                var nowSwallowTailSpacing = player.swallowTailSpacing * Custom.LerpMap(Mathf.Abs(moveScale), 0, 10, 1f, 0.3f);
 
                 for (int i = 0; i < player.swallowtail.GetLength(0); i++)
                 {
@@ -160,8 +162,16 @@ namespace TheOutsider.PlayerGraphics_Hooks
                     float num9 = 28f;*/
 
                     player.swallowtail[i, 0].connectedPoint = new Vector2?(rootPos);
+                    Vector2 lastNormalized = dir;
                     for (int k = 0; k < player.swallowtail.GetLength(1); k++)
                     {
+                        //超出长度限位
+                        if (!Custom.DistLess(player.swallowtail[i, k].pos, rootPos, player.MaxLength))
+                        {
+                            player.swallowtail[i, k].pos = rootPos + Custom.DirVec(rootPos, player.swallowtail[i, k].pos) * player.MaxLength;// * (1 + t);if (k > 1)
+                            player.swallowtail[i, k].vel *= 0.5f;
+                        }
+
                         float t = (float)k / (float)(player.swallowtail.GetLength(1) - 1);//在单根触须上的长度占比
                         player.swallowtail[i, k].Update();
                         player.swallowtail[i, k].vel *= Mathf.Lerp(0.75f, 0.95f, num3 * (1f - self.owner.bodyChunks[1].submersion));//水中减少速度
@@ -169,12 +179,6 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         Vector2 drift = Drift(self, player, k, i, bodyVel) * Mathf.InverseLerp(player.isFlying ? 0f : 2f, player.isFlying ? 4f : 8f, bodyVel.magnitude);
                         player.swallowtail[i, k].vel.y = player.swallowtail[i, k].vel.y - Mathf.Lerp(0.1f, 0.5f, num3) * (1f - self.owner.bodyChunks[1].submersion) * self.owner.EffectiveRoomGravity;
                         num3 = (num3 * 10f + 1f) / 11f;
-
-                        //超出长度限位
-                        if (!Custom.DistLess(player.swallowtail[i, k].pos, rootPos, player.MaxLength * (k + 1)))
-                        {
-                            player.swallowtail[i, k].pos = rootPos + Custom.DirVec(rootPos, player.swallowtail[i, k].pos) * player.MaxLength * (k + 1);
-                        }
 
                         player.swallowtail[i, k].pos += 0.1f * drift;
 
@@ -187,7 +191,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         if (!self.player.room.PointSubmerged(player.swallowtail[i, k].pos))
                         {
                             player.swallowtail[i, k].vel *= 0.99f;
-                            player.swallowtail[i, k].vel.y -= self.player.room.gravity * 0.6f * Mathf.InverseLerp(player.isFlying ? 4f : 8f, 1f, bodyVel.magnitude);
+                            player.swallowtail[i, k].vel.y -= self.player.room.gravity * 0.6f * Mathf.InverseLerp(player.isFlying ? 4f : 8f, 1f, bodyVel.magnitude) * (1f - t);
                         }
 
                         if (player.isFlying && Random.value < 0.1f && player.flutterTimeAdd <= player.upFlightTime && player.flightTime > 0)
@@ -202,16 +206,26 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         {
                             Vector2 normalized = (player.swallowtail[i, k].pos - player.swallowtail[i, k - 1].pos).normalized;
                             float dist = Vector2.Distance(player.swallowtail[i, k].pos, player.swallowtail[i, k - 1].pos);
-                            player.swallowtail[i, k].pos += normalized * (idealDist - dist) * 0.5f * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
-                            player.swallowtail[i, k].vel += normalized * (idealDist - dist) * 0.5f * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
-                            player.swallowtail[i, k - 1].pos -= normalized * (idealDist - dist) * 0.5f * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
-                            player.swallowtail[i, k - 1].vel -= normalized * (idealDist - dist) * 0.5f * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
+                            float distScale = idealDist - dist;
+                            //float distScale = Mathf.Sign(idealDist - dist) * Mathf.Pow(Mathf.Abs(idealDist - dist), 2f);
+                            float influence = Mathf.Lerp(0.5f, 1f, t);
+                            player.swallowtail[i, k].pos += normalized * distScale * influence * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
+                            player.swallowtail[i, k].vel += normalized * distScale * influence * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
+                            player.swallowtail[i, k - 1].pos -= normalized * distScale * influence * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
+                            player.swallowtail[i, k - 1].vel -= normalized * distScale * influence * Mathf.InverseLerp(1f, 2f, bodyVel.magnitude);
                             if (k > 1)
                             {
-                                normalized = (player.swallowtail[i, k].pos - player.swallowtail[i, k - 2].pos).normalized;
-                                player.swallowtail[i, k].vel += normalized * 0.5f;
-                                player.swallowtail[i, k - 2].vel -= normalized * 0.2f;
-                            }
+                                Vector2 newNormalized = (player.swallowtail[i, k].pos - player.swallowtail[i, k - 2].pos).normalized;
+                                player.swallowtail[i, k].vel += newNormalized * influence;
+                                player.swallowtail[i, k - 2].vel -= newNormalized * 0.2f;
+                            }/*
+                            else // k == 1
+                            {
+                                player.swallowtail[i, k].vel += 4f * Custom.DirVec(normalized, dir) * Mathf.InverseLerp(0.1f, 2f, bodyVel.magnitude);
+                            }*/
+                            if (!player.isFlying)
+                                player.swallowtail[i, k].vel += 6f * (1 - t) * Custom.DirVec(normalized, lastNormalized) * Mathf.InverseLerp(0.1f, 2f, bodyVel.magnitude);
+                            //lastNormalized = normalized;
                         }
                         //触须根部位置
                         else
@@ -225,6 +239,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                             player.swallowtail[i, k].pos = rootPos;
                             player.swallowtail[i, k].vel *= 0f;
                         }
+                        rootPos = player.swallowtail[i, k].pos;
                         /*
                         num9 *= 0.5f;
                         pos = player.swallowtail[i, k].pos;*/

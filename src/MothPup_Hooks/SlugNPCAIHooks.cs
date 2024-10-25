@@ -19,8 +19,6 @@ namespace TheOutsider.MothPup_Hooks
 
         public static void Init()
         {
-            IL.MoreSlugcats.SlugNPCAI.ctor += IL_SlugNPCAI_ctor;
-
             On.MoreSlugcats.SlugNPCAI.ctor += SlugNPCAI_ctor;
             On.MoreSlugcats.SlugNPCAI.Update += SlugNPCAI_Update;
             On.MoreSlugcats.SlugNPCAI.TheoreticallyEatMeat += SlugNPCAI_TheoreticallyEatMeat;
@@ -31,6 +29,7 @@ namespace TheOutsider.MothPup_Hooks
             On.MoreSlugcats.SlugNPCAI.Move += SlugNPCAI_Move;
             On.MoreSlugcats.SlugNPCAI.DecideBehavior += SlugNPCAI_DecideBehavior;
             On.MoreSlugcats.SlugNPCAI.TravelPreference += SlugNPCAI_TravelPreference;
+            //IL.MoreSlugcats.SlugNPCAI.ctor += IL_SlugNPCAI_ctor;
             //On.MoreSlugcats.SlugNPCAI.SocialEvent += SlugNPCAI_SocialEvent;
         }
         /*
@@ -77,20 +76,17 @@ namespace TheOutsider.MothPup_Hooks
                 throw;
             }
         }
-        */
         private static void IL_SlugNPCAI_ctor(ILContext il)
         {
-            ILCursor itemTrackerCurs = new(il);
-            itemTrackerCurs.GotoNext(MoveType.Before, x => x.MatchNewobj<ItemTracker>());
-            /* GOTO BEFORE IL_007d
-             *	IL_007b: ldc.i4.m1
-	         *  IL_007c: ldc.i4.1
-	         *  IL_007d: newobj instance void ItemTracker::.ctor(class ArtificialIntelligence, int32, int32, int32, int32, bool)
-	         *  IL_0082: call instance void ArtificialIntelligence::AddModule(class AIModule)
-             */
-            itemTrackerCurs.Emit(OpCodes.Pop);
-            itemTrackerCurs.Emit(OpCodes.Ldc_I4_0); // Switch stopTrackingCarried to false
+            ILCursor c = new ILCursor(il);
+            if(c.TryGotoNext(MoveType.Before, 
+                i => i.MatchNewobj<ItemTracker>()))
+            {
+                c.Emit(OpCodes.Pop);
+                c.Emit(OpCodes.Ldc_I4_0);
+            }
         }
+        */
         private static void SlugNPCAI_ctor(On.MoreSlugcats.SlugNPCAI.orig_ctor orig, SlugNPCAI self, AbstractCreature creature, World world)
         {
             orig(self, creature, world);
@@ -98,31 +94,10 @@ namespace TheOutsider.MothPup_Hooks
             {
                 //pupVariables.pathingVisualizer = new(self, 5);
                 //pupVariables.labelManager = new(self.cat);
-                SlugcatStats slugcatStats = self.cat.slugcatStats;
-
-                slugcatStats.bodyWeightFac = 0.65f;
-                slugcatStats.generalVisibilityBonus = -0.2f;
-                slugcatStats.visualStealthInSneakMode = 0.6f;
-                slugcatStats.loudnessFac = 0.5f;
-                slugcatStats.lungsFac = 0.8f;
-                slugcatStats.throwingSkill = 0;
-                slugcatStats.poleClimbSpeedFac = 1.4f;
-                slugcatStats.corridorClimbSpeedFac = 1.35f;
-                slugcatStats.runspeedFac = 1.35f;
-                if (slugcatStats.malnourished)
-                {
-                    slugcatStats.runspeedFac = 1f;
-                    slugcatStats.poleClimbSpeedFac = 0.9f;
-                    slugcatStats.corridorClimbSpeedFac = 0.9f;
-                }
                 if (Plugin.optionsMenuInstance.infiniteFlight.Value)
                 {
                     self.cat.abstractCreature.creatureTemplate.canFly = true;
                 }
-
-                self.cat.abstractCreature.personality.energy = Mathf.Pow(Mathf.Clamp01(self.cat.abstractCreature.personality.energy + 0.1f), 0.5f);
-                self.cat.abstractCreature.personality.aggression = Mathf.Pow(Mathf.Clamp01(self.cat.abstractCreature.personality.aggression - 1f), 2f);
-                self.cat.abstractCreature.personality.sympathy = Mathf.Pow(Mathf.Clamp01(self.cat.abstractCreature.personality.sympathy + 0.1f), 0.5f);
             }
 
         }
@@ -228,16 +203,22 @@ namespace TheOutsider.MothPup_Hooks
                         if (self.threatTracker.GetThreatCreature(self.tracker.GetRep(i).representedCreature) != null && self.tracker.GetRep(i).representedCreature.realizedCreature != null)
                         {
                             Creature realizedCreature = self.tracker.GetRep(i).representedCreature.realizedCreature;
-                            if (realizedCreature.bodyChunks.Length != 0 && !realizedCreature.dead && !realizedCreature.Blinded)
+                            if (realizedCreature.bodyChunks.Length != 0 && !(realizedCreature.dead || realizedCreature.Blinded))
                             {
                                 int num = UnityEngine.Random.Range(0, realizedCreature.bodyChunks.Length - 1);
-                                if ((realizedCreature is Spider || realizedCreature is BigSpider ||
-                                     realizedCreature is MirosBird || (realizedCreature is Vulture vulture && vulture.IsMiros)) &&
-                                    (Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.burningRange) ||
-                                     (Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.burningRangeWithVisualContact) &&
-                                     self.cat.room.VisualContact(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos))) &&
-                                     self.cat.FoodInStomach >= 1 && !Plugin.optionsMenuInstance.neverFlare.Value && //self.cat.canJump > 0 &&
-                                     UnityEngine.Random.value < Mathf.Lerp(0.035f, 0.1f, Mathf.InverseLerp(0f, 1f, self.creature.personality.aggression)))
+                                bool isCreatureDislikeFlareAndBig = realizedCreature is BigSpider ||
+                                                                    realizedCreature is MirosBird || 
+                                                                    (realizedCreature is Vulture vulture && vulture.IsMiros);
+                                bool isCreatureDislikeFlare = realizedCreature is Spider || isCreatureDislikeFlareAndBig;
+                                bool inFlareRange = Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.burningRange) ||
+                                                    (Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.burningRangeWithVisualContact) &&
+                                                    self.cat.room.VisualContact(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos));
+                                bool canFlare = self.cat.FoodInStomach >= 1 && !Plugin.optionsMenuInstance.neverFlare.Value;
+                                bool wantFlare = UnityEngine.Random.value < Mathf.Lerp(0.035f, 0.1f, Mathf.InverseLerp(0f, 1f, self.creature.personality.aggression)) ||
+                                                 (isCreatureDislikeFlareAndBig && Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, 50f)) ||
+                                                 (realizedCreature is Spider && (realizedCreature as Spider).centipede.totalMass > self.cat.TotalMass &&
+                                                  Custom.DistLess(self.cat.bodyChunks[1].pos, (realizedCreature as Spider).centipede.FirstSpider.mainBodyChunk.pos, 200f));
+                                if (isCreatureDislikeFlare && inFlareRange && canFlare && wantFlare)
                                 {
                                     //self.cat.standing = true;
                                     inputPackage.jmp = true;
@@ -422,26 +403,6 @@ namespace TheOutsider.MothPup_Hooks
             return origCost;
         }
 
-        public static bool TryGetPupState(PlayerState self, out PupNPCState pupNPCState)
-        {
-            if (self != null && self is PlayerNPCState playerNPCState)
-            {
-                pupNPCState = GetPupState(playerNPCState);
-            }
-            else pupNPCState = null;
-
-            return pupNPCState != null;
-        }
-        public static bool TryGetPupState(PlayerNPCState self, out PupNPCState pupNPCState)
-        {
-            if (self != null)
-            {
-                pupNPCState = GetPupState(self);
-            }
-            else pupNPCState = null;
-
-            return pupNPCState != null;
-        }
         public static bool TryGetParentVariables(Player self, out ParentVariables parentVariables)
         {
             if (self != null)

@@ -5,6 +5,9 @@ using RWCustom;
 using System.Text.RegularExpressions;
 using TheOutsider.CustomLore.CustomCreature;
 using Custom = RWCustom.Custom;
+using UnityEngine;
+using System.Collections.Generic;
+using HUD;
 
 namespace TheOutsider.MothPup_Hooks
 {
@@ -12,17 +15,19 @@ namespace TheOutsider.MothPup_Hooks
     {
         public static void Init()
         {
-            //On.SlugcatStats.ctor += SlugcatStats_ctor;
-            //On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;
+            IL.MoreSlugcats.PlayerNPCState.CycleTick += PlayerNPCState_CycleTickIL;
+            IL.HUD.FoodMeter.TrySpawnPupBars += FoodMeter_TrySpawnPupBarsIL;
+
+            On.SlugcatStats.ctor += SlugcatStats_ctor;
+            On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
+            On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;
 
             On.AbstractCreature.ctor += AbstractCreature_ctor;
             On.AImap.TileAccessibleToCreature_IntVector2_CreatureTemplate += AImap_TileAccessibleToCreature;
 
-            IL.RegionState.AdaptRegionStateToWorld += IL_RegionState_AdaptRegionStateToWorld;
-            IL.MoreSlugcats.PlayerNPCState.CycleTick += IL_PlayerNPCState_CycleTick;
+            //IL.RegionState.AdaptRegionStateToWorld += IL_RegionState_AdaptRegionStateToWorld;
             //IL.SlugcatStats.NourishmentOfObjectEaten += IL_SlugcatStats_NourishmentOfObjectEaten;
 
-            //On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             //On.MoreSlugcats.PlayerNPCState.ctor += ;
             //On.MoreSlugcats.PlayerNPCState.ToString += PlayerNPCState_ToString;
             //On.MoreSlugcats.PlayerNPCState.LoadFromString += PlayerNPCState_LoadFromString;
@@ -74,6 +79,54 @@ namespace TheOutsider.MothPup_Hooks
             }
         }
         */
+        #region IL Hooks
+        private static void PlayerNPCState_CycleTickIL(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            while (c.TryGotoNext(MoveType.After,
+                i => i.MatchLdsfld<MoreSlugcatsEnums.SlugcatStatsName>(nameof(MoreSlugcatsEnums.SlugcatStatsName.Slugpup))))
+            {
+                Plugin.Log("PlayerNPCState_CycleTickIL MatchFind!");
+                c.Emit(OpCodes.Ldarg_0); // self
+                c.EmitDelegate((SlugcatStats.Name slugpup, PlayerNPCState self) =>
+                {
+                    SlugcatStats.Name result = slugpup;
+                    Plugin.Log("PlayerNPCState_CycleTickIL 0 :" + result.ToString());
+                    if (self.player.creatureTemplate.type == MothPupCritob.MothPup)
+                    {
+                        result = Plugin.MothPup;
+                        Plugin.Log("PlayerNPCState_CycleTickIL 1 :" + result.ToString());
+                    }
+                    Plugin.Log("PlayerNPCState_CycleTickIL 2 :" + result.ToString());
+                    return result;
+                });
+            }
+        }
+
+        private static void FoodMeter_TrySpawnPupBarsIL(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            while (c.TryGotoNext(MoveType.After,
+                i => i.MatchLdsfld<MoreSlugcatsEnums.CreatureTemplateType>(nameof(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC)),
+                i => i.Match(OpCodes.Call)))
+            {
+                Plugin.Log("FoodMeter_TrySpawnPupBarsIL MatchFind!");
+                c.Emit(OpCodes.Ldarg_0); // self
+                c.Emit(OpCodes.Ldloc_1); // i
+                c.EmitDelegate((bool isSlugNPC, FoodMeter self, int i) =>
+                {
+                    bool isMothPup = false;
+                    if ((self.hud.owner as Player).abstractCreature.Room.creatures[i].creatureTemplate.type == MothPupCritob.MothPup)
+                    {
+                        isMothPup = true;
+                    }
+                    return isSlugNPC || isMothPup;
+                });
+            }
+        }
+        #endregion
         private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature self, World world, CreatureTemplate creatureTemplate, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
         {
             orig(self, world, creatureTemplate, realizedCreature, pos, ID);
@@ -85,17 +138,19 @@ namespace TheOutsider.MothPup_Hooks
         private static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats self, SlugcatStats.Name slugcat, bool malnourished)
         {
             orig(self, slugcat, malnourished);
+
+            Plugin.Log("SlugcatStats_ctor :" + slugcat.ToString());
             if (slugcat == Plugin.MothPup)
             {
                 self.bodyWeightFac = 0.65f;
                 self.generalVisibilityBonus = -0.2f;
                 self.visualStealthInSneakMode = 0.6f;
-                self.loudnessFac = 0.5f;
-                self.lungsFac = 0.8f;
+                self.loudnessFac = 1f;
+                self.lungsFac = 1f;
                 self.throwingSkill = 0;
-                self.poleClimbSpeedFac = 1.4f;
-                self.corridorClimbSpeedFac = 1.35f;
-                self.runspeedFac = 1.35f;
+                self.poleClimbSpeedFac = 1.6f;
+                self.corridorClimbSpeedFac = 1.15f;
+                self.runspeedFac = 1.25f;
                 if (malnourished)
                 {
                     self.runspeedFac = 1f;
@@ -105,7 +160,7 @@ namespace TheOutsider.MothPup_Hooks
             }
         }
         private static IntVector2 SlugcatStats_SlugcatFoodMeter(On.SlugcatStats.orig_SlugcatFoodMeter orig, SlugcatStats.Name slugcat)
-        {
+        {/*/
             Player player = null;
             if (Custom.rainWorld != null && Custom.rainWorld.processManager != null &&
                 Custom.rainWorld.processManager.currentMainLoop != null && Custom.rainWorld.processManager.currentMainLoop is RainWorldGame)
@@ -119,13 +174,17 @@ namespace TheOutsider.MothPup_Hooks
                     if (player == null)
                         continue;
                 }
-            }
+            }*/
 
-            if (slugcat == Plugin.MothPup || (player != null && PlayerEx.PlayerNPCShouldBeMoth(player)))
+            IntVector2 result = orig(slugcat);
+            Plugin.Log("SlugcatStats_SlugcatFoodMeter 0 :" + result.ToString());
+            Plugin.Log("SlugcatStats_SlugcatFoodMeter slugcat :" + slugcat.ToString());
+            if (slugcat == Plugin.MothPup)// || (player != null && PlayerEx.PlayerNPCShouldBeMoth(player)))
             {
-                return new IntVector2(4, 3);
+                result = new IntVector2(4, 3);
+                Plugin.Log("SlugcatStats_SlugcatFoodMeter 1 :" + result.ToString());
             }
-            return orig(slugcat);
+            return result;
         }
         private static bool AImap_TileAccessibleToCreature(On.AImap.orig_TileAccessibleToCreature_IntVector2_CreatureTemplate orig, AImap self, IntVector2 pos, CreatureTemplate crit)
         {
@@ -146,21 +205,30 @@ namespace TheOutsider.MothPup_Hooks
             }
             return result;
         }
+        private static bool SlugcatStats_HiddenOrUnplayableSlugcat(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugcatStats.Name i)
+        {
+            if (i == Plugin.MothPup)
+            {
+                return true;
+            }
+            return orig(i);
+        }
         private static string PlayerNPCState_ToString(On.MoreSlugcats.PlayerNPCState.orig_ToString orig, PlayerNPCState self)
         {
             string text = orig(self);
-            if (self.player.realizedCreature is Player pup && SlugNPCAIHooks.TryGetPupState(pup.playerState, out var pupNPCState))
+            if (self.player.realizedCreature is Player pup && Player_Hooks.PlayerHooks.PlayerData.TryGetValue(pup, out var player) && player.isMothNPC)
             {
                 text += "Variant<cC>" + ((pup.slugcatStats.name != MoreSlugcatsEnums.SlugcatStatsName.Slugpup) ? pup.slugcatStats.name.value : "NULL") + "<cB>";
-                text += "PupsPlusStomach<cC>" + ((pupNPCState.PupsPlusStomachObject != null) ? pupNPCState.PupsPlusStomachObject.ToString() : "NULL") + "<cB>";
+                text += "IsColorVariation<cC>" + (player.isColorVariation) + "<cB>";
             }
             return text;
 
         }
+        /*
         private static void PlayerNPCState_LoadFromString(On.MoreSlugcats.PlayerNPCState.orig_LoadFromString orig, PlayerNPCState self, string[] s)
         {
             orig(self, s);
-            if (SlugNPCAIHooks.TryGetPupState(self, out var pupNPCState))
+            if (self.player.realizedCreature != null && Player_Hooks.PlayerHooks.PlayerData.TryGetValue(self.player.realizedCreature as Player, out var player) && player.isMothNPC)
             {
                 for (int i = 0; i < s.Length - 1; i++)
                 {
@@ -186,21 +254,14 @@ namespace TheOutsider.MothPup_Hooks
                                     pupNPCState.PupsPlusStomachObject = SaveState.AbstractCreatureFromString(self.player.Room.world, array[1], onlyInCurrentRegion: false);
                                 }
                             }
-                            break;/*
-                        // BeastMasterPupExtras Compat
-                        case "SlugcatCharacter":
-                            if (BeastMasterPupExtras && !array[1].Equals("Slugpup") && self.player.TryGetPupAbstract(out var pupAbstract))
-                            {
-                                pupAbstract.regular = true;
-                            }
                             break;
-                            */
                     }
                 }
             }
             self.unrecognizedSaveStrings.Remove("Variant");
             self.unrecognizedSaveStrings.Remove("PupsPlusStomach");
         }
+        */
         private static void AbstractCreature_setCustomFlags(On.AbstractCreature.orig_setCustomFlags orig, AbstractCreature self)
         {
             if (self.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC)
@@ -264,72 +325,12 @@ namespace TheOutsider.MothPup_Hooks
             }
             orig(self, newCoord);
         }
-        private static bool SlugcatStats_HiddenOrUnplayableSlugcat(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugcatStats.Name i)
-        {
-            if (i == Plugin.MothPup)
-            {
-                return true;
-            }
-            return orig(i);
-        }
-        private static void IL_PlayerNPCState_CycleTick(ILContext il)
-        {
-            ILCursor foodCurs = new(il);
-
-            while (foodCurs.TryGotoNext(MoveType.After, x => x.MatchLdsfld<MoreSlugcatsEnums.SlugcatStatsName>(nameof(MoreSlugcatsEnums.SlugcatStatsName.Slugpup))))
-            {
-                /* WHILE TRYGOTO AFTER ldsfld class SlugcatStats/Name MoreSlugcats.MoreSlugcatsEnums/SlugcatStatsName::Slugpup
-                 * 	IL_****: ldarg.0
-	             *  IL_****: ldsfld class SlugcatStats/Name MoreSlugcats.MoreSlugcatsEnums/SlugcatStatsName::Slugpup
-                 */
-                foodCurs.Emit(OpCodes.Ldarg_0); // self
-                foodCurs.EmitDelegate((SlugcatStats.Name slugpup, PlayerNPCState self) =>   // If pupNPCState.variant != null, return variant, else return slugpup
-                {
-                    if (SlugNPCAIHooks.TryGetPupState(self, out var pupNPCState))
-                    {
-                        SlugcatStats.Name variant = pupNPCState.Variant;
-                        if (variant != null)
-                        {
-                            return variant;
-                        }
-                    }
-                    return slugpup;
-                });
-            }
-        }
-        private static void IL_RegionState_AdaptRegionStateToWorld(ILContext il)
-        {
-            ILCursor stomachObjCurs = new(il);
-
-            stomachObjCurs.GotoNext(x => x.MatchLdstr("Add pup to pendingFriendSpawns {0}"));
-            stomachObjCurs.GotoNext(MoveType.Before, x => x.MatchLdarg(0));
-            /* GOTO BEFORE IL_02ab
-             * 	IL_02b0: ldarg.0
-			 *  IL_02b1: ldfld class SaveState RegionState::saveState
-			 *  IL_02b6: ldfld class [mscorlib]System.Collections.Generic.List`1<string> SaveState::pendingFriendCreatures
-             */
-            stomachObjCurs.Emit(OpCodes.Ldloc, 6); // abstractCreature
-            stomachObjCurs.EmitDelegate((AbstractCreature abstractCreature) =>   // If abstractCreature is player and player playerState is PlayerNPCState, set PupsPlusStomachObject to objectInStomach
-            {
-                if (abstractCreature.realizedCreature is Player player && player.isNPC)
-                {
-                    if (SlugNPCAIHooks.TryGetPupState(player.playerState, out var pupNPCState))
-                    {
-                        if (player.objectInStomach != null)
-                        {
-                            pupNPCState.PupsPlusStomachObject = player.objectInStomach;
-                        }
-                        else pupNPCState.PupsPlusStomachObject = null;
-                    }
-                }
-            });
-        }
         /*
         private static void IL_Snail_Click(ILContext il)
         {
             ILCursor staggerCurs = new(il);
 
-            staggerCurs.GotoNext(MoveType.After, x => x.MatchLdsfld<MoreSlugcatsEnums.SlugcatStatsName>(nameof(MoreSlugcatsEnums.SlugcatStatsName.Saint)), x => x.Match(OpCodes.Call));
+            staggerCurs.TryGotoNext(MoveType.After, x => x.MatchLdsfld<MoreSlugcatsEnums.SlugcatStatsName>(nameof(MoreSlugcatsEnums.SlugcatStatsName.Saint)), x => x.Match(OpCodes.Call));
             staggerCurs.Emit(OpCodes.Ldloc, 10); // item
             staggerCurs.EmitDelegate((PhysicalObject item) =>   // If item is Player and Player is Tundrapup, return true
             {

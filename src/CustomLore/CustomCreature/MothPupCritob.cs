@@ -38,7 +38,8 @@ namespace TheOutsider.CustomLore.CustomCreature
                 DefaultRelationship = new(CreatureTemplate.Relationship.Type.Ignores, 0.5f),
                 HasAI = true,
                 InstantDeathDamage = 1,
-                Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
+                Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.CicadaB),
+                //Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
                     OffScreen = new(1f, Allowed),
@@ -129,16 +130,18 @@ namespace TheOutsider.CustomLore.CustomCreature
             // You can use StaticWorld.EstablishRelationship, but the Relationships class exists to make this process more ergonomic.
             // 您可以使用 StaticWorld.EstablishRelationship，但Relationships类的存在是为了使此过程更符合人体工程学。
             Relationships self = new(MothPup);
-
+            CreatureTemplate slugpupTemplate = StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC);
             foreach (var template in StaticWorld.creatureTemplates)
             {
                 if (template.quantified)
-                {
+                {/*
                     self.Ignores(template.type);
-                    self.IgnoredBy(template.type);
+                    self.IgnoredBy(template.type);*/
+                    StaticWorld.EstablishRelationship(template.type, MothPup, template.relationships[slugpupTemplate.index]);
+                    StaticWorld.EstablishRelationship(MothPup, template.type, slugpupTemplate.relationships[template.index]);
                 }
             }
-            /*
+
             self.IsInPack(MothPup, 0.5f);
             
             //原捕食，现忽略
@@ -155,6 +158,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             //被攻击
 
             //被捕食
+            self.EatenBy(CreatureTemplate.Type.Spider, 1f);
             self.EatenBy(CreatureTemplate.Type.LizardTemplate, 0.5f);
             self.EatenBy(CreatureTemplate.Type.Vulture, 0.3f);
             self.EatenBy(CreatureTemplate.Type.DaddyLongLegs, 1f);
@@ -172,6 +176,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             self.Fears(CreatureTemplate.Type.Centipede, 0.5f);
             self.Fears(CreatureTemplate.Type.Centiwing, 0.4f);
             self.Fears(CreatureTemplate.Type.LizardTemplate, 0.6f);
+            self.Fears(CreatureTemplate.Type.Spider, 0.5f);
             self.Fears(CreatureTemplate.Type.BigSpider, 0.5f);
             self.Fears(CreatureTemplate.Type.SpitterSpider, 0.8f);
             self.Fears(CreatureTemplate.Type.DropBug, 0.5f);
@@ -183,7 +188,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             self.HasDynamicRelationship(CreatureTemplate.Type.CicadaB, 1f);
             self.HasDynamicRelationship(CreatureTemplate.Type.JetFish, 1f);
             self.HasDynamicRelationship(CreatureTemplate.Type.Scavenger, 1f);
-            self.HasDynamicRelationship(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, 1f);*/
+            self.HasDynamicRelationship(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, 1f);
         }
 
         public override ArtificialIntelligence CreateRealizedAI(AbstractCreature acrit)
