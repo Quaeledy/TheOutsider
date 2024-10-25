@@ -15,7 +15,7 @@ namespace TheOutsider.Player_Hooks
         public static void Player_Fly(On.Player.orig_UpdateMSC orig, Player self)
         {
             orig(self);
-            
+
             if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
                 if (self.animation == Player.AnimationIndex.HangFromBeam || self.animation == Player.AnimationIndex.SurfaceSwim)

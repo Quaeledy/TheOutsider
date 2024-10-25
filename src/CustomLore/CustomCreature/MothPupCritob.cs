@@ -1,19 +1,19 @@
-﻿using Fisobs.Creatures;
-using Fisobs.Properties;
-using System.Collections.Generic;
-using DevInterface;
-using Fisobs.Sandbox;
-using RWCustom;
-using UnityEngine;
-using MoreSlugcats;
-using static PathCost.Legality;
+﻿using DevInterface;
 using Fisobs.Core;
+using Fisobs.Creatures;
+using Fisobs.Properties;
+using Fisobs.Sandbox;
+using MoreSlugcats;
+using RWCustom;
+using System.Collections.Generic;
+using UnityEngine;
+using static PathCost.Legality;
 
 namespace TheOutsider.CustomLore.CustomCreature
 {
     sealed class MothPupCritob : Critob
     {
-        public static readonly CreatureTemplate.Type MothPup = new ("MothPup", true);
+        public static readonly CreatureTemplate.Type MothPup = new("MothPup", true);
         public static readonly MultiplayerUnlocks.SandboxUnlockID MothPupUnlock = new("MothPup", true);
 
         public MothPupCritob() : base(MothPup)
@@ -143,7 +143,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
 
             self.IsInPack(MothPup, 0.5f);
-            
+
             //原捕食，现忽略
             self.Ignores(CreatureTemplate.Type.Fly);
             self.Ignores(CreatureTemplate.Type.EggBug);

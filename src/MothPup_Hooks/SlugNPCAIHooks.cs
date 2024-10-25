@@ -1,22 +1,15 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MoreSlugcats;
+﻿using MoreSlugcats;
 using RWCustom;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using TheOutsider.Player_Hooks;
 using UnityEngine;
 using Custom = RWCustom.Custom;
-using Random = UnityEngine.Random;
 
 namespace TheOutsider.MothPup_Hooks
 {
     public class SlugNPCAIHooks
     {
-        public static readonly ConditionalWeakTable<Player, ParentVariables> parentVariablesCWT = new();
-        public static readonly ConditionalWeakTable<PlayerNPCState, PupNPCState> pupStateCWT = new();
-        public static readonly ConditionalWeakTable<AbstractCreature, PupAbstract> pupAbstractCWT = new();
-
         public static void Init()
         {
             On.MoreSlugcats.SlugNPCAI.ctor += SlugNPCAI_ctor;
@@ -29,64 +22,7 @@ namespace TheOutsider.MothPup_Hooks
             On.MoreSlugcats.SlugNPCAI.Move += SlugNPCAI_Move;
             On.MoreSlugcats.SlugNPCAI.DecideBehavior += SlugNPCAI_DecideBehavior;
             On.MoreSlugcats.SlugNPCAI.TravelPreference += SlugNPCAI_TravelPreference;
-            //IL.MoreSlugcats.SlugNPCAI.ctor += IL_SlugNPCAI_ctor;
-            //On.MoreSlugcats.SlugNPCAI.SocialEvent += SlugNPCAI_SocialEvent;
         }
-        /*
-        public void RainWorld_PostModsInit(On.RainWorld.orig_PostModsInit orig, RainWorld self)
-        {
-            orig(self);
-            try
-            {
-                if (PostIsInit) return;
-
-                if (ModManager.ActiveMods.Any(mod => mod.id == "dressmyslugcat"))
-                {
-                    PupsPlusModCompat.SetupDMSSprites();
-                }
-                if (ModManager.ActiveMods.Any(mod => mod.id == "yeliah.slugpupFieldtrip"))
-                {
-                    SlugpupSafari = true;
-                }
-                if (ModManager.ActiveMods.Any(mod => mod.id == "rgbpups"))
-                {
-                    RainbowPups = true;
-                }
-                if (ModManager.ActiveMods.Any(mod => mod.id == "pearlcat"))
-                {
-                    Pearlcat = true;
-                }
-                if (ModManager.ActiveMods.Any(mod => mod.id == "NoirCatto.BeastMasterPupExtras"))
-                {
-                    BeastMasterPupExtras = true;
-                }
-                if (ModManager.ActiveMods.Any(mod => mod.id == "slime-cubed.devconsole"))
-                {
-                    PupsPlusModCompat.RegisterSpawnPupCommand();
-                    Logger.LogInfo("spawn_pup command registered");
-                    //PupsPlusModCompat.RegisterPupsPlusDebugCommands();
-                }
-
-                PostIsInit = true;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Pups+ PostModsInit failed to load!");
-                Logger.LogError(ex);
-                throw;
-            }
-        }
-        private static void IL_SlugNPCAI_ctor(ILContext il)
-        {
-            ILCursor c = new ILCursor(il);
-            if(c.TryGotoNext(MoveType.Before, 
-                i => i.MatchNewobj<ItemTracker>()))
-            {
-                c.Emit(OpCodes.Pop);
-                c.Emit(OpCodes.Ldc_I4_0);
-            }
-        }
-        */
         private static void SlugNPCAI_ctor(On.MoreSlugcats.SlugNPCAI.orig_ctor orig, SlugNPCAI self, AbstractCreature creature, World world)
         {
             orig(self, creature, world);
@@ -124,7 +60,7 @@ namespace TheOutsider.MothPup_Hooks
                              self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 2)).AnyBeam ||
                              self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 3)).AnyBeam ||
                              self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 4)).AnyBeam ||
-                             Plugin.optionsMenuInstance.infiniteFlight.Value || 
+                             Plugin.optionsMenuInstance.infiniteFlight.Value ||
                              self.behaviorType == SlugNPCAI.BehaviorType.Fleeing))
                         {
                             inputPackage.jmp = true;/*
@@ -207,7 +143,7 @@ namespace TheOutsider.MothPup_Hooks
                             {
                                 int num = UnityEngine.Random.Range(0, realizedCreature.bodyChunks.Length - 1);
                                 bool isCreatureDislikeFlareAndBig = realizedCreature is BigSpider ||
-                                                                    realizedCreature is MirosBird || 
+                                                                    realizedCreature is MirosBird ||
                                                                     (realizedCreature is Vulture vulture && vulture.IsMiros);
                                 bool isCreatureDislikeFlare = realizedCreature is Spider || isCreatureDislikeFlareAndBig;
                                 bool inFlareRange = Custom.DistLess(self.cat.bodyChunks[1].pos, realizedCreature.mainBodyChunk.pos, player.burningRange) ||
@@ -402,48 +338,5 @@ namespace TheOutsider.MothPup_Hooks
             }*/
             return origCost;
         }
-
-        public static bool TryGetParentVariables(Player self, out ParentVariables parentVariables)
-        {
-            if (self != null)
-            {
-                parentVariables = GetParentVariables(self);
-            }
-            else parentVariables = null;
-
-            return parentVariables != null;
-        }
-        public static ParentVariables GetParentVariables(Player self)
-        {
-            if (self != null)
-            {
-                return parentVariablesCWT.GetValue(self, _ => new ParentVariables());
-            }
-            return null;
-        }
-        public static PupNPCState GetPupState(PlayerNPCState self)
-        {
-            if (self != null)
-            {
-                return pupStateCWT.GetValue(self, _ => new PupNPCState());
-            }
-            return null;
-        }
-    }
-
-    public class PupNPCState // DONT CHANGE THIS FFS, BEASTMASTERPUPEXTRAS RELIES ON IT!!!!!
-    {
-        public SlugcatStats.Name Variant;
-        public AbstractPhysicalObject PupsPlusStomachObject;
-    }
-
-    public class PupAbstract
-    {
-        public bool moth;
-    }
-
-    public class ParentVariables
-    {
-        public bool rotundPupExhaustion;
     }
 }

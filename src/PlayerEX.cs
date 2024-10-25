@@ -126,7 +126,7 @@ namespace TheOutsider
                 isMothNPC = true;
                 player.glowing = true;
                 Random.InitState(player.abstractCreature.ID.number);
-                if (Random.value <= 0.15f) 
+                if (Random.value <= 0.15f)
                     isColorVariation = true;
                 else
                     isColorVariation = false;
@@ -144,7 +144,7 @@ namespace TheOutsider
             wingSpeed = 10;
             upFlightTime = 30;
 
-            burningRange = isMothNPC ? 300f: 600f;
+            burningRange = isMothNPC ? 300f : 600f;
             burningRangeWithVisualContact = isMothNPC ? 800f : 1600f;
 
             if (player.playerState.isPup || player.isSlugpup)

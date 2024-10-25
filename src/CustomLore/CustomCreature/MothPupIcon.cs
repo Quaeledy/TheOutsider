@@ -1,5 +1,4 @@
 ﻿using Fisobs.Core;
-using RWCustom;
 using UnityEngine;
 
 namespace TheOutsider.CustomLore.CustomCreature
@@ -20,11 +19,11 @@ namespace TheOutsider.CustomLore.CustomCreature
             return (int)(centiShieldAbstract.hue * 1000f);*/
             return 0;
         }
-        
+
         public override Color SpriteColor(int data)
         {
             //return Custom.HSL2RGB((float)data / 1000f, 0.65f, 0.4f);
-            return new Color(106f / 255f, 229f / 255f, 191f /255f);
+            return new Color(106f / 255f, 229f / 255f, 191f / 255f);
         }
 
         public override string SpriteName(int data)

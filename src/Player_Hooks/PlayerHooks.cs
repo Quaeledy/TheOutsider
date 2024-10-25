@@ -22,9 +22,7 @@ namespace TheOutsider.Player_Hooks
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
-            /*
-            if (self.isNPC && PlayerEx.PlayerNPCShouldBeMoth(self))
-                self.SlugCatClass = Plugin.MothPup;*/
+
             if ((self.SlugCatClass == Plugin.SlugName || self.abstractCreature.creatureTemplate.type == MothPupCritob.MothPup) &&
                 !PlayerData.TryGetValue(self, out _))
             {

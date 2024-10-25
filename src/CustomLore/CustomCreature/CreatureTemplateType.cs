@@ -1,12 +1,4 @@
 ﻿using Fisobs.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MoreSlugcats;
-using MonoMod.RuntimeDetour;
-using TheOutsider.World_Hooks;
 
 namespace TheOutsider.CustomLore.CustomCreature
 {

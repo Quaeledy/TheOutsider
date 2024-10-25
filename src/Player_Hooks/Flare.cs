@@ -21,7 +21,7 @@ namespace TheOutsider.Player_Hooks
                     self.jumpBoost = 0f;
                     self.wantToJump = 0;
                     self.SubtractFood(1);
-                    player.charged = true; 
+                    player.charged = true;
                     player.AIwantFlare = false;
                 }
                 //开始闪光

@@ -3,13 +3,13 @@ using SlugBase.DataTypes;
 using System;
 using System.Security;
 using System.Security.Permissions;
-using TheOutsider.HUD_Hooks;
 /*
 using TheOutsider.CustomLore.CustomOracle;
 using TheOutsider.CustomLore.CustomDream;*/
 using TheOutsider.CustomLore.CustomCreature;/*
 using TheOutsider.CustomOracleTx;
 using TheOutsider.CustomDreamTx;*/
+using TheOutsider.HUD_Hooks;
 using TheOutsider.Menu_Hooks;
 using TheOutsider.Oracle_Hooks;
 using TheOutsider.Player_Hooks;
