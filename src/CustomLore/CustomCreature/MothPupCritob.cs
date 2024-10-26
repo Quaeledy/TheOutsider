@@ -13,15 +13,15 @@ namespace TheOutsider.CustomLore.CustomCreature
 {
     sealed class MothPupCritob : Critob
     {
-        public static readonly CreatureTemplate.Type MothPup = new("MothPup", true);
-        public static readonly MultiplayerUnlocks.SandboxUnlockID MothPupUnlock = new("MothPup", true);
+        public static readonly CreatureTemplate.Type Mothpup = new("Mothpup", true);
+        public static readonly MultiplayerUnlocks.SandboxUnlockID MothPupUnlock = new("Mothpup", true);
 
-        public MothPupCritob() : base(MothPup)
+        public MothPupCritob() : base(Mothpup)
         {
             LoadedPerformanceCost = 10f;
             SandboxPerformanceCost = new(linear: 0.6f, exponential: 0.1f);
             ShelterDanger = ShelterDanger.Safe;
-            CreatureName = "MothPup";
+            CreatureName = "Mothpup";
             base.Icon = new MothPupIcon();
             RegisterUnlock(killScore: KillScore.Configurable(2), MothPupUnlock, parent: MoreSlugcatsEnums.SandboxUnlockID.SlugNPC, data: 0);
         }
@@ -129,7 +129,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             // You can use StaticWorld.EstablishRelationship, but the Relationships class exists to make this process more ergonomic.
             // 您可以使用 StaticWorld.EstablishRelationship，但Relationships类的存在是为了使此过程更符合人体工程学。
-            Relationships self = new(MothPup);
+            Relationships self = new(Mothpup);
             CreatureTemplate slugpupTemplate = StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC);
             foreach (var template in StaticWorld.creatureTemplates)
             {
@@ -137,12 +137,12 @@ namespace TheOutsider.CustomLore.CustomCreature
                 {/*
                     self.Ignores(template.type);
                     self.IgnoredBy(template.type);*/
-                    StaticWorld.EstablishRelationship(template.type, MothPup, template.relationships[slugpupTemplate.index]);
-                    StaticWorld.EstablishRelationship(MothPup, template.type, slugpupTemplate.relationships[template.index]);
+                    StaticWorld.EstablishRelationship(template.type, Mothpup, template.relationships[slugpupTemplate.index]);
+                    StaticWorld.EstablishRelationship(Mothpup, template.type, slugpupTemplate.relationships[template.index]);
                 }
             }
 
-            self.IsInPack(MothPup, 0.5f);
+            self.IsInPack(Mothpup, 0.5f);
 
             //原捕食，现忽略
             self.Ignores(CreatureTemplate.Type.Fly);
@@ -201,7 +201,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             acrit.state = new PlayerNPCState(acrit, 0);
             acrit.abstractAI = new SlugNPCAbstractAI(acrit.world, acrit);
             Player mothPup = new Player(acrit, acrit.world);
-            //mothPup.SlugCatClass = Plugin.MothPup;
+            //mothPup.SlugCatClass = Plugin.Mothpup;
             //mothPup.glowing = true;
             return mothPup;
         }
@@ -275,7 +275,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             // The Mosquitoes example demonstrates this.
             // 如果需要使用forObject参数，请将其传递给ItemProperties类的构造函数。
             // 蚊子的例子说明了这一点。
-            if (crit is Player mothPup && (crit as Player).SlugCatClass == Plugin.MothPup)
+            if (crit is Player mothPup && (crit as Player).abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
             {
                 return new MothPupProperties(mothPup);
             }

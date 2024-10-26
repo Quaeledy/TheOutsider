@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
+using System.Collections.Generic;
 using TheOutsider.CustomLore.CustomCreature;
 
 namespace TheOutsider.MothPup_Hooks
@@ -18,10 +19,10 @@ namespace TheOutsider.MothPup_Hooks
             On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;
 
+            On.MoreSlugcats.PlayerNPCState.ctor += PlayerNPCState_ctor;
             On.AbstractCreature.ctor += AbstractCreature_ctor;
             On.AImap.TileAccessibleToCreature_IntVector2_CreatureTemplate += AImap_TileAccessibleToCreature;
         }
-        
         #region IL Hooks
         private static void PlayerNPCState_CycleTickIL(ILContext il)
         {
@@ -35,9 +36,9 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((SlugcatStats.Name slugpup, PlayerNPCState self) =>
                 {
                     SlugcatStats.Name result = slugpup;
-                    if (self.player.creatureTemplate.type == MothPupCritob.MothPup)
+                    if (self.player.creatureTemplate.type == MothPupCritob.Mothpup)
                     {
-                        result = Plugin.MothPup;
+                        result = Plugin.Mothpup;
                     }
                     return result;
                 });
@@ -58,7 +59,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((bool isSlugNPC, FoodMeter self, int i) =>
                 {
                     bool isMothPup = false;
-                    if ((self.hud.owner as Player).abstractCreature.Room.creatures[i].creatureTemplate.type == MothPupCritob.MothPup)
+                    if ((self.hud.owner as Player).abstractCreature.Room.creatures[i].creatureTemplate.type == MothPupCritob.Mothpup)
                     {
                         isMothPup = true;
                     }
@@ -67,19 +68,28 @@ namespace TheOutsider.MothPup_Hooks
             }
         }
         #endregion
+        private static void PlayerNPCState_ctor(On.MoreSlugcats.PlayerNPCState.orig_ctor orig, PlayerNPCState self, AbstractCreature abstractCreature, int playerNumber)
+        {
+            orig(self, abstractCreature, playerNumber);
+            if (abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+            {
+                self.Glowing = true;
+            }
+        }
         private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature self, World world, CreatureTemplate creatureTemplate, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
         {
             orig(self, world, creatureTemplate, realizedCreature, pos, ID);
             if (self.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && PlayerEx.PlayerNPCShouldBeMoth(world))
             {
-                self.creatureTemplate = StaticWorld.GetCreatureTemplate(MothPupCritob.MothPup);
+                self.creatureTemplate = StaticWorld.GetCreatureTemplate(MothPupCritob.Mothpup);
             }
         }
         private static void SlugcatStats_ctor(On.SlugcatStats.orig_ctor orig, SlugcatStats self, SlugcatStats.Name slugcat, bool malnourished)
         {
             orig(self, slugcat, malnourished);
 
-            if (slugcat == Plugin.MothPup)
+            Plugin.Log("SlugcatStats_ctor: " + slugcat.ToString());
+            if (slugcat == Plugin.Mothpup)
             {
                 self.bodyWeightFac = 0.65f;
                 self.generalVisibilityBonus = -0.2f;
@@ -101,16 +111,25 @@ namespace TheOutsider.MothPup_Hooks
         private static IntVector2 SlugcatStats_SlugcatFoodMeter(On.SlugcatStats.orig_SlugcatFoodMeter orig, SlugcatStats.Name slugcat)
         {
             IntVector2 result = orig(slugcat);
-            if (slugcat == Plugin.MothPup)// || (player != null && PlayerEx.PlayerNPCShouldBeMoth(player)))
+            if (slugcat == Plugin.Mothpup)// || (player != null && PlayerEx.PlayerNPCShouldBeMoth(player)))
             {
                 result = new IntVector2(4, 3);
+            }
+            return result;
+        }
+        private static bool SlugcatStats_HiddenOrUnplayableSlugcat(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugcatStats.Name i)
+        {
+            bool result = orig(i);
+            if (i == Plugin.Mothpup)
+            {
+                result = true;
             }
             return result;
         }
         private static bool AImap_TileAccessibleToCreature(On.AImap.orig_TileAccessibleToCreature_IntVector2_CreatureTemplate orig, AImap self, IntVector2 pos, CreatureTemplate crit)
         {
             bool result = orig(self, pos, crit);
-            if (crit.type == MothPupCritob.MothPup)
+            if (crit.type == MothPupCritob.Mothpup)
             {
                 AItile aitile = self.getAItile(pos);
                 if (Plugin.optionsMenuInstance.infiniteFlight.Value)
@@ -125,14 +144,6 @@ namespace TheOutsider.MothPup_Hooks
                 }
             }
             return result;
-        }
-        private static bool SlugcatStats_HiddenOrUnplayableSlugcat(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugcatStats.Name i)
-        {
-            if (i == Plugin.MothPup)
-            {
-                return true;
-            }
-            return orig(i);
         }
     }
 }

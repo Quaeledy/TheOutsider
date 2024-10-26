@@ -19,7 +19,7 @@ namespace TheOutsider
             get
             {
                 if (playerRef.TryGetTarget(out Player player))
-                    return player.SlugCatClass == Plugin.SlugName || player.slugcatStats.name == Plugin.MothPup || isMothNPC;
+                    return player.SlugCatClass == Plugin.SlugName || player.slugcatStats.name == Plugin.Mothpup || isMothNPC;
                 else
                     return false;
             }
@@ -124,7 +124,6 @@ namespace TheOutsider
             if (player.isNPC)
             {
                 isMothNPC = true;
-                player.glowing = true;
                 Random.InitState(player.abstractCreature.ID.number);
                 if (Random.value <= 0.15f)
                     isColorVariation = true;
@@ -147,7 +146,7 @@ namespace TheOutsider
             burningRange = isMothNPC ? 300f : 600f;
             burningRangeWithVisualContact = isMothNPC ? 800f : 1600f;
 
-            if (player.playerState.isPup || player.isSlugpup)
+            if (player.isSlugpup || player.playerState.isPup)
             {
                 wingLength = 10f;
                 wingWidth = 14f;
@@ -411,7 +410,7 @@ namespace TheOutsider
         #region 猫崽相关
         public static bool PlayerNPCShouldBeMoth(Player player)
         {
-            if (player.abstractCreature.creatureTemplate.type == MothPupCritob.MothPup)
+            if (player.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
                 return true;
             if (player.abstractCreature != null &&
                 player.abstractCreature.world != null &&

@@ -14,11 +14,17 @@
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="DressMySlugcat">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2948971756\newest\plugins\DressMySlugcat.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
         <Reference Include="EmgTx">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2991981689\newest\plugins\EmgTx.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="Fisobs">
           <HintPath>..\lib\Fisobs.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="HOOKS-Assembly-CSharp">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>

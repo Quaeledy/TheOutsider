@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using SlugBase.DataTypes;
 using System;
+using System.Linq;
 using System.Security;
 using System.Security.Permissions;
 /*
@@ -26,9 +27,9 @@ namespace TheOutsider
     [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.11")]
     public class Plugin : BaseUnityPlugin
     {
-        static public readonly string MOD_ID = "Quaeledy.outsider";
-        static public SlugcatStats.Name SlugName = new SlugcatStats.Name("Outsider", false);
-        public static readonly SlugcatStats.Name MothPup = new SlugcatStats.Name("MothPup", false);
+        public static readonly string MOD_ID = "Quaeledy.outsider";
+        public static SlugcatStats.Name SlugName = new SlugcatStats.Name("Outsider", false);
+        public static SlugcatStats.Name Mothpup = new SlugcatStats.Name("Mothpup", false);
         private bool IsInit;
 
         // Add hooks
@@ -62,6 +63,11 @@ namespace TheOutsider
                 //需要注册的变量
                 MothEnums.RegisterValues();
                 CreatureTemplateType.RegisterValues();
+
+                if (ModManager.ActiveMods.Any(mod => mod.id == "dressmyslugcat"))
+                {
+                    DressMySlugcatHooks.Init();
+                }
 
                 //我的hook们
                 Player_Hooks.PlayerHooks.Init();

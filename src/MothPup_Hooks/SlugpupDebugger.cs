@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
 
-namespace TheOutsider.MothPup
+namespace TheOutsider.Mothpup
 {
     public class SlugpupDebugger
     {

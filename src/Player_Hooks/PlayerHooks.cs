@@ -23,15 +23,10 @@ namespace TheOutsider.Player_Hooks
         {
             orig(self, abstractCreature, world);
 
-            if ((self.SlugCatClass == Plugin.SlugName || self.abstractCreature.creatureTemplate.type == MothPupCritob.MothPup) &&
-                !PlayerData.TryGetValue(self, out _))
+            if (self.SlugCatClass == Plugin.SlugName && !PlayerData.TryGetValue(self, out _))
             {
                 PlayerEx player = new PlayerEx(self);
                 PlayerData.Add(self, player);
-                if (player.isMothNPC)
-                {
-                    self.npcStats = new Player.NPCStats(self);
-                }
             }
         }
 

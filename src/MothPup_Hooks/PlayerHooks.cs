@@ -1,6 +1,11 @@
 ﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using MonoMod.RuntimeDetour;
 using MoreSlugcats;
+using SlugBase.Features;
+using System.Reflection;
+using TheOutsider.CustomLore.CustomCreature;
+using TheOutsider.World_Hooks;
 using UnityEngine;
 using Custom = RWCustom.Custom;
 using Random = UnityEngine.Random;
@@ -9,20 +14,36 @@ namespace TheOutsider.MothPup_Hooks
 {
     public class PlayerHooks
     {
+        private static BindingFlags propFlags = BindingFlags.Instance | BindingFlags.Public;
+        private static BindingFlags methodFlags = BindingFlags.Static | BindingFlags.NonPublic;
+        public delegate bool orig_Playere_isSlugpup(Player self);
+
         public static void Init()
         {
-            IL.Player.NPCStats.ctor += NPCStats_ctorIL;
+            IL.Player.NPCStats.ctor += Player_NPCStats_ctorIL;
             IL.Player.ObjectEaten += Player_ObjectEatenIL;
             IL.Player.ThrowObject += Player_ThrowObjectIL;
             IL.Player.FoodInRoom_Room_bool += Player_FoodInRoomIL;
             IL.Player.SetMalnourished += Player_SetMalnourishedIL;
 
             On.Player.NPCStats.ctor += Player_NPCStats_ctor;
+            On.Player.ctor += Player_ctor;
             On.Player.AllowGrabbingBatflys += Player_AllowGrabbingBatflys;
             On.Player.CanEatMeat += Player_CanEatMeat;
             On.Player.ThrownSpear += Player_ThrownSpear;
             On.Player.ShortCutColor += Player_ShortCutColor;
+
+            Hook hook = new Hook(typeof(Player).GetProperty(nameof(Player.isSlugpup), PlayerHooks.propFlags).GetGetMethod(), typeof(PlayerHooks).GetMethod(nameof(Player_get_isSlugpup), PlayerHooks.methodFlags));
         }
+
+        private static bool Player_get_isSlugpup(PlayerHooks.orig_Playere_isSlugpup orig, Player self)
+        {
+            bool result = orig(self);
+            if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+                result = true;
+            return result;
+        }
+
         #region IL Hooks
         private static void Player_ThrowObjectIL(ILContext il)
         {
@@ -48,24 +69,27 @@ namespace TheOutsider.MothPup_Hooks
             }
         }
 
-        private static void NPCStats_ctorIL(ILContext il)
+        private static void Player_NPCStats_ctorIL(ILContext il)
         {
             ILCursor c = new ILCursor(il);
             if (c.TryGotoNext(MoveType.After,
                 i => i.MatchLdsfld<MoreSlugcatsEnums.SlugcatStatsName>(nameof(MoreSlugcatsEnums.SlugcatStatsName.Slugpup))))
             {
-                Plugin.Log("NPCStats_ctorIL MatchFind!");
+                Plugin.Log("Player_NPCStats_ctorIL MatchFind!");
                 c.Emit(OpCodes.Ldarg_1); // player
                 c.EmitDelegate((SlugcatStats.Name slugpup, Player player) =>
                 {
-                    if (Player_Hooks.PlayerHooks.PlayerData.TryGetValue(player, out var playerEX) && playerEX.isMothNPC)
+                    SlugcatStats.Name result = slugpup;
+                    if (player.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
                     {
-                        return Plugin.MothPup;
+                        result = Plugin.Mothpup;
                     }
-                    return slugpup;
+                    Plugin.Log("Player_NPCStats_ctorIL: " + result.ToString());
+                    return result;
                 });
             }
         }
+
         private static void Player_ObjectEatenIL(ILContext il)
         {
             ILCursor c = new ILCursor(il);
@@ -77,14 +101,16 @@ namespace TheOutsider.MothPup_Hooks
                 c.Emit(OpCodes.Ldarg_0); // self
                 c.EmitDelegate((SlugcatStats.Name SlugCatClass, Player self) =>
                 {
-                    if (self.isSlugpup)
+                    SlugcatStats.Name result = SlugCatClass;
+                    if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
                     {
-                        return self.slugcatStats.name;
+                        result = self.slugcatStats.name;
                     }
-                    return SlugCatClass;
+                    return result;
                 });
             }
         }
+
         private static void Player_FoodInRoomIL(ILContext il)
         {
             ILCursor c = new ILCursor(il);
@@ -96,14 +122,16 @@ namespace TheOutsider.MothPup_Hooks
                 c.Emit(OpCodes.Ldarg_0); // self
                 c.EmitDelegate((SlugcatStats.Name SlugCatClass, Player self) =>   // If self.isSlugpup, return slugcatStats.name, else return SlugCatClass
                 {
-                    if (self.isSlugpup)
+                    SlugcatStats.Name result = SlugCatClass;
+                    if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
                     {
-                        return self.slugcatStats.name;
+                        result = self.slugcatStats.name;
                     }
-                    return SlugCatClass;
+                    return result;
                 });
             }
         }
+
         private static void Player_SetMalnourishedIL(ILContext il)
         {
             ILCursor c = new ILCursor(il);
@@ -115,11 +143,12 @@ namespace TheOutsider.MothPup_Hooks
                 c.Emit(OpCodes.Ldarg_0); // self
                 c.EmitDelegate((SlugcatStats.Name slugpup, Player self) =>
                 {
-                    if (Player_Hooks.PlayerHooks.PlayerData.TryGetValue(self, out var player) && player.isMothNPC)
+                    SlugcatStats.Name result = slugpup;
+                    if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
                     {
-                        return self.slugcatStats.name;
+                        result = Plugin.Mothpup;
                     }
-                    return slugpup;
+                    return result;
                 });
             }
         }
@@ -127,27 +156,43 @@ namespace TheOutsider.MothPup_Hooks
         private static void Player_NPCStats_ctor(On.Player.NPCStats.orig_ctor orig, Player.NPCStats self, Player player)
         {
             orig(self, player);
-            if (Player_Hooks.PlayerHooks.PlayerData.TryGetValue(player, out var playerEX) && playerEX.isMothNPC)
+            if (Player_Hooks.PlayerHooks.PlayerData.TryGetValue(player, out var outsider) && outsider.isMothNPC)
             {
-                if (player.abstractCreature.superSizeMe)
-                    player.playerState.forceFullGrown = true;
-
-                Random.InitState(player.abstractCreature.ID.number);
-                if (!playerEX.isColorVariation)
-                {
-                    self.Dark = true;
-                    Vector3 defaultColor = Custom.RGB2HSL(PlayerEx.BlueGreen);
-                    self.H = ((self.H + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.x;
-                    self.S = ((self.S + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.y;
-                    self.L = ((self.L + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.z;
-                }
-                AbstractCreature.Personality personality = player.abstractCreature.personality;
-                personality.energy = Mathf.Pow(Mathf.Clamp01(personality.energy + 0.1f), 0.5f);
-                personality.aggression = Mathf.Pow(Mathf.Clamp01(personality.aggression - 1f), 2f);
-                personality.sympathy = Mathf.Pow(Mathf.Clamp01(personality.sympathy + 0.1f), 0.5f);
-                player.abstractCreature.personality = personality;
             }
         }
+
+        private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
+        {
+            orig(self, abstractCreature, world);
+            if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup &&
+                !Player_Hooks.PlayerHooks.PlayerData.TryGetValue(self, out _))
+            {
+                PlayerEx outsider = new PlayerEx(self);
+                Player_Hooks.PlayerHooks.PlayerData.Add(self, outsider);
+
+                if (outsider.isMothNPC)
+                {
+                    if (self.abstractCreature.superSizeMe)
+                        self.playerState.forceFullGrown = true;
+
+                    Random.InitState(self.abstractCreature.ID.number);
+                    if (!outsider.isColorVariation)
+                    {
+                        self.npcStats.Dark = true;
+                        Vector3 defaultColor = Custom.RGB2HSL(PlayerEx.BlueGreen);
+                        self.npcStats.H = ((self.npcStats.H + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.x;
+                        self.npcStats.S = ((self.npcStats.S + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.y;
+                        self.npcStats.L = ((self.npcStats.L + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.z;
+                    }
+                    AbstractCreature.Personality personality = self.abstractCreature.personality;
+                    personality.energy = Mathf.Pow(Mathf.Clamp01(personality.energy + 0.1f), 0.5f);
+                    personality.aggression = Mathf.Pow(Mathf.Clamp01(personality.aggression - 1f), 2f);
+                    personality.sympathy = Mathf.Pow(Mathf.Clamp01(personality.sympathy + 0.1f), 0.5f);
+                    self.abstractCreature.personality = personality;
+                }
+            }
+        }
+
         private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player self, Spear spear)
         {
             orig(self, spear);

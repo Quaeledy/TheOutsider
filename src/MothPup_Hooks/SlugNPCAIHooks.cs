@@ -1,7 +1,8 @@
-﻿using MoreSlugcats;
+﻿using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MoreSlugcats;
 using RWCustom;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using TheOutsider.Player_Hooks;
 using UnityEngine;
 using Custom = RWCustom.Custom;
@@ -23,6 +24,7 @@ namespace TheOutsider.MothPup_Hooks
             On.MoreSlugcats.SlugNPCAI.DecideBehavior += SlugNPCAI_DecideBehavior;
             On.MoreSlugcats.SlugNPCAI.TravelPreference += SlugNPCAI_TravelPreference;
         }
+
         private static void SlugNPCAI_ctor(On.MoreSlugcats.SlugNPCAI.orig_ctor orig, SlugNPCAI self, AbstractCreature creature, World world)
         {
             orig(self, creature, world);
