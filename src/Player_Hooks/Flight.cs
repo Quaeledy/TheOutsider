@@ -24,7 +24,7 @@ namespace TheOutsider.Player_Hooks
                 }
                 else if (self.bodyMode == Player.BodyModeIndex.WallClimb)
                 {
-                    player.preventFlight = 10;//下次试试 8，或者更少
+                    player.preventFlight = 8;
                 }
                 else if (player.preventFlight > 0)
                 {
