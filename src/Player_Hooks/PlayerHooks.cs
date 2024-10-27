@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using TheOutsider.CustomLore.CustomCreature;
 
 namespace TheOutsider.Player_Hooks
 {

@@ -1,11 +1,6 @@
-﻿using System;
+﻿using MonoMod.RuntimeDetour;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using DressMySlugcat;
-using MonoMod.RuntimeDetour;
 using UnityEngine;
 
 namespace TheOutsider
@@ -20,7 +15,7 @@ namespace TheOutsider
         public static void Init()
         {
             DressMySlugcatForOutsider();
-            Hook hook1 = new Hook(typeof(DressMySlugcat.Utils).GetProperty(nameof(DressMySlugcat.Utils.ValidSlugcatNames), DressMySlugcatHooks.propFlags).GetGetMethod(), 
+            Hook hook1 = new Hook(typeof(DressMySlugcat.Utils).GetProperty(nameof(DressMySlugcat.Utils.ValidSlugcatNames), DressMySlugcatHooks.propFlags).GetGetMethod(),
                                  typeof(DressMySlugcatHooks).GetMethod(nameof(DressMySlugcat_Utils_ValidSlugcatNames), DressMySlugcatHooks.methodFlags));
             Hook hook2 = new Hook(typeof(DressMySlugcat.Utils).GetMethod(nameof(DressMySlugcat.Utils.DefaultColorForSprite), DressMySlugcatHooks.propFlags),
                                  typeof(DressMySlugcatHooks).GetMethod(nameof(DressMySlugcat_Utils_DefaultColorForSprite), DressMySlugcatHooks.methodFlags));

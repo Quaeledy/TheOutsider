@@ -96,6 +96,8 @@ namespace TheOutsider
                 CustomDreamRx.ApplyTreatment( new OutsiderDream());
                 CustomOracleRx.ApplyTreatment(new AMOracleRegistry());
                 */
+                //DEBUG
+                //On.RWCustom.Custom.Log += Custom_Log;
 
                 UnityEngine.Debug.Log($"Plugin {Plugin.MOD_ID} is loaded!");
             }
@@ -127,6 +129,15 @@ namespace TheOutsider
         public static void Log(string f, params object[] args)
         {
             UnityEngine.Debug.Log("[Outsider] " + string.Format(f, args));
+        }
+
+        public static void Custom_Log(On.RWCustom.Custom.orig_Log orig, params string[] values)
+        {
+            orig(values);
+            for (int i = 0; i < values.Length; i++)
+            {
+                UnityEngine.Debug.Log(string.Format(values[i]));
+            }
         }
     }
 }

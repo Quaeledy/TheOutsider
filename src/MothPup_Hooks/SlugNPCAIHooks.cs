@@ -1,6 +1,4 @@
-﻿using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MoreSlugcats;
+﻿using MoreSlugcats;
 using RWCustom;
 using System.Linq;
 using TheOutsider.Player_Hooks;

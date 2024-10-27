@@ -1,10 +1,8 @@
 ﻿using DevInterface;
-using Fisobs.Core;
 using Fisobs.Creatures;
 using Fisobs.Properties;
 using Fisobs.Sandbox;
 using MoreSlugcats;
-using RWCustom;
 using System.Collections.Generic;
 using UnityEngine;
 using static PathCost.Legality;
@@ -38,7 +36,9 @@ namespace TheOutsider.CustomLore.CustomCreature
                 DefaultRelationship = new(CreatureTemplate.Relationship.Type.Ignores, 0.5f),
                 HasAI = true,
                 InstantDeathDamage = 1,
-                Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.CicadaB),
+                Pathing = Plugin.optionsMenuInstance.infiniteFlight.Value ?
+                          PreBakedPathing.Ancestral(CreatureTemplate.Type.CicadaB) :
+                          PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
                 //Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
@@ -94,7 +94,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             t.bodySize = 1f;//蝙蝠是0.1，蛋虫是0.4，蓝香菇是5.5，蛞蝓是1
             t.shortcutSegments = 2;
             t.doPreBakedPathing = false;
-            t.waterRelationship = CreatureTemplate.WaterRelationship.AirAndSurface;//水生类型：两栖
+            t.waterRelationship = CreatureTemplate.WaterRelationship.AirAndSurface;//水生类型：空气和水面
             t.waterPathingResistance = 2f;
             t.canSwim = true;
             t.requireAImap = true;
@@ -198,14 +198,22 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public override Creature CreateRealizedCreature(AbstractCreature acrit)
         {
-            acrit.state = new PlayerNPCState(acrit, 0);
-            acrit.abstractAI = new SlugNPCAbstractAI(acrit.world, acrit);
+            //acrit.state = new PlayerNPCState(acrit, 0);
+            //acrit.abstractAI = new SlugNPCAbstractAI(acrit.world, acrit);
             Player mothPup = new Player(acrit, acrit.world);
-            //mothPup.SlugCatClass = Plugin.Mothpup;
-            //mothPup.glowing = true;
             return mothPup;
         }
 
+        public override CreatureState CreateState(AbstractCreature acrit)
+        {
+            return new PlayerNPCState(acrit, 0);
+        }
+
+        public override AbstractCreatureAI? CreateAbstractAI(AbstractCreature acrit)
+        {
+            return new SlugNPCAbstractAI(acrit.world, acrit);
+        }
+        /*
         public override void ConnectionIsAllowed(AImap map, MovementConnection connection, ref bool? allowed)
         {
             // DLLs don't travel through shortcuts that start and end in the same room—they only travel through room exits.
@@ -225,8 +233,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 allowed &=
                     map.room.GetTile(connection.startCoord).Terrain == Room.Tile.TerrainType.ShortcutEntrance && map.room.shortcutData(connection.StartTile).shortCutType == n ||
-                    map.room.GetTile(connection.destinationCoord).Terrain == Room.Tile.TerrainType.ShortcutEntrance && map.room.shortcutData(connection.DestTile).shortCutType == n
-                    ;
+                    map.room.GetTile(connection.destinationCoord).Terrain == Room.Tile.TerrainType.ShortcutEntrance && map.room.shortcutData(connection.DestTile).shortCutType == n;
             }
         }
 
@@ -245,7 +252,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             // 要模仿这种行为，请使用以下内容：
 
             allowed |= map.room.GetTile(tilePos).Terrain == Room.Tile.TerrainType.ShortcutEntrance;
-        }
+        }*/
 
         public override IEnumerable<string> WorldFileAliases()
         {
@@ -261,7 +268,7 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public override string DevtoolsMapName(AbstractCreature acrit)
         {
-            return "mothPup";
+            return "Mothpup";
         }
 
         public override Color DevtoolsMapColor(AbstractCreature acrit)

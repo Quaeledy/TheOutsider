@@ -2,10 +2,8 @@
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MoreSlugcats;
-using SlugBase.Features;
 using System.Reflection;
 using TheOutsider.CustomLore.CustomCreature;
-using TheOutsider.World_Hooks;
 using UnityEngine;
 using Custom = RWCustom.Custom;
 using Random = UnityEngine.Random;
@@ -16,7 +14,7 @@ namespace TheOutsider.MothPup_Hooks
     {
         private static BindingFlags propFlags = BindingFlags.Instance | BindingFlags.Public;
         private static BindingFlags methodFlags = BindingFlags.Static | BindingFlags.NonPublic;
-        public delegate bool orig_Playere_isSlugpup(Player self);
+        public delegate bool orig_Player_isSlugpup(Player self);
 
         public static void Init()
         {
@@ -36,7 +34,7 @@ namespace TheOutsider.MothPup_Hooks
             Hook hook = new Hook(typeof(Player).GetProperty(nameof(Player.isSlugpup), PlayerHooks.propFlags).GetGetMethod(), typeof(PlayerHooks).GetMethod(nameof(Player_get_isSlugpup), PlayerHooks.methodFlags));
         }
 
-        private static bool Player_get_isSlugpup(PlayerHooks.orig_Playere_isSlugpup orig, Player self)
+        private static bool Player_get_isSlugpup(PlayerHooks.orig_Player_isSlugpup orig, Player self)
         {
             bool result = orig(self);
             if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
@@ -84,7 +82,6 @@ namespace TheOutsider.MothPup_Hooks
                     {
                         result = Plugin.Mothpup;
                     }
-                    Plugin.Log("Player_NPCStats_ctorIL: " + result.ToString());
                     return result;
                 });
             }

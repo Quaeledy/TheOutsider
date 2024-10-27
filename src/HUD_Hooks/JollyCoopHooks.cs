@@ -37,7 +37,7 @@ namespace TheOutsider.HUD_Hooks
         private static void JollyMeter_PlayerIcon_ctor(On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.orig_ctor orig, JollyMeter.PlayerIcon self, JollyMeter meter, AbstractCreature associatedPlayer, Color color)
         {
             orig(self, meter, associatedPlayer, color);
-            if (((associatedPlayer.state as PlayerState).slugcatCharacter == Plugin.SlugName ||
+            if ((//(associatedPlayer.state as PlayerState).slugcatCharacter == Plugin.SlugName ||
                 (associatedPlayer.realizedCreature != null && (associatedPlayer.realizedCreature as Player).SlugCatClass == Plugin.SlugName)) &&
                 !OutsiderPlayerIconData.TryGetValue(associatedPlayer, out _))
             {
@@ -47,9 +47,12 @@ namespace TheOutsider.HUD_Hooks
                 List<AbstractCreature> players = (meter.hud.owner as Player).abstractCreature.world.game.session.Players;
                 for (int j = 0; j < players.Count; j++)
                     if (players[j] == associatedPlayer)
+                    {
                         i = j;
+                        break;
+                    }
                 if (i != -1)
-                    OutsiderPlayerIconData.Add(associatedPlayer, new OutsiderPlayerIcon(meter, i, self, associatedPlayer));
+                    OutsiderPlayerIconData.Add(associatedPlayer, new OutsiderPlayerIcon(meter, i, self, players[i]));
             }
         }
 
@@ -86,7 +89,7 @@ namespace TheOutsider.HUD_Hooks
         {
             orig(self);
 
-            if ((self.jollyHud.PlayerState.slugcatCharacter == Plugin.SlugName ||
+            if ((//self.jollyHud.PlayerState.slugcatCharacter == Plugin.SlugName ||
                 (self.PlayerState.creature != null && self.PlayerState.creature.realizedCreature != null && (self.PlayerState.creature.realizedCreature as Player).SlugCatClass == Plugin.SlugName)) &&
                 !self.sprites[0].element.name.Contains(Plugin.SlugName.value) &&
                 !OutsiderJollyOffRoomData.TryGetValue(self.PlayerState.creature, out _))
