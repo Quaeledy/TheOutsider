@@ -3,22 +3,23 @@ using Fisobs.Creatures;
 using Fisobs.Properties;
 using Fisobs.Sandbox;
 using MoreSlugcats;
+using RWCustom;
 using System.Collections.Generic;
 using UnityEngine;
 using static PathCost.Legality;
 
 namespace TheOutsider.CustomLore.CustomCreature
 {
-    internal sealed class MothPupCritob : Critob
+    internal sealed class AlcedoCritob : Critob
     {
-        public MothPupCritob() : base(OutsiderEnums.CreatureTemplateType.Mothpup)
+        public AlcedoCritob() : base(OutsiderEnums.CreatureTemplateType.Alcedo)
         {
             LoadedPerformanceCost = 10f;
             SandboxPerformanceCost = new(linear: 0.6f, exponential: 0.1f);
             ShelterDanger = ShelterDanger.Safe;
-            CreatureName = "Mothpup";
-            base.Icon = new MothPupIcon();
-            RegisterUnlock(killScore: KillScore.Configurable(2), OutsiderEnums.CreatureTemplateType.MothPupUnlock, parent: MoreSlugcatsEnums.SandboxUnlockID.SlugNPC, data: 0);
+            CreatureName = "Alcedo";
+            base.Icon = new AlcedoIcon();
+            RegisterUnlock(killScore: KillScore.Configurable(15), OutsiderEnums.CreatureTemplateType.AlcedoUnlock, parent: MoreSlugcatsEnums.SandboxUnlockID.MirosVulture, data: 0);
         }
 
         public override CreatureTemplate CreateTemplate()
@@ -28,14 +29,12 @@ namespace TheOutsider.CustomLore.CustomCreature
             //创建新的CreatureTemplate时，CreatureFormula会为您完成大部分丑陋的工作，
             //但如果需要，您可以手动构建一个CreatureTemplate。
 
-            CreatureTemplate t = new CreatureFormula(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, this)
+            CreatureTemplate t = new CreatureFormula(this)
             {
                 DefaultRelationship = new(CreatureTemplate.Relationship.Type.Ignores, 0.5f),
                 HasAI = true,
-                InstantDeathDamage = 1,
-                Pathing = Plugin.optionsMenuInstance.infiniteFlight.Value ?
-                          PreBakedPathing.Ancestral(CreatureTemplate.Type.CicadaB) :
-                          PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
+                InstantDeathDamage = 15,
+                Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.Vulture),
                 //Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
@@ -91,14 +90,14 @@ namespace TheOutsider.CustomLore.CustomCreature
             t.bodySize = 1f;//蝙蝠是0.1，蛋虫是0.4，蓝香菇是5.5，蛞蝓是1
             t.shortcutSegments = 2;
             t.doPreBakedPathing = false;
-            t.waterRelationship = CreatureTemplate.WaterRelationship.AirAndSurface;//水生类型：空气和水面
-            t.waterPathingResistance = 2f;
+            t.waterRelationship = CreatureTemplate.WaterRelationship.Amphibious;//水生类型：空气和水面
+            t.waterPathingResistance = 0f;
             t.canSwim = true;
             t.requireAImap = true;
             t.socialMemory = true;
             t.interestInOtherAncestorsCatches = 0f;
             t.interestInOtherCreaturesCatches = 0f;
-            t.meatPoints = 2;
+            t.meatPoints = 8;
             t.jumpAction = "Jump";
             t.pickupAction = "Pick up / Eat";
             t.throwAction = "Throw";
@@ -126,89 +125,86 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             // You can use StaticWorld.EstablishRelationship, but the Relationships class exists to make this process more ergonomic.
             // 您可以使用 StaticWorld.EstablishRelationship，但Relationships类的存在是为了使此过程更符合人体工程学。
-            Relationships self = new(OutsiderEnums.CreatureTemplateType.Mothpup);
-            CreatureTemplate slugpupTemplate = StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC);
+            Relationships self = new(OutsiderEnums.CreatureTemplateType.Alcedo);
+            CreatureTemplate vultureTemplate = StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Vulture);
             foreach (var template in StaticWorld.creatureTemplates)
             {
                 if (template.quantified)
                 {/*
                     self.Ignores(template.type);
                     self.IgnoredBy(template.type);*/
-                    StaticWorld.EstablishRelationship(template.type, OutsiderEnums.CreatureTemplateType.Mothpup, template.relationships[slugpupTemplate.index]);
-                    StaticWorld.EstablishRelationship(OutsiderEnums.CreatureTemplateType.Mothpup, template.type, slugpupTemplate.relationships[template.index]);
+                    StaticWorld.EstablishRelationship(template.type, OutsiderEnums.CreatureTemplateType.Alcedo, template.relationships[vultureTemplate.index]);
+                    StaticWorld.EstablishRelationship(OutsiderEnums.CreatureTemplateType.Alcedo, template.type, vultureTemplate.relationships[template.index]);
                 }
             }
 
-            self.IsInPack(OutsiderEnums.CreatureTemplateType.Mothpup, 0.5f);
+            self.IsInPack(OutsiderEnums.CreatureTemplateType.Alcedo, 0.5f);
 
             //原捕食，现忽略
-            self.Ignores(CreatureTemplate.Type.Fly);
-            self.Ignores(CreatureTemplate.Type.EggBug);
-            self.Ignores(CreatureTemplate.Type.SmallCentipede);
-            self.Ignores(CreatureTemplate.Type.SmallNeedleWorm);
             self.Ignores(CreatureTemplate.Type.VultureGrub);
 
             //恐吓
-            self.FearedBy(CreatureTemplate.Type.Fly, 0.5f);
-            self.FearedBy(CreatureTemplate.Type.LanternMouse, 0.3f);
+            self.FearedBy(CreatureTemplate.Type.JetFish, 0.5f);
+            self.FearedBy(CreatureTemplate.Type.Leech, 0.3f);
+            self.FearedBy(CreatureTemplate.Type.Spider, 0.3f);
+            self.FearedBy(CreatureTemplate.Type.LizardTemplate, 0.6f);
+            self.FearedBy(CreatureTemplate.Type.GreenLizard, 0f);
+            self.FearedBy(CreatureTemplate.Type.RedLizard, 0f);
+            self.FearedBy(MoreSlugcatsEnums.CreatureTemplateType.TrainLizard, 0f);
+            self.FearedBy(OutsiderEnums.CreatureTemplateType.Mothpup, 0.9f);
 
             //被攻击
 
+            //捕食
+            self.Eats(CreatureTemplate.Type.LizardTemplate, 0.5f);
+            self.Eats(CreatureTemplate.Type.GreenLizard, 0f);
+            self.Eats(CreatureTemplate.Type.RedLizard, 0f);
+            self.Eats(CreatureTemplate.Type.Centipede, 0.5f);
+            self.Eats(CreatureTemplate.Type.Centiwing, 0.7f);
+            self.Eats(CreatureTemplate.Type.DropBug, 0.5f);
+            self.Eats(CreatureTemplate.Type.BigSpider, 1f);
+            self.Eats(CreatureTemplate.Type.SpitterSpider, 0.9f);
+            self.Eats(MoreSlugcatsEnums.CreatureTemplateType.TrainLizard, 0f);
+            self.Eats(MoreSlugcatsEnums.CreatureTemplateType.MotherSpider, 0.7f);
+            self.Eats(OutsiderEnums.CreatureTemplateType.Mothpup, 0.4f);
+
             //被捕食
-            self.EatenBy(CreatureTemplate.Type.Spider, 1f);
-            self.EatenBy(CreatureTemplate.Type.LizardTemplate, 0.5f);
-            self.EatenBy(CreatureTemplate.Type.Vulture, 0.3f);
             self.EatenBy(CreatureTemplate.Type.DaddyLongLegs, 1f);
-            self.EatenBy(CreatureTemplate.Type.MirosBird, 0.6f);
-            self.EatenBy(CreatureTemplate.Type.BigSpider, 0.4f);
-            self.EatenBy(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 1f);
-            self.EatenBy(MoreSlugcatsEnums.CreatureTemplateType.FireBug, 0.5f);
+            self.EatenBy(CreatureTemplate.Type.Vulture, 0.1f);
+            self.EatenBy(CreatureTemplate.Type.KingVulture, 0.3f);
+            self.EatenBy(CreatureTemplate.Type.MirosBird, 0.3f);
+            self.EatenBy(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 0.3f);
 
             //害怕
-            self.Fears(CreatureTemplate.Type.Vulture, 1f);
+            self.Fears(CreatureTemplate.Type.Vulture, 0.3f);
+            self.Fears(CreatureTemplate.Type.KingVulture, 0.8f);
             self.Fears(CreatureTemplate.Type.BigEel, 1f);
             self.Fears(CreatureTemplate.Type.DaddyLongLegs, 1f);
             self.Fears(CreatureTemplate.Type.TentaclePlant, 1f);
-            self.Fears(CreatureTemplate.Type.MirosBird, 1f);
-            self.Fears(CreatureTemplate.Type.Centipede, 0.5f);
-            self.Fears(CreatureTemplate.Type.Centiwing, 0.4f);
-            self.Fears(CreatureTemplate.Type.LizardTemplate, 0.6f);
-            self.Fears(CreatureTemplate.Type.Spider, 0.5f);
-            self.Fears(CreatureTemplate.Type.BigSpider, 0.5f);
-            self.Fears(CreatureTemplate.Type.SpitterSpider, 0.8f);
-            self.Fears(CreatureTemplate.Type.DropBug, 0.5f);
-            self.Fears(CreatureTemplate.Type.RedCentipede, 1f);
-            self.Fears(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 1f);
-
-            //独立社会关系
-            self.HasDynamicRelationship(CreatureTemplate.Type.CicadaA, 1f);
-            self.HasDynamicRelationship(CreatureTemplate.Type.CicadaB, 1f);
-            self.HasDynamicRelationship(CreatureTemplate.Type.JetFish, 1f);
-            self.HasDynamicRelationship(CreatureTemplate.Type.Scavenger, 1f);
-            self.HasDynamicRelationship(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, 1f);
+            self.Fears(CreatureTemplate.Type.RedCentipede, 0.2f);
+            self.Fears(CreatureTemplate.Type.RedLizard, 0.2f);
+            self.Fears(CreatureTemplate.Type.MirosBird, 0.2f);
+            self.Fears(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 0.8f);
         }
 
         public override ArtificialIntelligence CreateRealizedAI(AbstractCreature acrit)
         {
-            return new SlugNPCAI(acrit, acrit.world);
+            return new AlcedoAI(acrit, acrit.world);
         }
 
         public override Creature CreateRealizedCreature(AbstractCreature acrit)
         {
-            //acrit.state = new PlayerNPCState(acrit, 0);
-            //acrit.abstractAI = new SlugNPCAbstractAI(acrit.world, acrit);
-            Player mothPup = new Player(acrit, acrit.world);
-            return mothPup;
+            return new Alcedo(acrit, acrit.world);
         }
 
         public override CreatureState CreateState(AbstractCreature acrit)
         {
-            return new PlayerNPCState(acrit, 0);
+            return new Alcedo.AlcedoState(acrit);
         }
 
         public override AbstractCreatureAI? CreateAbstractAI(AbstractCreature acrit)
         {
-            return new SlugNPCAbstractAI(acrit.world, acrit);
+            return new AlcedoAbstractAI(acrit.world, acrit);
         }
         /*
         public override void ConnectionIsAllowed(AImap map, MovementConnection connection, ref bool? allowed)
@@ -233,7 +229,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     map.room.GetTile(connection.destinationCoord).Terrain == Room.Tile.TerrainType.ShortcutEntrance && map.room.shortcutData(connection.DestTile).shortCutType == n;
             }
         }
-
+        */
         public override void TileIsAllowed(AImap map, IntVector2 tilePos, ref bool? allowed)
         {
             // Large creatures like vultures, miros birds, and DLLs need 2 tiles of free space to move around in. Leviathans need 4! None of them can fit in one-tile tunnels.
@@ -241,7 +237,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             //大型生物，如秃鹫、钢鸟和香菇，需要2块空闲空间才能在其中移动。利维坦需要4块！没有一个能放在一个瓷砖隧道里。
             //要模仿这种行为，请使用以下内容：
 
-            allowed &= map.IsFreeSpace(tilePos, tilesOfFreeSpace: 1);
+            //allowed &= map.IsFreeSpace(tilePos, tilesOfFreeSpace: 1);
 
             // DLLs can fit into shortcuts despite being fat.
             // To emulate this behavior, use something like:
@@ -249,11 +245,11 @@ namespace TheOutsider.CustomLore.CustomCreature
             // 要模仿这种行为，请使用以下内容：
 
             allowed |= map.room.GetTile(tilePos).Terrain == Room.Tile.TerrainType.ShortcutEntrance;
-        }*/
+        }
 
         public override IEnumerable<string> WorldFileAliases()
         {
-            yield return "mothPup";
+            yield return "alcedo";
         }
 
         public override IEnumerable<RoomAttractivenessPanel.Category> DevtoolsRoomAttraction()
@@ -265,12 +261,12 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public override string DevtoolsMapName(AbstractCreature acrit)
         {
-            return "Mothpup";
+            return "Alcedo";
         }
 
         public override Color DevtoolsMapColor(AbstractCreature acrit)
         {
-            return new Color(40f / 255f, 102f / 255f, 141f / 255f);
+            return new Color(210f / 255f, 202f / 255f, 108f / 255f);
         }
 
         public override ItemProperties? Properties(Creature crit)
@@ -279,9 +275,9 @@ namespace TheOutsider.CustomLore.CustomCreature
             // The Mosquitoes example demonstrates this.
             // 如果需要使用forObject参数，请将其传递给ItemProperties类的构造函数。
             // 蚊子的例子说明了这一点。
-            if (crit is Player mothPup && (crit as Player).abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+            if (crit is Alcedo alcedo && (crit as Alcedo).abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Alcedo)
             {
-                return new MothPupProperties(mothPup);
+                return new AlcedoProperties(alcedo);
             }
             return null;
 

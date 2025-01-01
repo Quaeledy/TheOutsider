@@ -36,7 +36,7 @@ namespace TheOutsider.Player_Hooks
                 {
                     player.burning += 0.016666668f;
                     //结束闪光
-                    if (player.burning > 1f)
+                    if (player.burning > 1f || self.room == null)
                     {
                         player.charged = false;
                         player.burning = 0f;
@@ -50,10 +50,11 @@ namespace TheOutsider.Player_Hooks
                     player.flashRad = Mathf.Pow(Random.value, 0.3f) * player.LightIntensity * player.burningRange / 3f * 16f;
                     for (int i = 0; i < self.room.abstractRoom.creatures.Count; i++)
                     {
+                        float dist = Custom.Dist(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos);
+                        bool visualContact = self.room.VisualContact(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos);
                         if (self.room.abstractRoom.creatures[i].realizedCreature != null &&
-                            (Custom.DistLess(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, player.LightIntensity * player.burningRange) ||
-                             (Custom.DistLess(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos, player.LightIntensity * player.burningRangeWithVisualContact) &&
-                             self.room.VisualContact(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk.pos))))
+                            (dist <= player.LightIntensity * player.burningRange ||
+                             (dist <= player.LightIntensity * player.burningRangeWithVisualContact && visualContact)))
                         {
                             //杀死小蜘蛛
                             if (self.room.abstractRoom.creatures[i].realizedCreature is Spider && !self.room.abstractRoom.creatures[i].realizedCreature.dead)
@@ -69,6 +70,12 @@ namespace TheOutsider.Player_Hooks
                                 self.room.abstractRoom.creatures[i].realizedCreature.Stun(Random.Range(10, 20));
                                 //击杀生物计算
                                 self.room.abstractRoom.creatures[i].realizedCreature.SetKillTag((self as Creature).abstractCreature);
+                            }
+                            else if (self.room.abstractRoom.creatures[i].creatureTemplate.TopAncestor().type == CreatureTemplate.Type.BigSpider &&
+                                     !self.room.abstractRoom.creatures[i].realizedCreature.dead)
+                            {
+                                float distInfluence = Custom.LerpMap(dist, 0f, visualContact ? player.LightIntensity * player.burningRangeWithVisualContact : player.LightIntensity * player.burningRange, 1f, 0f);
+                                self.room.abstractRoom.creatures[i].realizedCreature.Violence(self.firstChunk, Vector2.zero, self.room.abstractRoom.creatures[i].realizedCreature.mainBodyChunk, null, Creature.DamageType.Electric, distInfluence, 10f * distInfluence);
                             }
                             self.room.abstractRoom.creatures[i].realizedCreature.Blind((int)Custom.LerpMap(Vector2.Distance(self.bodyChunks[1].pos, self.room.abstractRoom.creatures[i].realizedCreature.VisionPoint), 60f, 600f, 400f, 20f));
                         }

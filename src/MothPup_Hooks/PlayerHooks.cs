@@ -3,7 +3,6 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MoreSlugcats;
 using System.Reflection;
-using TheOutsider.CustomLore.CustomCreature;
 using UnityEngine;
 using Custom = RWCustom.Custom;
 using Random = UnityEngine.Random;
@@ -37,7 +36,7 @@ namespace TheOutsider.MothPup_Hooks
         private static bool Player_get_isSlugpup(PlayerHooks.orig_Player_isSlugpup orig, Player self)
         {
             bool result = orig(self);
-            if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+            if (self.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
                 result = true;
             return result;
         }
@@ -78,7 +77,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((SlugcatStats.Name slugpup, Player player) =>
                 {
                     SlugcatStats.Name result = slugpup;
-                    if (player.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+                    if (player.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         result = Plugin.Mothpup;
                     }
@@ -99,7 +98,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((SlugcatStats.Name SlugCatClass, Player self) =>
                 {
                     SlugcatStats.Name result = SlugCatClass;
-                    if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+                    if (self.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         result = self.slugcatStats.name;
                     }
@@ -120,7 +119,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((SlugcatStats.Name SlugCatClass, Player self) =>   // If self.isSlugpup, return slugcatStats.name, else return SlugCatClass
                 {
                     SlugcatStats.Name result = SlugCatClass;
-                    if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+                    if (self.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         result = self.slugcatStats.name;
                     }
@@ -141,7 +140,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((SlugcatStats.Name slugpup, Player self) =>
                 {
                     SlugcatStats.Name result = slugpup;
-                    if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+                    if (self.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         result = Plugin.Mothpup;
                     }
@@ -161,10 +160,10 @@ namespace TheOutsider.MothPup_Hooks
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
-            if (self.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup &&
+            if (self.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup &&
                 !Player_Hooks.PlayerHooks.PlayerData.TryGetValue(self, out _))
             {
-                PlayerEx outsider = new PlayerEx(self);
+                TheOutsider outsider = new TheOutsider(self);
                 Player_Hooks.PlayerHooks.PlayerData.Add(self, outsider);
 
                 if (outsider.isMothNPC)
@@ -176,7 +175,7 @@ namespace TheOutsider.MothPup_Hooks
                     if (!outsider.isColorVariation)
                     {
                         self.npcStats.Dark = true;
-                        Vector3 defaultColor = Custom.RGB2HSL(PlayerEx.BlueGreen);
+                        Vector3 defaultColor = Custom.RGB2HSL(TheOutsider.BlueGreen);
                         self.npcStats.H = ((self.npcStats.H + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.x;
                         self.npcStats.S = ((self.npcStats.S + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.y;
                         self.npcStats.L = ((self.npcStats.L + 0.5f) % 1f) * Random.value * (Random.value - 1f) * 0.2f + defaultColor.z;

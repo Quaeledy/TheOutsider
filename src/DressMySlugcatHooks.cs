@@ -51,11 +51,11 @@ namespace TheOutsider
                     case "ANTENNAE1":
                     case "ANTENNAE2":
                     case "LEPIDOTICWING":
-                        result = PlayerEx.LightGreen;
+                        result = TheOutsider.LightGreen;
                         break;
                     case "WINGGRADIENT":
                     case "SPECKLE":
-                        result = PlayerEx.LightBlue;
+                        result = TheOutsider.LightBlue;
                         break;
                     default:
                         result = DressMySlugcat.Utils.DefaultExtraColor(slugcat);

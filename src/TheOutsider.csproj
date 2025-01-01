@@ -97,9 +97,19 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Compile Include="CustomLore\CustomCreature\CreatureTemplateType.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoAbstractAI.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoAI.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoAppendage.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoCritob.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoFeather.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoGraphics.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoPather.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoTentacle.cs" />
       <Compile Include="CustomLore\CustomCreature\MothPupCritob.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoIcon.cs" />
       <Compile Include="CustomLore\CustomCreature\MothPupIcon.cs" />
+      <Compile Include="CustomLore\CustomCreature\AlcedoProperties.cs" />
       <Compile Include="CustomLore\CustomCreature\MothPupProperties.cs" />
     </ItemGroup>
     

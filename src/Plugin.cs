@@ -7,9 +7,6 @@ using System.Security.Permissions;
 /*
 using TheOutsider.CustomLore.CustomOracle;
 using TheOutsider.CustomLore.CustomDream;*/
-using TheOutsider.CustomLore.CustomCreature;/*
-using TheOutsider.CustomOracleTx;
-using TheOutsider.CustomDreamTx;*/
 using TheOutsider.HUD_Hooks;
 using TheOutsider.Menu_Hooks;
 using TheOutsider.Oracle_Hooks;
@@ -24,7 +21,7 @@ using TheOutsider.World_Hooks;
 
 namespace TheOutsider
 {
-    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.11")]
+    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.12")]
     public class Plugin : BaseUnityPlugin
     {
         public static readonly string MOD_ID = "Quaeledy.outsider";
@@ -61,8 +58,7 @@ namespace TheOutsider
                 MachineConnector.SetRegisteredOI(MOD_ID, optionsMenuInstance);
 
                 //需要注册的变量
-                MothEnums.RegisterValues();
-                CreatureTemplateType.RegisterValues();
+                OutsiderEnums.RegisterValues();
 
                 if (ModManager.ActiveMods.Any(mod => mod.id == "dressmyslugcat"))
                 {
@@ -118,6 +114,7 @@ namespace TheOutsider
             Futile.atlasManager.LoadAtlas("atlases/Kill_Slugcat_Outsider");
             Futile.atlasManager.LoadAtlas("atlases/icon_Quetzalcoatl");
             Futile.atlasManager.LoadAtlas("atlases/icon_MothPup");
+            Futile.atlasManager.LoadAtlas("atlases/icon_Alcedo");
             Log("Load Resources!");
         }
 

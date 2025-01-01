@@ -1,25 +1,31 @@
 ﻿using RWCustom;
 using SlugBase.DataTypes;
 using System;
-using TheOutsider.CustomLore.CustomCreature;
+using TheOutsider.PlayerGraphics_Hooks;
 using UnityEngine;
+using Flare = TheOutsider.PlayerGraphics_Hooks.Flare;
 using Random = UnityEngine.Random;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 namespace TheOutsider
 {
-    public class PlayerEx
+    public class TheOutsider
     {
         public WeakReference<Player> playerRef;
-        //public WeakReference<PlayerGraphics> iGraphicsRef; 
+        public Antennaes antennaes;
+        public Wings wings;
+        public SwallowTails swallowTails;
+        public Speckles speckles;
+        public Flare flare;
 
         public bool IsOutsider
         {
             get
             {
                 if (playerRef.TryGetTarget(out Player player))
-                    return player.SlugCatClass == Plugin.SlugName || player.slugcatStats.name == Plugin.Mothpup || isMothNPC;
+                    return player.SlugCatClass == Plugin.SlugName ||
+                           player.slugcatStats.name == Plugin.Mothpup || player.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup || isMothNPC;
                 else
                     return false;
             }
@@ -84,43 +90,18 @@ namespace TheOutsider
             }
         }
         #endregion
-        #region 外观相关
-        //图像
-        public int wingSprite;
-        public int antennaeSprite;
-        public int FlareSprite;
-        public int swallowtailSprite;
-        public int speckleSprite;
-        //手臂替代贴图
-        public int handWingSprite;
-
-        //翅膀长度及宽度
-        public float wingLength;
-        public float wingWidth;
-        //触须长度
-        public float antennaeLength;
-
-        //身体部件
-        public GenericBodyPart[] wing;
-        public GenericBodyPart[] antennae;
-        public TailSegment[,] swallowtail;
-
-        public Vector2 lastAntennaePos;
-
-        public int tailN;
-        public readonly float swallowTailSpacing = 6f;
-        public readonly float MaxLength = 15f;
-        public readonly float swallowTailWidth = 0.4f;
-        public float tailTimeAdd;
-        #endregion
         //public DynamicSoundLoop flyingBuzzSound;
 
         //梦境相关
         //public DreamStateOverride stateOverride;
 
-        public PlayerEx(Player player)
+        public TheOutsider(Player player)
         {
             playerRef = new WeakReference<Player>(player);
+
+            if (!IsOutsider)
+                return;
+
             if (player.isNPC)
             {
                 isMothNPC = true;
@@ -131,12 +112,9 @@ namespace TheOutsider
                     isColorVariation = false;
             }
 
-            if (!IsOutsider)
-                return;
-
             /*
             flyingBuzzSound = new ChunkDynamicSoundLoop(player.bodyChunks[0]);
-            flyingBuzzSound.sound = MothEnums.MothBuzz;
+            flyingBuzzSound.sound = OutsiderEnums.MothBuzz;
             flyingBuzzSound.Pitch = 1f;
             flyingBuzzSound.Volume = 1f;
             */
@@ -145,21 +123,9 @@ namespace TheOutsider
 
             burningRange = isMothNPC ? 300f : 600f;
             burningRangeWithVisualContact = isMothNPC ? 800f : 1600f;
-
-            if (player.isSlugpup || player.playerState.isPup)
-            {
-                wingLength = 10f;
-                wingWidth = 14f;
-                antennaeLength = 0.1f;
-            }
-            else
-            {
-                wingLength = 15f;
-                wingWidth = 20f;
-                antennaeLength = 0.3f;
-            }
         }
 
+        #region 颜色相关
         public Color GetBodyColor()
         {
             if (!playerRef.TryGetTarget(out Player player))
@@ -301,6 +267,7 @@ namespace TheOutsider
                              distReciprocal4 * presetColor4) / distReciprocalAdd;
             return color;
         }
+        #endregion
 
         #region 飞行相关
         public void StopFlight()
@@ -309,7 +276,7 @@ namespace TheOutsider
             isFlying = false;
         }
 
-        public void InitiateFlight(Player self, PlayerEx player)
+        public void InitiateFlight(Player self, TheOutsider player)
         {
             if (self.input[0].y < 0)
             {
@@ -322,7 +289,7 @@ namespace TheOutsider
             isFlying = true;
         }
 
-        public bool CanSustainFlight(Player self, PlayerEx player)
+        public bool CanSustainFlight(Player self, TheOutsider player)
         {
             return preventFlight == 0
                 && self.canJump <= 0
@@ -339,16 +306,24 @@ namespace TheOutsider
                 && self.animation != Player.AnimationIndex.ZeroGPoleGrab
                 && self.animation != Player.AnimationIndex.HangUnderVerticalBeam;
         }
-
-        public int WingSprite(int side, int wing)
-        {
-            return wingSprite + side + wing + wing;
-        }
         #endregion
-
+        /*
         #region 翅膀相关
         public void MothWing(PlayerGraphics self)
         {
+            bool isPup = self.player.playerState.isPup || (self.player.isSlugpup && !self.player.playerState.forceFullGrown);
+
+            if (isPup)
+            {
+                wingLength = 10f;
+                wingWidth = 14f;
+            }
+            else
+            {
+                wingLength = 15f;
+                wingWidth = 20f;
+            }
+
             wing = new GenericBodyPart[36];
             for (int i = 0; i < wing.Length; i++)
             {
@@ -357,11 +332,12 @@ namespace TheOutsider
 
         }
         #endregion
-
+        */
+        /*
         #region 尾巴相关
         public void MothSwallowTail(PlayerGraphics self)
         {
-            bool isPup = self.player.playerState.isPup || self.player.isSlugpup;
+            bool isPup = self.player.playerState.isPup || (self.player.isSlugpup && !self.player.playerState.forceFullGrown);
 
             if (isPup)
             {
@@ -395,10 +371,22 @@ namespace TheOutsider
             }
         }
         #endregion
-
+        */
+        /*
         #region 触须相关
         public void MothAntennae(PlayerGraphics self)
         {
+            bool isPup = self.player.playerState.isPup || (self.player.isSlugpup && !self.player.playerState.forceFullGrown);
+
+            if (isPup)
+            {
+                antennaeLength = 0.1f;
+            }
+            else
+            {
+                antennaeLength = 0.3f;
+            }
+
             antennae = new GenericBodyPart[2];
             for (int i = 0; i < antennae.Length; i++)
             {
@@ -406,11 +394,11 @@ namespace TheOutsider
             }
         }
         #endregion
-
+        */
         #region 猫崽相关
         public static bool PlayerNPCShouldBeMoth(Player player)
         {
-            if (player.abstractCreature.creatureTemplate.type == MothPupCritob.Mothpup)
+            if (player.abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
                 return true;
             if (player.abstractCreature != null &&
                 player.abstractCreature.world != null &&
@@ -422,16 +410,23 @@ namespace TheOutsider
             }
             return false;
         }
-        public static bool PlayerNPCShouldBeMoth(World world)
+        public static bool PlayerNPCShouldBeMoth(World world, EntityID ID)
         {
+            bool result = false;
+            Random.State state = Random.state;
+            Random.InitState(ID.number + 10);
             if (world != null && world.game != null && world.game.IsStorySession &&
-               (world.game.session.characterStats.name == Plugin.SlugName || world.region.name == "OSAM"))
+               (world.game.session.characterStats.name == Plugin.SlugName || world.region.name == "OSAM" ||
+               (Plugin.optionsMenuInstance.allowMothPupInOtherTimeLine.Value &&
+                Plugin.optionsMenuInstance.mothPupGenerationProbability.Value > Random.value * 100f)))
             {
-                return true;
+                result = true;
             }
-            return false;
+            Random.state = state;
+            return result;
         }
         #endregion
+
         /*
         #region 梦境相关
         public class DreamStateOverride

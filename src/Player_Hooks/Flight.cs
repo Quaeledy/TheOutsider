@@ -129,7 +129,7 @@ namespace TheOutsider.Player_Hooks
         }
 
         //消耗饱食度飞行
-        private static void FoodConsumption(Player self, PlayerEx player)
+        private static void FoodConsumption(Player self, TheOutsider player)
         {
 
             PlayerState playerState = self.abstractCreature.world.game.Players.Count == 1 || player.isMothNPC ?
@@ -148,7 +148,7 @@ namespace TheOutsider.Player_Hooks
         }
 
         //飞行速度
-        private static void FlightSpeed(Player self, PlayerEx player)
+        private static void FlightSpeed(Player self, TheOutsider player)
         {
             self.bodyChunks[0].vel.x = self.bodyChunks[0].vel.x + player.wingSpeed * player.ax / player.upFlightTime;
             self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.wingSpeed * player.ay / player.upFlightTime;
@@ -215,7 +215,7 @@ namespace TheOutsider.Player_Hooks
         }
         public static float num = 0;
         //飞行加速度
-        private static void FlightAcceleration(Player self, PlayerEx player)
+        private static void FlightAcceleration(Player self, TheOutsider player)
         {
             //Debug.Log(player.ax + " + " + player.ay);
             if (player.isFlying)

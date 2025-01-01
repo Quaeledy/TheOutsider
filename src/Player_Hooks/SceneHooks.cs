@@ -26,7 +26,7 @@ namespace TheOutsider.Player_Hooks
         {
             orig(saveState, currentRegion, denPosition, ref cyclesSinceLastDream, ref cyclesSinceLastFamilyDream, ref cyclesSinceLastGuideDream, ref inGWOrSHCounter, ref upcomingDream, ref eventDream, ref everSleptInSB, ref everSleptInSB_S01, ref guideHasShownHimselfToPlayer, ref guideThread, ref guideHasShownMoonThisRound, ref familyThread);
 
-            if (!PlayerHooks.PlayerData.TryGetValue(PlayerEx.playerRef, out var player) || !player.isMoth)
+            if (!PlayerHooks.PlayerData.TryGetValue(TheOutsider.playerRef, out var player) || !player.isMoth)
             {
                 return;
             }

@@ -23,12 +23,17 @@ namespace TheOutsider.Menu_Hooks
             hideWing = config.Bind("Quaeledy_Outsider_Bool_HideWing", false);
             hideWingWhenFolded = config.Bind("Quaeledy_Outsider_Bool_HideWingWhenFolded", false);
             handWing = config.Bind("Quaeledy_Outsider_Bool_HandWing", false);
+
+            // Tab 3
+            allowMothPupInOtherTimeLine = config.Bind("Quaeledy_Outsider_Bool_AllowMothPupInOtherTimeLine", false);
+            mothPupGenerationProbability = config.Bind("Quaeledy_Outsider_Int_MothPupGenerationProbability", 0);
         }
         public override void Initialize()
         {
             var opTab1 = new OpTab(this, Custom.rainWorld.inGameTranslator.Translate("Capacity"));//InGameTranslator.Translate("Capacity")
             var opTab2 = new OpTab(this, Custom.rainWorld.inGameTranslator.Translate("Appearance"));
-            Tabs = new[] { opTab1, opTab2 };
+            var opTab3 = new OpTab(this, Custom.rainWorld.inGameTranslator.Translate("Other"));
+            Tabs = new[] { opTab1, opTab2, opTab3 };
 
             OpContainer tab1Container = new OpContainer(new Vector2(0, 0));
             opTab1.AddItems(tab1Container);
@@ -81,6 +86,21 @@ namespace TheOutsider.Menu_Hooks
                     new OpLabel(80, 200, Custom.rainWorld.inGameTranslator.Translate("Replacing Wings with Hands (Chiroptera)")),
             };
             opTab2.AddItems(UIArrayElements);
+
+            // Tab 3：其他
+            OpContainer containerTab3 = new OpContainer(new Vector2(0, 0));
+            opTab3.AddItems(containerTab3);
+            UIArrayElements = new UIelement[]
+            {
+                    new OpLabel(10f, 550f, Custom.rainWorld.inGameTranslator.Translate("Other"), true),
+                    new OpLabel(180f, 550f, Custom.rainWorld.inGameTranslator.Translate("Other settings about this mod.")),
+                    //允许蛾猫崽在不是离群者的时间线生成
+                    new OpCheckBox(allowMothPupInOtherTimeLine, 50, 500),
+                    new OpLabel(80, 500, Custom.rainWorld.inGameTranslator.Translate("Allow Mothpups to generate in other campaigns that have slugpups")),
+                    new OpSlider(mothPupGenerationProbability, new Vector2(50, 450), 100){max = 100, hideLabel = false, description = Custom.rainWorld.inGameTranslator.Translate("Mothpups generation probability (The probability of other pups turning into mothpups)")},
+                    new OpLabel(180, 450, Custom.rainWorld.inGameTranslator.Translate("Mothpups generation probability in other campaigns that have slugpups")),
+            };
+            opTab3.AddItems(UIArrayElements);
         }
 
         public override void Update()
@@ -102,5 +122,8 @@ namespace TheOutsider.Menu_Hooks
         public readonly Configurable<bool> hideWing;
         public readonly Configurable<bool> hideWingWhenFolded;
         public readonly Configurable<bool> handWing;
+        // Tab 3
+        public readonly Configurable<bool> allowMothPupInOtherTimeLine;
+        public readonly Configurable<int> mothPupGenerationProbability;
     }
 }

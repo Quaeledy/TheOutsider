@@ -30,7 +30,6 @@ namespace TheOutsider.HUD_Hooks
             On.JollyCoop.JollyMenu.SymbolButtonTogglePupButton.LoadIcon += SymbolButtonTogglePupButton_LoadIcon;
             On.JollyCoop.JollyMenu.SymbolButtonTogglePupButton.HasUniqueSprite += SymbolButtonTogglePupButton_HasUniqueSprite;
             On.JollyCoop.JollyMenu.SymbolButtonToggle.LoadIcon += SymbolButtonToggleButton_LoadIcon;
-            On.PlayerGraphics.JollyUniqueColorMenu += PlayerGraphics_JollyUniqueColorMenu;
         }
 
         #region 游戏中右下角头像
@@ -164,24 +163,6 @@ namespace TheOutsider.HUD_Hooks
                 self.uniqueSymbol.sprite.SetElementByName(self.uniqueSymbol.fileName);
                 self.uniqueSymbol.pos.y = self.size.y / 2f;
             }
-        }
-
-        private static Color PlayerGraphics_JollyUniqueColorMenu(On.PlayerGraphics.orig_JollyUniqueColorMenu orig, SlugcatStats.Name slugName, SlugcatStats.Name reference, int playerNumber)
-        {
-            Color result = orig(slugName, reference, playerNumber);
-            if (slugName == Plugin.SlugName)
-            {
-                result = new Color(106f / 255f, 229f / 255f, 191f / 255f);
-                if (playerNumber == 0 && Custom.rainWorld.options.jollyColorMode != Options.JollyColorMode.CUSTOM)
-                {
-                    return result;
-                }
-                if ((Custom.rainWorld.options.jollyColorMode == Options.JollyColorMode.AUTO && playerNumber > 0) || Custom.rainWorld.options.jollyColorMode == Options.JollyColorMode.CUSTOM)
-                {
-                    return PlayerGraphics.JollyColor(playerNumber, 2);
-                }
-            }
-            return result;
         }
 
         private static void SymbolButtonToggleButton_LoadIcon(On.JollyCoop.JollyMenu.SymbolButtonToggle.orig_LoadIcon orig, SymbolButtonToggle self)
