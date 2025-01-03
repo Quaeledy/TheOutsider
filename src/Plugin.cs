@@ -110,6 +110,8 @@ namespace TheOutsider
             Futile.atlasManager.LoadAtlas("atlases/mothantennae1");
             Futile.atlasManager.LoadAtlas("atlases/mothantennae2");
             Futile.atlasManager.LoadAtlas("atlases/mothwings");
+            Futile.atlasManager.LoadAtlas("atlases/AlcedoFeather");
+            Futile.atlasManager.LoadAtlas("atlases/AlcedoMask");
             Futile.atlasManager.LoadAtlas("atlases/OutsiderGuidanceSlugcat");
             Futile.atlasManager.LoadAtlas("atlases/Kill_Slugcat_Outsider");
             Futile.atlasManager.LoadAtlas("atlases/icon_Quetzalcoatl");

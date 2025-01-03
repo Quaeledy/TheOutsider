@@ -93,7 +93,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 return num4 * num7 * num8;
             }
-            return num4 * Mathf.Lerp(0.5f, 1f, Mathf.Cos(Mathf.Pow(Mathf.InverseLerp(num3, 1f, x), 4f) * 3.1415927f * 0.5f)) * num7 * num8;
+            return 2f * num4 * Mathf.Lerp(0.5f, 1f, Mathf.Cos(Mathf.Pow(Mathf.InverseLerp(num3, 1f, x), 4f) * 3.1415927f * 0.5f)) * num7 * num8;
         }
 
         public float FeatherContour(float x)
@@ -101,27 +101,36 @@ namespace TheOutsider.CustomLore.CustomCreature
             return AlcedoTentacle.FeatherContour(x, this.flyingMode);
         }
 
+        //羽毛长度
         public static float FeatherContour(float x, float k)
         {
-            float num = Mathf.Lerp(0.2f, 1f, Custom.SCurve(Mathf.Pow(x, 1.5f), 0.1f));
+            float num = 0.25f * Mathf.Sin(Mathf.Pow(Mathf.Abs(x - 0.5f), 0.8f) * 5f);
+            num *= Mathf.Pow(x + 0.5f, 2.5f) + 0.5f;
+            //羽毛分布
+            /*
+            float num = Mathf.Lerp(0.2f, 1f, Custom.SCurve(Mathf.Pow(x, 1.5f), 0.1f));//SCurve: 增函数，越接近1增幅越大，0处约0.5，1处为1
             if (Mathf.Pow(x, 1.5f) > 0.5f)
             {
-                num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));
+                num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));//右侧为减函数，越接近1增幅越大，0处约1，1处为0
+                //整体：减函数，越接近1增幅越大，0处约0.5，1处为0
+                //num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));
             }
+            //羽毛长度
             float num2 = 1f;
             num2 *= Mathf.Pow(Mathf.Sin(Mathf.Pow(x, 0.5f) * 3.1415927f), 0.7f);
             if (x < 0.3f)
             {
                 num2 *= Mathf.Lerp(0.7f, 1f, Custom.SCurve(Mathf.InverseLerp(0f, 0.3f, x), 0.5f));
-            }
-            return Mathf.Lerp(num * 0.5f, num2, k);
+            }*/
+            num = Mathf.Lerp(num, 1f, 0.5f);
+            return Mathf.Lerp(num * 0.5f, num, k);
         }
 
         public AlcedoTentacle(Alcedo alcedo, BodyChunk chunk, float length, int tentacleNumber) : base(alcedo, chunk, length)
         {
             this.tentacleNumber = tentacleNumber;
             this.tProps = new Tentacle.TentacleProps(false, false, true, 0.5f, 0f, 0.2f, 1.2f, 0.2f, 1.2f, 10f, 0.25f, 5f, 15, 60, 12, 0);
-            this.tChunks = new Tentacle.TentacleChunk[alcedo.IsKing ? 10 : 8];
+            this.tChunks = new Tentacle.TentacleChunk[alcedo.IsKing ? 7 : 5];
             for (int i = 0; i < this.tChunks.Length; i++)
             {
                 this.tChunks[i] = new Tentacle.TentacleChunk(this, i, (float)(i + 1) / (float)this.tChunks.Length, 5f);
@@ -130,6 +139,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.debugViz = false;
         }
 
+        //羽毛宽度
         public static float FeatherWidth(float x)
         {
             return Mathf.Pow(Mathf.Sin(Mathf.InverseLerp(-0.45f, 1f, x) * 3.1415927f), 2.6f);
@@ -173,7 +183,9 @@ namespace TheOutsider.CustomLore.CustomCreature
                 return;
             }
             this.attachedAtTip = false;
-            this.idealLength = Mathf.Lerp(20f * (this.alcedo.IsKing ? 9f : 7f), 20f * (this.alcedo.IsKing ? 13.5f : 11f), this.flyingMode);
+            idealLength = Mathf.Lerp(this.alcedo.wingLength * (this.alcedo.IsKing ? 9f : 7f),
+                         this.alcedo.wingLength * (this.alcedo.IsKing ? 13.5f : 11f),
+                         flyingMode);
             if (this.stun > 0)
             {
                 this.stun--;
@@ -321,26 +333,30 @@ namespace TheOutsider.CustomLore.CustomCreature
                 }
                 else if (this.mode == AlcedoTentacle.Mode.Fly)
                 {
-                    bool flag2 = false;
+                    bool contact = false;
                     this.flyingMode += 0.05f;
                     for (int n = 0; n < this.tChunks.Length; n++)
                     {
                         this.tChunks[n].vel *= 0.95f;
                         Tentacle.TentacleChunk tentacleChunk3 = this.tChunks[n];
                         tentacleChunk3.vel.x = tentacleChunk3.vel.x + this.tentacleDir * 0.6f;
-                        bool flag3 = this.tentacleNumber == 0;
-                        if (this.alcedo.IsMiros)
-                        {
-                            flag3 = (this.tentacleNumber % 2 == 0);
-                        }
-                        Vector2 vector = this.connectedChunk.pos - Custom.DirVec(this.connectedChunk.pos, flag3 ? this.alcedo.bodyChunks[3].pos : this.alcedo.bodyChunks[2].pos) * this.idealLength * this.tChunks[n].tPos;
-                        vector = Vector2.Lerp(vector, this.connectedChunk.pos + new Vector2(this.tentacleDir * this.idealLength * this.tChunks[n].tPos, 0f), 0.5f);
-                        Vector2 a2 = Custom.PerpendicularVector((this.connectedChunk.pos - vector).normalized) * (flag3 ? -1f : 1f);
-                        vector += a2 * Mathf.Sin(6.2831855f * (this.alcedo.wingFlap - this.tChunks[n].tPos * 0.5f)) * Mathf.Lerp(200f, 600f, this.alcedo.wingFlapAmplitude);
-                        this.tChunks[n].vel += Vector2.ClampMagnitude(vector - this.tChunks[n].pos, 30f) / 30f * 5f * Mathf.Lerp(0.2f, 1f, this.alcedo.wingFlapAmplitude);
+                        bool shouldBeMirrored = this.tentacleNumber % 2 == 0;
+
+                        Vector2 wantDir = Custom.DirVec(this.connectedChunk.pos, shouldBeMirrored ? this.alcedo.bodyChunks[3].pos : this.alcedo.bodyChunks[2].pos);
+                        Vector2 wantPos = this.connectedChunk.pos - this.idealLength * Mathf.Pow(this.tChunks[n].tPos, Mathf.Sqrt(this.alcedo.wingLength / 20f)) * wantDir;
+                        wantPos = Vector2.Lerp(wantPos, this.connectedChunk.pos + new Vector2(this.tentacleDir * this.idealLength * this.tChunks[n].tPos, 0f), 0.5f);
+                        Vector2 perp = Custom.PerpendicularVector((this.connectedChunk.pos - wantPos).normalized) * (shouldBeMirrored ? -1f : 1f);
+                        float wave = Mathf.Sin((float)Math.PI * 2f * (this.alcedo.wingFlap - this.tChunks[n].tPos * 0.5f));
+                        float waveScale = Mathf.Lerp(Mathf.Pow(1 - this.tChunks[n].tPos, 1 - Mathf.Sqrt(this.alcedo.wingLength / 20f)), 1f, 0.5f) *
+                                          this.alcedo.wingLength * Mathf.Lerp(10f, 30f, this.alcedo.wingFlapAmplitude);//Mathf.Lerp(200f, 600f, this.alcedo.wingFlapAmplitude);
+                        wantPos += perp * waveScale * wave;
+                        this.tChunks[n].vel += Vector2.ClampMagnitude(wantPos - this.tChunks[n].pos, 1.5f * this.alcedo.wingLength) /
+                            (1.5f * this.alcedo.wingLength) * 5f * Mathf.Lerp(0.2f, 1f, this.alcedo.wingFlapAmplitude);
+                        
+                        
                         if (this.tChunks[n].contactPoint.x != 0 || this.tChunks[n].contactPoint.y != 0)
                         {
-                            flag2 = true;
+                            contact = true;
                         }
                     }
                     float num3 = 0.5f;
@@ -349,17 +365,17 @@ namespace TheOutsider.CustomLore.CustomCreature
                         num3 = 1.4f / (float)this.alcedo.tentacles.Length;
                     }
                     BodyChunk bodyChunk2 = this.alcedo.bodyChunks[1];
-                    bodyChunk2.vel.y = bodyChunk2.vel.y + Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 5.6f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
+                    bodyChunk2.vel.y = bodyChunk2.vel.y + this.alcedo.wingLength / 20f * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 5.6f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                     BodyChunk bodyChunk3 = this.alcedo.bodyChunks[1];
-                    bodyChunk3.vel.x = bodyChunk3.vel.x + (num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap)) * -2.6f * this.tentacleDir * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
+                    bodyChunk3.vel.x = bodyChunk3.vel.x + this.alcedo.wingLength / 20f * (num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap)) * -2.6f * this.tentacleDir * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                     if (this.OtherTentacle.stun > 0 && this.stun < 1)
                     {
                         for (int num4 = 0; num4 < 4; num4++)
                         {
-                            this.alcedo.bodyChunks[num4].vel += Custom.DirVec(base.Tip.pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
+                            this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(base.Tip.pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                         }
                     }
-                    if (flag2)
+                    if (contact)
                     {
                         this.framesOfHittingTerrain++;
                     }

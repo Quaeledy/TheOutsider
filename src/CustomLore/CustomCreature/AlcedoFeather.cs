@@ -66,7 +66,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
         }
 
-        public AlcedoFeather(AlcedoGraphics kGraphics, AlcedoTentacle wing, float wingPosition, float contractedLength, float extendedLength, float width) : base(kGraphics)
+        public AlcedoFeather(AlcedoGraphics kGraphics, AlcedoTentacle wing, float wingPosition, float contractedLength, float extendedLength, float width, string type) : base(kGraphics)
         {
             this.kGraphics = kGraphics;
             this.wing = wing;
@@ -75,6 +75,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.extendedLength = extendedLength;
             this.width = width;
             this.lose = 0f;
+            this.type = type;
         }
 
         public override void Update()
@@ -87,10 +88,20 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.lastPos = this.pos;
             this.pos += this.vel;
             this.vel *= 0.7f;
-            Vector2 normalized = Vector2.Lerp(this.PreviousChunk.pos - this.PreviousPreviousChunk.pos, this.NextChunk.pos - this.PreviousChunk.pos, (this.PreviousPreviousChunk == this.PreviousChunk) ? 1f : this.BetweenChunksLerp).normalized;
-            Vector2 a = Custom.PerpendicularVector(normalized) * (this.kGraphics.alcedo.IsMiros ? this.GetTentacleAngle(this.wing.tentacleNumber) : ((this.wing.tentacleNumber == 1) ? -1f : 1f));
-            float d = Mathf.Lerp(Mathf.Lerp(1f, Mathf.Lerp(-0.9f, 1.5f, Mathf.InverseLerp(this.wing.idealLength * 0.5f, this.wing.idealLength, Vector2.Distance(this.wing.FloatBase, this.wing.Tip.pos))), this.wingPosition), Mathf.Lerp(-0.5f, 4f, this.wingPosition), this.extendedFac);
+            Vector2 normalized = Vector2.Lerp(this.PreviousChunk.pos - this.PreviousPreviousChunk.pos, 
+                                              this.NextChunk.pos - this.PreviousChunk.pos, 
+                                              (this.PreviousPreviousChunk == this.PreviousChunk) ? 1f : this.BetweenChunksLerp).normalized;
+            Vector2 a = Custom.PerpendicularVector(normalized) * 
+                (this.kGraphics.alcedo.IsMiros ? this.GetTentacleAngle(this.wing.tentacleNumber) : ((this.wing.tentacleNumber == 1) ? -1f : 1f));
+            float d = Mathf.Lerp(Mathf.Lerp(1f, 
+                                            Mathf.Lerp(-0.9f, //翅膀折叠，此时翅尖翅根距离为翅长的1/2
+                                                        1.5f, //翅膀展开
+                                                       Mathf.InverseLerp(this.wing.idealLength * 0.5f, this.wing.idealLength, Vector2.Distance(this.wing.FloatBase, this.wing.Tip.pos))), //翅膀折叠程度
+                                            this.wingPosition), //翅根处几乎不变，翅尖变化剧烈
+                                 Mathf.Lerp(-0.5f, 4f, this.wingPosition),  //翅根处几乎不变且反向，翅尖变化剧烈
+                                 this.extendedFac);//羽毛不伸展时不变，伸展程度越大变化越剧烈
             Vector2 a2 = this.ConnectedPos + (a + normalized * d).normalized * this.CurrentLength;
+            //Vector2 a2 = this.ConnectedPos + (a + normalized * d).normalized * this.CurrentLength;
             this.vel += (a2 - this.pos) * Mathf.Lerp(0.3f, 0.8f, this.wing.flyingMode) * (1f - this.lose);
             if (this.wing.flyingMode > this.extendedFac)
             {
@@ -167,6 +178,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 this.terrainContactTimer = 0;
             }
         }
+
         public Color CurrentColor()
         {
             if (this.kGraphics.alcedo.IsMiros)
@@ -198,6 +210,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             rgb2.a = Mathf.Max(this.forcedAlpha, Mathf.Lerp(0.2f, 0.6f, Mathf.Cos(Mathf.Pow(this.wingPosition, 1.7f) * 3.1415927f))) * (this.extendedFac + this.wing.flyingMode) * 0.5f * (1f - this.brokenColor);
             return rgb2;
         }
+
         public float GetTentacleAngle(int id)
         {
             if (id == 0)
@@ -217,6 +230,7 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public AlcedoGraphics kGraphics;
         public AlcedoTentacle wing;
+        public string type;
         public float wingPosition;
         private float ef;
         public float width;

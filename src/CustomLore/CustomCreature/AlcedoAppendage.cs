@@ -17,6 +17,7 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public float conRad;
 
+        //爪子
         public AlcedoAppendage(AlcedoGraphics kGraphics, int side, int index, float rad, float conRad)
             : base(kGraphics)
         {

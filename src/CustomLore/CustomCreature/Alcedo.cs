@@ -95,22 +95,29 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public Alcedo(AbstractCreature abstractCreature, World world) : base(abstractCreature, world)
         {
+            this.wingLength = 5f;
             base.bodyChunks = new BodyChunk[5];
             float num = this.IsKing ? 1.4f : 1f;
+            base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
+            base.bodyChunks[1] = new BodyChunk(this, 1, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
+            //2，3可能是翅膀根部
+            base.bodyChunks[2] = new BodyChunk(this, 2, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
+            base.bodyChunks[3] = new BodyChunk(this, 3, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
+            base.bodyChunks[4] = new BodyChunk(this, 4, new Vector2(0f, 0f), 6f, 0.3f * num);/*
             base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[1] = new BodyChunk(this, 1, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[2] = new BodyChunk(this, 2, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[3] = new BodyChunk(this, 3, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
-            base.bodyChunks[4] = new BodyChunk(this, 4, new Vector2(0f, 0f), 6.5f, 0.3f * num);
+            base.bodyChunks[4] = new BodyChunk(this, 4, new Vector2(0f, 0f), 6.5f, 0.3f * num);*/
             for (int i = 0; i < base.bodyChunks.Length; i++)
             {
                 base.bodyChunks[i].restrictInRoomRange = 2400f;
                 base.bodyChunks[i].defaultRestrictInRoomRange = 2400f;
             }
             this.bodyChunkConnections = new PhysicalObject.BodyChunkConnection[(ModManager.MMF && !this.IsMiros) ? 8 : 7];
-            float num2 = 40f;
-            float num3 = 26f;
-            float num4 = 10f;
+            float num2 = 40f * 0.6f;
+            float num3 = 26f * 0.6f;
+            float num4 = 10f * 0.6f;
             this.bodyChunkConnections[0] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[0], base.bodyChunks[1], num3, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
             this.bodyChunkConnections[1] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[3], num2, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
             this.bodyChunkConnections[2] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[1], Mathf.Sqrt(Mathf.Pow(num4, 2f) + Mathf.Pow(num2 / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
@@ -125,14 +132,14 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.tentacles = new AlcedoTentacle[this.IsMiros ? 4 : 2];
             for (int j = 0; j < this.tentacles.Length; j++)
             {
-                this.tentacles[j] = new AlcedoTentacle(this, base.bodyChunks[2 + j % 2], (this.IsKing ? 9f : 7f) * 20f, j);
+                this.tentacles[j] = new AlcedoTentacle(this, base.bodyChunks[2 + j % 2], (this.IsKing ? 9f : 7f) * wingLength * 4f, j);
             }
             this.neck = new Tentacle(this, base.bodyChunks[0], (this.IsKing ? 6f : 5f) * 20f);
             this.neck.tProps = new Tentacle.TentacleProps(false, false, true, 0.5f, 0f, 0.5f, 1.8f, 0.2f, 1.2f, 10f, 0.25f, 3f, 15, 20, 6, 0);
             this.neck.tChunks = new Tentacle.TentacleChunk[4];
             for (int k = 0; k < this.neck.tChunks.Length; k++)
             {
-                this.neck.tChunks[k] = new Tentacle.TentacleChunk(this.neck, k, (float)(k + 1) / (float)this.neck.tChunks.Length, this.IsKing ? 6f : 5f);
+                this.neck.tChunks[k] = new Tentacle.TentacleChunk(this.neck, k, (float)(k + 1) / (float)this.neck.tChunks.Length, 0.6f * (this.IsKing ? 6f : 5f));
             }
             this.neck.tChunks[this.neck.tChunks.Length - 1].rad = 7f;
             this.neck.stretchAndSqueeze = 0f;
@@ -1306,7 +1313,9 @@ namespace TheOutsider.CustomLore.CustomCreature
                 return;
             }
             (base.State as Alcedo.AlcedoState).mask = false;
-            AbstractPhysicalObject abstractPhysicalObject = new VultureMask.AbstractVultureMask(this.room.world, null, this.abstractPhysicalObject.pos, this.room.game.GetNewID(), base.abstractCreature.ID.RandomSeed, this.IsKing);
+            AbstractPhysicalObject abstractPhysicalObject = new VultureMask.AbstractVultureMask(this.room.world, null, 
+                this.abstractPhysicalObject.pos, this.room.game.GetNewID(), 
+                base.abstractCreature.ID.RandomSeed, this.IsKing);
             this.room.abstractRoom.AddEntity(abstractPhysicalObject);
             abstractPhysicalObject.pos = base.abstractCreature.pos;
             abstractPhysicalObject.RealizeInRoom();
@@ -1677,6 +1686,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         public int timeSinceLastTakeoff;
         public float wingFlapAmplitude;
         public float wingFlap;
+        public float wingLength;
         public int landingBrake;
         public Vector2 landingBrakePos;
         private Alcedo.AlcedoThruster[] thrusters;

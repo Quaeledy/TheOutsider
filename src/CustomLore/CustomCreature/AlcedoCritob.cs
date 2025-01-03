@@ -90,7 +90,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             t.bodySize = 1f;//蝙蝠是0.1，蛋虫是0.4，蓝香菇是5.5，蛞蝓是1
             t.shortcutSegments = 2;
             t.doPreBakedPathing = false;
-            t.waterRelationship = CreatureTemplate.WaterRelationship.Amphibious;//水生类型：空气和水面
+            t.waterRelationship = CreatureTemplate.WaterRelationship.Amphibious;//水生类型：两栖
             t.waterPathingResistance = 0f;
             t.canSwim = true;
             t.requireAImap = true;
