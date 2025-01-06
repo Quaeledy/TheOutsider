@@ -268,7 +268,8 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public bool OnlyHurtDontGrab(PhysicalObject testObj)
         {
-            return testObj is Creature && base.tracker.RepresentationForCreature((testObj as Creature).abstractCreature, false) != null && base.tracker.RepresentationForCreature((testObj as Creature).abstractCreature, false).dynamicRelationship.currentRelationship.type == CreatureTemplate.Relationship.Type.Attacks;
+            return testObj is Creature && base.tracker.RepresentationForCreature((testObj as Creature).abstractCreature, false) != null && 
+                base.tracker.RepresentationForCreature((testObj as Creature).abstractCreature, false).dynamicRelationship.currentRelationship.type == CreatureTemplate.Relationship.Type.Attacks;
         }
 
         public bool DoIWantToBiteCreature(AbstractCreature creature)

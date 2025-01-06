@@ -97,13 +97,14 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             this.wingLength = 5f;
             base.bodyChunks = new BodyChunk[5];
-            float num = this.IsKing ? 1.4f : 1f;
+            float num = 0.5f;//this.IsKing ? 1.4f : 1f;
             base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[1] = new BodyChunk(this, 1, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
             //2，3可能是翅膀根部
             base.bodyChunks[2] = new BodyChunk(this, 2, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[3] = new BodyChunk(this, 3, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
-            base.bodyChunks[4] = new BodyChunk(this, 4, new Vector2(0f, 0f), 6f, 0.3f * num);/*
+            //4大概是头
+            base.bodyChunks[4] = new BodyChunk(this, 4, new Vector2(0f, 0f), 3.5f, 0.3f * num);/*
             base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[1] = new BodyChunk(this, 1, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[2] = new BodyChunk(this, 2, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
@@ -139,7 +140,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.neck.tChunks = new Tentacle.TentacleChunk[4];
             for (int k = 0; k < this.neck.tChunks.Length; k++)
             {
-                this.neck.tChunks[k] = new Tentacle.TentacleChunk(this.neck, k, (float)(k + 1) / (float)this.neck.tChunks.Length, 0.6f * (this.IsKing ? 6f : 5f));
+                this.neck.tChunks[k] = new Tentacle.TentacleChunk(this.neck, k, (float)(k + 1) / (float)this.neck.tChunks.Length, 0.7f * (this.IsKing ? 6f : 5f));
             }
             this.neck.tChunks[this.neck.tChunks.Length - 1].rad = 7f;
             this.neck.stretchAndSqueeze = 0f;
@@ -484,13 +485,14 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 this.wingFlap -= 1f;
             }
-            float num2 = 0f;
+            float upForce = 0f;
             for (int j = 0; j < this.tentacles.Length; j++)
             {
-                num2 += this.tentacles[j].Support() * (this.IsMiros ? 0.75f : 0.5f);
+                upForce += this.tentacles[j].Support() * (this.IsMiros ? 0.75f : 0.5f);
+                //upForce += this.tentacles[j].Support() * (this.IsMiros ? 0.75f : 0.5f);
             }
-            num2 = Mathf.Pow(num2, 0.5f);
-            num2 = Mathf.Max(num2, 0.1f);
+            upForce = Mathf.Pow(upForce, 0.5f);
+            upForce = Mathf.Max(upForce, 0.1f);
             this.hoverStill = false;
             IntVector2 intVector = this.room.GetTilePosition(base.mainBodyChunk.pos);
             for (int k = 0; k < 5; k++)
@@ -505,7 +507,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 return;
             }
             MovementConnection movementConnection = (this.AI.pathFinder as AlcedoPather).FollowPath(this.room.GetWorldCoordinate(intVector), true);
-            AlcedoTentacle.Mode a = AlcedoTentacle.Mode.Climb;
+            AlcedoTentacle.Mode climb = AlcedoTentacle.Mode.Climb;
             if (base.safariControlled)
             {
                 bool flag = false;
@@ -536,7 +538,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     {
                         Vector2 p = base.bodyChunks[4].pos + new Vector2((float)this.inputWithDiagonals.Value.x, (float)this.inputWithDiagonals.Value.y) * 200f;
                         base.bodyChunks[4].vel += Custom.DirVec(base.bodyChunks[4].pos, p) * 15f;
-                        this.neck.tChunks[this.neck.tChunks.Length - 1].vel -= Custom.DirVec(base.bodyChunks[4].pos, p) * num2;
+                        this.neck.tChunks[this.neck.tChunks.Length - 1].vel -= Custom.DirVec(base.bodyChunks[4].pos, p) * upForce;
                     }
                     else if ((this.inputWithDiagonals.Value.x != 0 || this.inputWithDiagonals.Value.y != 0) && flag)
                     {
@@ -544,7 +546,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     }
                     if (this.inputWithDiagonals.Value.jmp)
                     {
-                        a = AlcedoTentacle.Mode.Fly;
+                        climb = AlcedoTentacle.Mode.Fly;
                         if (!this.lastInputWithDiagonals.Value.jmp)
                         {
                             bool flag2 = false;
@@ -625,27 +627,28 @@ namespace TheOutsider.CustomLore.CustomCreature
                 if (this.AirBorne)
                 {
                     base.bodyChunks[num3].vel *= 0.98f;
-                    num2 = 0f;
+                    upForce = 0f;
                     for (int num4 = 0; num4 < this.tentacles.Length; num4++)
                     {
-                        num2 += ((this.tentacles[num4].stun >= 5) ? 0f : (1f / (float)this.tentacles.Length));
+                        upForce += ((this.tentacles[num4].stun >= 5) ? 0f : (1f / (float)this.tentacles.Length));
                     }
                 }
                 else
                 {
-                    base.bodyChunks[num3].vel *= Mathf.Lerp(0.98f, 0.9f, num2);
-                    if (num2 > 0.1f)
+                    base.bodyChunks[num3].vel *= Mathf.Lerp(0.98f, 0.9f, upForce);
+                    if (upForce > 0.1f)
                     {
                         BodyChunk bodyChunk2 = base.bodyChunks[num3];
-                        bodyChunk2.vel.y = bodyChunk2.vel.y + Mathf.Lerp(1.2f, 0.5f, num2);
+                        bodyChunk2.vel.y = bodyChunk2.vel.y + Mathf.Lerp(1.2f, 0.5f, upForce);
                     }
                 }
             }
             BodyChunk bodyChunk3 = base.bodyChunks[1];
-            bodyChunk3.vel.y = bodyChunk3.vel.y + 1.9f * num2 * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
+            bodyChunk3.vel.y = bodyChunk3.vel.y + 1.9f * upForce * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
             BodyChunk bodyChunk4 = base.bodyChunks[0];
-            bodyChunk4.vel.y = bodyChunk4.vel.y - 1.9f * num2 * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
-            if (!this.hoverStill && (movementConnection == default(MovementConnection) || (movementConnection.DestTile == this.lastConnection.DestTile && this.room.IsPositionInsideBoundries(base.abstractCreature.pos.Tile))))
+            bodyChunk4.vel.y = bodyChunk4.vel.y - 1.9f * upForce * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
+            if (!this.hoverStill && 
+                (movementConnection == default(MovementConnection) || (movementConnection.DestTile == this.lastConnection.DestTile && this.room.IsPositionInsideBoundries(base.abstractCreature.pos.Tile))))
             {
                 this.stuck++;
                 if (this.stuck > 60)
@@ -731,7 +734,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 if (this.dontSwitchModesCounter > 0)
                 {
                     this.dontSwitchModesCounter--;
-                }
+                }/*
                 else if (this.IsMiros)
                 {
                     if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 5 && this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && base.mainBodyChunk.vel.y > 4f && this.moveDirection.y > 0f && SharedPhysics.RayTraceTilesForTerrain(this.room, this.room.GetTilePosition(base.mainBodyChunk.pos), this.room.GetTilePosition(base.mainBodyChunk.pos + this.moveDirection * 400f)) && flag4)
@@ -739,7 +742,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                         this.TakeOff();
                         this.dontSwitchModesCounter = 200;
                     }
-                    else if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 4 && this.CheckTentacleModeOr(AlcedoTentacle.Mode.Climb) && (!base.safariControlled || a == AlcedoTentacle.Mode.Fly))
+                    else if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 4 && this.CheckTentacleModeOr(AlcedoTentacle.Mode.Climb) && (!base.safariControlled || climb == AlcedoTentacle.Mode.Fly))
                     {
                         for (int num9 = 0; num9 < this.tentacles.Length; num9++)
                         {
@@ -747,7 +750,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                         }
                         this.dontSwitchModesCounter = 200;
                     }
-                    else if (this.room.aimap.getTerrainProximity(movementConnection.DestTile) <= (this.IsMiros ? 4 : 8) && this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y != -1 && this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 10 && this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Fly) && (!base.safariControlled || a == AlcedoTentacle.Mode.Climb))
+                    else if (this.room.aimap.getTerrainProximity(movementConnection.DestTile) <= (this.IsMiros ? 4 : 8) && this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y != -1 && this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 10 && this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Fly) && (!base.safariControlled || climb == AlcedoTentacle.Mode.Climb))
                     {
                         for (int num10 = 0; num10 < this.tentacles.Length; num10++)
                         {
@@ -757,7 +760,11 @@ namespace TheOutsider.CustomLore.CustomCreature
                         this.dontSwitchModesCounter = 200;
                     }
                 }
-                else if (this.room.aimap.getTerrainProximity(movementConnection.DestTile) <= (this.IsMiros ? 4 : 8) && this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y != -1 && this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 10 && this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Fly) && (!base.safariControlled || a == AlcedoTentacle.Mode.Climb))
+                */
+                else if (this.room.aimap.getTerrainProximity(movementConnection.DestTile) <= (this.IsMiros ? 4 : 8) && 
+                    this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y != -1 && 
+                    this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 10 && 
+                    this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Fly) && (!base.safariControlled || climb == AlcedoTentacle.Mode.Climb))
                 {
                     for (int num11 = 0; num11 < this.tentacles.Length; num11++)
                     {
@@ -766,7 +773,10 @@ namespace TheOutsider.CustomLore.CustomCreature
                     this.AirBrake(30);
                     this.dontSwitchModesCounter = 200;
                 }
-                else if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 5 && this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && base.mainBodyChunk.vel.y > 4f && this.moveDirection.y > 0f && SharedPhysics.RayTraceTilesForTerrain(this.room, this.room.GetTilePosition(base.mainBodyChunk.pos), this.room.GetTilePosition(base.mainBodyChunk.pos + this.moveDirection * 400f)) && flag4 && (!base.safariControlled || a == AlcedoTentacle.Mode.Fly))
+                else if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 5 && 
+                    this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && base.mainBodyChunk.vel.y > 4f && this.moveDirection.y > 0f && 
+                    SharedPhysics.RayTraceTilesForTerrain(this.room, this.room.GetTilePosition(base.mainBodyChunk.pos), this.room.GetTilePosition(base.mainBodyChunk.pos + this.moveDirection * 400f)) && 
+                    flag4 && (!base.safariControlled || climb == AlcedoTentacle.Mode.Fly))
                 {
                     this.TakeOff();
                     this.dontSwitchModesCounter = 200;
@@ -777,7 +787,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 flag5 = (flag5 && !this.tentacles[num12].hasAnyGrip);
             }
-            if (base.mainBodyChunk.vel.y < -10f && this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && flag5 && this.landingBrake < 1 && (!base.safariControlled || a == AlcedoTentacle.Mode.Fly))
+            if (base.mainBodyChunk.vel.y < -10f && this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && flag5 && this.landingBrake < 1 && (!base.safariControlled || climb == AlcedoTentacle.Mode.Fly))
             {
                 for (int num13 = 0; num13 < this.tentacles.Length; num13++)
                 {
@@ -812,31 +822,32 @@ namespace TheOutsider.CustomLore.CustomCreature
                     this.hoverPos = this.room.GetTilePosition(base.mainBodyChunk.pos);
                 }
                 BodyChunk bodyChunk5 = base.bodyChunks[1];
-                bodyChunk5.vel.y = bodyChunk5.vel.y + 0.1f * num2;
+                bodyChunk5.vel.y = bodyChunk5.vel.y + 0.1f * upForce;
                 for (int num15 = 0; num15 < 4; num15++)
                 {
-                    base.bodyChunks[num15].vel *= Mathf.Lerp(1f, 0.9f, num2);
-                    base.bodyChunks[num15].vel += 0.6f * num2 * Vector2.ClampMagnitude(this.room.MiddleOfTile(this.hoverPos) - base.mainBodyChunk.pos, 10f) / 10f;
+                    base.bodyChunks[num15].vel *= Mathf.Lerp(1f, 0.9f, upForce);
+                    base.bodyChunks[num15].vel += 0.6f * upForce * Vector2.ClampMagnitude(this.room.MiddleOfTile(this.hoverPos) - base.mainBodyChunk.pos, 10f) / 10f;
                 }
             }
             else if (movementConnection != default(MovementConnection))
             {
-                Vector2 vector = Custom.DirVec(base.mainBodyChunk.pos, this.room.MiddleOfTile(movementConnection.destinationCoord));
-                vector = Vector2.Lerp(vector, IntVector2.ClampAtOne(movementConnection.DestTile - movementConnection.StartTile).ToVector2(), 0.5f);
+                Vector2 destinationPos = Custom.DirVec(base.mainBodyChunk.pos, this.room.MiddleOfTile(movementConnection.destinationCoord));
+                destinationPos = Vector2.Lerp(destinationPos, IntVector2.ClampAtOne(movementConnection.DestTile - movementConnection.StartTile).ToVector2(), 0.5f);
                 if (this.AirBorne)
                 {
-                    if (this.room.IsPositionInsideBoundries(base.abstractCreature.pos.Tile) || vector.y < 0f)
+                    if (this.room.IsPositionInsideBoundries(base.abstractCreature.pos.Tile) || destinationPos.y < 0f)
                     {
-                        vector.y *= 0.5f;
-                        if (vector.y < 0f)
+                        destinationPos.y *= 0.5f;
+                        if (destinationPos.y < 0f)
                         {
-                            vector.y = 0f;
+                            destinationPos.y = 0f;
                         }
                     }
                     if (movementConnection.destinationCoord.y > movementConnection.startCoord.y || !movementConnection.destinationCoord.TileDefined)
                     {
                         BodyChunk bodyChunk6 = base.bodyChunks[1];
                         bodyChunk6.vel.y = bodyChunk6.vel.y + 3.5f;
+                        //bodyChunk6.vel.y = bodyChunk6.vel.y + 3.5f;
                     }
                     else if (movementConnection.destinationCoord.y < movementConnection.startCoord.y)
                     {
@@ -849,7 +860,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     {
                         this.TakeOff();
                     }
-                    else if (!base.safariControlled || a == AlcedoTentacle.Mode.Fly)
+                    else if (!base.safariControlled || climb == AlcedoTentacle.Mode.Fly)
                     {
                         for (int num16 = 0; num16 < this.tentacles.Length; num16++)
                         {
@@ -859,7 +870,8 @@ namespace TheOutsider.CustomLore.CustomCreature
                 }
                 for (int num17 = 0; num17 < 4; num17++)
                 {
-                    base.bodyChunks[num17].vel += vector * (this.AirBorne ? 0.6f : (this.IsKing ? 1.9f : 1.2f)) * num2;
+                    base.bodyChunks[num17].vel += destinationPos * (this.AirBorne ? 0.6f : (this.IsKing ? 1.9f : 1.2f)) * upForce;
+                    //base.bodyChunks[num17].vel += destinationPos * (this.AirBorne ? 0.6f : (this.IsKing ? 1.9f : 1.2f)) * upForce;
                 }
                 MovementConnection movementConnection2 = movementConnection;
                 for (int num18 = 0; num18 < 3; num18++)
@@ -869,7 +881,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 }
                 if (movementConnection2 == movementConnection)
                 {
-                    this.moveDirection = (this.moveDirection + vector * 0.1f).normalized;
+                    this.moveDirection = (this.moveDirection + destinationPos * 0.1f).normalized;
                 }
                 else
                 {
@@ -929,7 +941,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     {
                         for (int num24 = 0; num24 < 4; num24++)
                         {
-                            base.bodyChunks[num24].vel *= Mathf.Lerp(1f, 0.2f, num2);
+                            base.bodyChunks[num24].vel *= Mathf.Lerp(1f, 0.2f, upForce);
                         }
                     }
                 }

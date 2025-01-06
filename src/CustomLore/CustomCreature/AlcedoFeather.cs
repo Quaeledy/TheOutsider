@@ -94,13 +94,13 @@ namespace TheOutsider.CustomLore.CustomCreature
             Vector2 a = Custom.PerpendicularVector(normalized) * 
                 (this.kGraphics.alcedo.IsMiros ? this.GetTentacleAngle(this.wing.tentacleNumber) : ((this.wing.tentacleNumber == 1) ? -1f : 1f));
             float d = Mathf.Lerp(Mathf.Lerp(1f, 
-                                            Mathf.Lerp(-0.9f, //翅膀折叠，此时翅尖翅根距离为翅长的1/2
-                                                        1.5f, //翅膀展开
+                                            Mathf.Lerp(-0.2f, //-0.9f,//翅膀折叠，此时翅尖翅根距离为翅长的1/2
+                                                        1.2f, //1.5f,//翅膀展开
                                                        Mathf.InverseLerp(this.wing.idealLength * 0.5f, this.wing.idealLength, Vector2.Distance(this.wing.FloatBase, this.wing.Tip.pos))), //翅膀折叠程度
                                             this.wingPosition), //翅根处几乎不变，翅尖变化剧烈
-                                 Mathf.Lerp(-0.5f, 4f, this.wingPosition),  //翅根处几乎不变且反向，翅尖变化剧烈
+                                 Mathf.Lerp(-0.5f, 4f, this.wingPosition),  //翅根处几乎不变且反向，翅尖变化剧烈  Mathf.Lerp(-0.5f, 4f, this.wingPosition),
                                  this.extendedFac);//羽毛不伸展时不变，伸展程度越大变化越剧烈
-            Vector2 a2 = this.ConnectedPos + (a + normalized * d).normalized * this.CurrentLength;
+            Vector2 a2 = this.ConnectedPos + (a * (1f - this.wingPosition) + normalized * d).normalized * this.CurrentLength;
             //Vector2 a2 = this.ConnectedPos + (a + normalized * d).normalized * this.CurrentLength;
             this.vel += (a2 - this.pos) * Mathf.Lerp(0.3f, 0.8f, this.wing.flyingMode) * (1f - this.lose);
             if (this.wing.flyingMode > this.extendedFac)
@@ -183,12 +183,14 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             if (this.kGraphics.alcedo.IsMiros)
             {
-                Color rgb = HSLColor.Lerp(new HSLColor(this.kGraphics.ColorB.hue, Mathf.Lerp(this.kGraphics.ColorB.saturation, 1f, this.saturationBonus), Mathf.Lerp(this.kGraphics.ColorB.lightness, 1f, this.lightnessBonus)), this.kGraphics.ColorA, Mathf.Cos(Mathf.Pow(this.wingPosition, 0.75f) * 3.1415927f)).rgb;
+                Color rgb = HSLColor.Lerp(new HSLColor(this.kGraphics.ColorB.hue, Mathf.Lerp(this.kGraphics.ColorB.saturation, 1f, this.saturationBonus), Mathf.Lerp(this.kGraphics.ColorB.lightness, 1f, this.lightnessBonus)), 
+                                          this.kGraphics.ColorA, 
+                                          Mathf.Cos(Mathf.Pow(this.wingPosition, 0.75f) * 3.1415927f)).rgb;
                 rgb.a = Mathf.Max(new float[]
                 {
-                0.4f,
-                this.forcedAlpha,
-                Mathf.Lerp(0.4f, 0.8f, Mathf.Cos(Mathf.Pow(this.wingPosition, 1.7f) * 3.1415927f))
+                    0.4f,
+                    this.forcedAlpha,
+                    Mathf.Lerp(0.4f, 0.8f, Mathf.Cos(Mathf.Pow(this.wingPosition, 1.7f) * 3.1415927f))
                 }) * (this.extendedFac + this.wing.flyingMode) * 0.5f * (1f - this.brokenColor);
                 if (this.kGraphics.alcedo.isLaserActive())
                 {
@@ -198,6 +200,13 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
             HSLColor colorB = this.kGraphics.ColorB;
             HSLColor colorA = this.kGraphics.ColorA;
+            if (this.type == "Covert")
+            {
+                colorB.hue -= 0.1f;
+                colorA.hue -= 0.1f;
+                colorB.hue = (colorB.hue + 1f) % 1f;
+                colorA.hue = (colorA.hue + 1f) % 1f;
+            }
             if (this.kGraphics.albino)
             {
                 colorB.saturation = Mathf.Lerp(colorB.saturation, 1f, 0.2f);
@@ -206,8 +215,15 @@ namespace TheOutsider.CustomLore.CustomCreature
                 colorA.saturation = 0.8f;
                 colorA.lightness = 0.6f;
             }
-            Color rgb2 = HSLColor.Lerp(new HSLColor(colorB.hue, Mathf.Lerp(colorB.saturation, 1f, this.saturationBonus), Mathf.Lerp(colorB.lightness, 1f, this.lightnessBonus)), colorA, Mathf.Cos(Mathf.Pow(this.wingPosition, 0.75f) * 3.1415927f)).rgb;
-            rgb2.a = Mathf.Max(this.forcedAlpha, Mathf.Lerp(0.2f, 0.6f, Mathf.Cos(Mathf.Pow(this.wingPosition, 1.7f) * 3.1415927f))) * (this.extendedFac + this.wing.flyingMode) * 0.5f * (1f - this.brokenColor);
+            Color rgb2 = HSLColor.Lerp(new HSLColor(colorB.hue, Mathf.Lerp(colorB.saturation, 1f, this.saturationBonus), Mathf.Lerp(colorB.lightness, 1f, this.lightnessBonus)), 
+                                       colorA, 
+                                       Mathf.Cos(Mathf.Pow(this.wingPosition, 0.75f) * 3.1415927f)).rgb;
+            rgb2.a = Mathf.Max(this.forcedAlpha, 
+                Mathf.Lerp(0.7f, 0.9f, Mathf.Cos(Mathf.Pow(this.wingPosition, 1.7f) * 3.1415927f))) * Mathf.Lerp((this.extendedFac + this.wing.flyingMode) * 0.5f, 1f, 0.5f) * (1f - this.brokenColor);
+            /*
+            rgb2.a = Mathf.Max(this.forcedAlpha, 
+                Mathf.Lerp(0.2f, 0.6f, Mathf.Cos(Mathf.Pow(this.wingPosition, 1.7f) * 3.1415927f))) * (this.extendedFac + this.wing.flyingMode) * 0.5f * (1f - this.brokenColor);
+            */
             return rgb2;
         }
 

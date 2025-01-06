@@ -41,7 +41,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             get
             {
-                return this.attachedAtTip || this.segmentsGrippingTerrain > 0;
+                return this.attachedAtClaw || this.segmentsGrippingTerrain > 0;
             }
         }
         public float flyingMode
@@ -70,16 +70,19 @@ namespace TheOutsider.CustomLore.CustomCreature
                 return this.alcedo.tentacles[this.tentacleNumber - 1];
             }
         }
+        public int halfWingIndex => Mathf.FloorToInt((float)this.tChunks.Length / 2f);
 
         public float TentacleContour(float x)
         {
-            float num = Mathf.Lerp(0.45f, 0.1f, this.flyingMode);
-            float num2 = Mathf.Lerp(0.51f, 0.25f, this.flyingMode);
-            float num3 = Mathf.Lerp(0.85f, 0.4f, this.flyingMode);
+            float num = Mathf.Lerp(0.45f, 0.3f, this.flyingMode);
+            float num2 = Mathf.Lerp(0.51f, 0.45f, this.flyingMode);
+            float num3 = Mathf.Lerp(0.85f, 0.6f, this.flyingMode);
+
             float num4 = Mathf.Lerp(6.5f, 5.5f, this.flyingMode);
-            float num5 = Mathf.Lerp(0.5f, 0.35f, this.flyingMode);
-            float num6 = Mathf.Lerp(0.85f, 0f, this.flyingMode);
+            float num5 = Mathf.Lerp(0.5f, 0.45f, this.flyingMode);
+            float num6 = Mathf.Lerp(0.85f, 0.7f, this.flyingMode);
             float num7 = num6 + (1f - num6) * Mathf.Cos(Mathf.InverseLerp(num2, 1.2f, x) * 3.1415927f * 0.5f);
+
             float num8 = this.alcedo.IsKing ? 1.2f : 1f;
             if (x < num)
             {
@@ -148,7 +151,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         public override void NewRoom(Room room)
         {
             base.NewRoom(room);
-            this.wooshSound = new StaticSoundLoop(SoundID.Vulture_Wing_Woosh_LOOP, base.Tip.pos, room, 1f, 1f);
+            this.wooshSound = new StaticSoundLoop(SoundID.Vulture_Wing_Woosh_LOOP, this.tChunks[this.halfWingIndex].pos, room, 1f, 1f);
             if (this.debugViz)
             {
                 if (this.grabGoalSprites != null)
@@ -168,7 +171,7 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public override void Update()
         {
-            base.Update();
+            base.Update();/*
             if (this.alcedo.enteringShortCut != null)
             {
                 base.retractFac = Mathf.Min(0f, base.retractFac - 0.1f);
@@ -181,11 +184,14 @@ namespace TheOutsider.CustomLore.CustomCreature
                     this.segments.RemoveAt(this.segments.Count - 1);
                 }
                 return;
-            }
-            this.attachedAtTip = false;
+            }*/
+            this.attachedAtClaw = false;
+            idealLength = Mathf.Lerp(this.alcedo.wingLength * 10f,
+                                     this.alcedo.wingLength * 11f,
+                                     flyingMode);/*
             idealLength = Mathf.Lerp(this.alcedo.wingLength * (this.alcedo.IsKing ? 9f : 7f),
-                         this.alcedo.wingLength * (this.alcedo.IsKing ? 13.5f : 11f),
-                         flyingMode);
+                                     this.alcedo.wingLength * (this.alcedo.IsKing ? 13.5f : 11f),
+                                     flyingMode);*/
             if (this.stun > 0)
             {
                 this.stun--;
@@ -236,26 +242,26 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 if (this.mode == AlcedoTentacle.Mode.Climb)
                 {
-                    if (this.floatGrabDest != null && Custom.DistLess(this.tChunks[this.tChunks.Length - 1].pos, this.floatGrabDest.Value, 40f) && this.backtrackFrom == -1)
+                    if (this.floatGrabDest != null && Custom.DistLess(this.tChunks[this.halfWingIndex].pos, this.floatGrabDest.Value, 40f) && this.backtrackFrom == -1)
                     {
+                        this.tChunks[this.halfWingIndex].pos = this.floatGrabDest.Value;
+                        this.tChunks[this.halfWingIndex].vel *= 0f;
+                        this.attachedAtClaw = true;
+                        /*
                         this.tChunks[this.tChunks.Length - 1].pos = this.floatGrabDest.Value;
                         this.tChunks[this.tChunks.Length - 1].vel *= 0f;
-                        this.attachedAtTip = true;
+                        this.attachedAtClaw = true;*/
                     }
                     this.flyingMode -= 0.025f;
-                    base.Tip.collideWithTerrain = !this.attachedAtTip;
+                    this.tChunks[this.halfWingIndex].collideWithTerrain = !this.attachedAtClaw;
                     this.UpdateDesiredGrabPos();
-                    bool flag = this.tentacleNumber == 0;
-                    if (this.alcedo.IsMiros)
-                    {
-                        flag = (this.tentacleNumber % 2 == 0);
-                    }
+                    bool flag = this.tentacleNumber % 2 == 0;
                     BodyChunk bodyChunk = flag ? this.alcedo.bodyChunks[3] : this.alcedo.bodyChunks[2];
                     this.segmentsGrippingTerrain = 0;
-                    for (int l = 0; l < this.tChunks.Length; l++)
+                    for (int l = 0; l < this.halfWingIndex + 1; l++)
                     {
                         this.tChunks[l].vel *= Mathf.Lerp(0.95f, 0.85f, this.Support());
-                        if (this.attachedAtTip && (this.backtrackFrom == -1 || l < this.backtrackFrom) && this.GripTerrain(l))
+                        if (this.attachedAtClaw && (this.backtrackFrom == -1 || l < this.backtrackFrom) && this.GripTerrain(l))
                         {
                             this.segmentsGrippingTerrain++;
                             for (int m = l - 1; m > 0; m--)
@@ -282,27 +288,57 @@ namespace TheOutsider.CustomLore.CustomCreature
                         }
                         this.tChunks[l].vel += Custom.DirVec(bodyChunk.pos, this.tChunks[l].pos) * 0.5f / ((float)l + 1f);
                     }
-                    if (this.attachedAtTip)
+                    for (int l = this.halfWingIndex + 1; l < this.tChunks.Length; l++)
+                    {
+                        this.tChunks[l].vel *= Mathf.Lerp(0.95f, 0.85f, this.Support());
+                        if (this.attachedAtClaw && (this.backtrackFrom == -1 || l < this.backtrackFrom) && this.GripTerrain(l))
+                        {
+                            this.segmentsGrippingTerrain++;
+                            for (int m = l - 1; m > 0; m--)
+                            {
+                                base.PushChunksApart(m, l);
+                            }
+                        }
+                        else
+                        {
+                            Tentacle.TentacleChunk tentacleChunk2 = this.tChunks[l];
+                            tentacleChunk2.vel.y = tentacleChunk2.vel.y + 0.1f;
+                            this.tChunks[l].vel += this.connectedChunk.vel * 0.1f;
+                            if (!this.hasAnyGrip)
+                            {
+                                if (this.floatGrabDest != null)
+                                {
+                                    this.tChunks[l].vel -= Custom.DirVec(this.tChunks[l].pos, this.floatGrabDest.Value) * 0.3f;
+                                }
+                                else
+                                {
+                                    this.tChunks[l].vel -= Custom.DirVec(this.tChunks[l].pos, this.desiredGrabPos + Custom.DirVec(base.FloatBase, this.desiredGrabPos) * 70f) * 0.6f;
+                                }
+                            }
+                        }
+                        //this.tChunks[l].vel += Custom.DirVec(bodyChunk.pos, this.tChunks[l].pos) * 0.5f / ((float)l + 1f);
+                    }
+                    if (this.attachedAtClaw)
                     {
                         this.framesWithoutReaching = 0;
                         if (SharedPhysics.RayTraceTilesForTerrain(this.room, base.BasePos, base.grabDest.Value))
                         {
-                            if (!Custom.DistLess(base.Tip.pos, this.connectedChunk.pos, this.idealLength))
+                            if (!Custom.DistLess(this.tChunks[this.halfWingIndex].pos, this.connectedChunk.pos, this.idealLength * 0.5f))
                             {
-                                Vector2 a = Custom.DirVec(base.Tip.pos, this.connectedChunk.pos);
-                                float num = Vector2.Distance(base.Tip.pos, this.connectedChunk.pos);
-                                float num2 = this.idealLength * 0.9f;
+                                Vector2 a = Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.connectedChunk.pos);
+                                float num = Vector2.Distance(this.tChunks[this.halfWingIndex].pos, this.connectedChunk.pos);
+                                float num2 = this.idealLength * 0.9f * 0.5f;
                                 this.connectedChunk.pos += a * (num2 - num) * 0.2f;
                                 this.connectedChunk.vel += a * (num2 - num) * 0.2f;
                             }
-                            if (!Custom.DistLess(base.Tip.pos, this.connectedChunk.pos, this.idealLength * 0.9f))
+                            if (!Custom.DistLess(this.tChunks[this.halfWingIndex].pos, this.connectedChunk.pos, this.idealLength * 0.9f * 0.5f))
                             {
                                 this.alcedo.hangingInTentacle = true;
                             }
                         }
                         if (this.playGrabSound)
                         {
-                            this.room.PlaySound(SoundID.Vulture_Tentacle_Grab_Terrain, base.Tip.pos);
+                            this.room.PlaySound(SoundID.Vulture_Tentacle_Grab_Terrain, this.tChunks[this.halfWingIndex].pos);
                             this.playGrabSound = false;
                         }
                     }
@@ -346,10 +382,14 @@ namespace TheOutsider.CustomLore.CustomCreature
                         Vector2 wantPos = this.connectedChunk.pos - this.idealLength * Mathf.Pow(this.tChunks[n].tPos, Mathf.Sqrt(this.alcedo.wingLength / 20f)) * wantDir;
                         wantPos = Vector2.Lerp(wantPos, this.connectedChunk.pos + new Vector2(this.tentacleDir * this.idealLength * this.tChunks[n].tPos, 0f), 0.5f);
                         Vector2 perp = Custom.PerpendicularVector((this.connectedChunk.pos - wantPos).normalized) * (shouldBeMirrored ? -1f : 1f);
-                        float wave = Mathf.Sin((float)Math.PI * 2f * (this.alcedo.wingFlap - this.tChunks[n].tPos * 0.5f));
+                        float wave = Wave(n);//Mathf.Sin((float)Math.PI * 2f * (this.alcedo.wingFlap - this.tChunks[n].tPos * 0.5f));
                         float waveScale = Mathf.Lerp(Mathf.Pow(1 - this.tChunks[n].tPos, 1 - Mathf.Sqrt(this.alcedo.wingLength / 20f)), 1f, 0.5f) *
                                           this.alcedo.wingLength * Mathf.Lerp(10f, 30f, this.alcedo.wingFlapAmplitude);//Mathf.Lerp(200f, 600f, this.alcedo.wingFlapAmplitude);
-                        wantPos += perp * waveScale * wave;
+
+                        float line = (n >= halfWingIndex) ? Mathf.Lerp(Wave(halfWingIndex), Wave(this.tChunks.Length-1), Mathf.InverseLerp(halfWingIndex, this.tChunks.Length-1, n)) :
+                                                            Mathf.Lerp(Wave(0), Wave(halfWingIndex), Mathf.InverseLerp(0, halfWingIndex, n));
+
+                        wantPos += perp * waveScale * Mathf.Lerp(wave, line, 0.5f);
                         this.tChunks[n].vel += Vector2.ClampMagnitude(wantPos - this.tChunks[n].pos, 1.5f * this.alcedo.wingLength) /
                             (1.5f * this.alcedo.wingLength) * 5f * Mathf.Lerp(0.2f, 1f, this.alcedo.wingFlapAmplitude);
                         
@@ -372,7 +412,8 @@ namespace TheOutsider.CustomLore.CustomCreature
                     {
                         for (int num4 = 0; num4 < 4; num4++)
                         {
-                            this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(base.Tip.pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
+                            this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
+                            //this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(base.Tip.pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                         }
                     }
                     if (contact)
@@ -400,9 +441,9 @@ namespace TheOutsider.CustomLore.CustomCreature
                     }
                 }
             }
-            this.wooshSound.volume = Custom.SCurve(Mathf.InverseLerp(0.4f, 18f, Vector2.Distance(base.Tip.pos - this.connectedChunk.pos, base.Tip.lastPos - this.connectedChunk.lastPos)), 0.6f) * this.flyingMode;
-            this.wooshSound.pitch = Mathf.Lerp(0.3f, 1.7f, Mathf.InverseLerp(-20f, 20f, base.Tip.lastPos.y - base.Tip.pos.y - (this.connectedChunk.lastPos.y - this.connectedChunk.pos.y)));
-            this.wooshSound.pos = Vector2.Lerp(this.connectedChunk.pos, base.Tip.pos, 0.7f);
+            this.wooshSound.volume = Custom.SCurve(Mathf.InverseLerp(0.4f, 18f, Vector2.Distance(this.tChunks[this.halfWingIndex].pos - this.connectedChunk.pos, this.tChunks[this.halfWingIndex].lastPos - this.connectedChunk.lastPos)), 0.6f) * this.flyingMode;
+            this.wooshSound.pitch = Mathf.Lerp(0.3f, 1.7f, Mathf.InverseLerp(-20f, 20f, this.tChunks[this.halfWingIndex].lastPos.y - this.tChunks[this.halfWingIndex].pos.y - (this.connectedChunk.lastPos.y - this.connectedChunk.pos.y)));
+            this.wooshSound.pos = Vector2.Lerp(this.connectedChunk.pos, this.tChunks[this.halfWingIndex].pos, 0.7f);
             this.wooshSound.Update();
             if (this.debugViz)
             {
@@ -436,10 +477,17 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             if (this.alcedo.hoverStill)
             {
+                this.desiredGrabPos = this.alcedo.mainBodyChunk.pos + new Vector2(this.tentacleDir, -0.8f).normalized * this.idealLength * 0.7f * 0.5f;
+                return;
+            }
+            this.desiredGrabPos = this.alcedo.mainBodyChunk.pos + Vector3.Slerp(this.alcedo.moveDirection, new Vector2(this.tentacleDir, -0.8f).normalized, 0.3f).ToVector2InPoints() * this.idealLength * 0.7f * 0.5f;
+            /*
+            if (this.alcedo.hoverStill)
+            {
                 this.desiredGrabPos = this.alcedo.mainBodyChunk.pos + new Vector2(this.tentacleDir, -0.8f).normalized * this.idealLength * 0.7f;
                 return;
             }
-            this.desiredGrabPos = this.alcedo.mainBodyChunk.pos + Vector3.Slerp(this.alcedo.moveDirection, new Vector2(this.tentacleDir, -0.8f).normalized, 0.3f).ToVector2InPoints() * this.idealLength * 0.7f;
+            this.desiredGrabPos = this.alcedo.mainBodyChunk.pos + Vector3.Slerp(this.alcedo.moveDirection, new Vector2(this.tentacleDir, -0.8f).normalized, 0.3f).ToVector2InPoints() * this.idealLength * 0.7f;*/
         }
 
         private void FindGrabPos(ref List<IntVector2> path)
@@ -455,11 +503,14 @@ namespace TheOutsider.CustomLore.CustomCreature
                 IntVector2? intVector2 = SharedPhysics.RayTraceTilesForTerrainReturnFirstSolid(this.room, base.BasePos, intVector.Value);
                 if (base.grabDest == null || this.GripPointAttractiveness(intVector2.Value) > this.GripPointAttractiveness(base.grabDest.Value))
                 {
-                    Vector2 newGrabDest = Custom.RestrictInRect(base.FloatBase, FloatRect.MakeFromVector2(this.room.MiddleOfTile(intVector2.Value) - new Vector2(11f, 11f), this.room.MiddleOfTile(intVector2.Value) + new Vector2(11f, 11f)));
+                    Vector2 newGrabDest = Custom.RestrictInRect(base.FloatBase, 
+                                                                FloatRect.MakeFromVector2(this.room.MiddleOfTile(intVector2.Value) - new Vector2(11f, 11f), 
+                                                                                          this.room.MiddleOfTile(intVector2.Value) + new Vector2(11f, 11f)));
                     base.MoveGrabDest(newGrabDest, ref path);
                 }
             }
-            Vector2 pos = this.desiredGrabPos + Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value * this.idealLength;
+            Vector2 pos = this.desiredGrabPos + Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value * this.idealLength * 0.5f;
+            //Vector2 pos = this.desiredGrabPos + Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value * this.idealLength;
             int num = this.room.RayTraceTilesList(base.BasePos.x, base.BasePos.y, this.room.GetTilePosition(pos).x, this.room.GetTilePosition(pos).y, ref path);
             int num2 = 0;
             while (num2 < num && !this.room.GetTile(path[num2]).Solid)
@@ -479,7 +530,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 return float.MinValue;
             }
-            float num = Vector2.Distance(base.Tip.pos, this.desiredGrabPos);
+            float num = Vector2.Distance(this.tChunks[this.halfWingIndex].pos, this.desiredGrabPos);
             if (this.floatGrabDest == null)
             {
                 num *= 2f;
@@ -532,7 +583,8 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
             if (this.mode == AlcedoTentacle.Mode.Climb)
             {
-                return Mathf.Clamp((this.hasAnyGrip ? (this.alcedo.IsMiros ? 4f : 0.5f) : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
+                return Mathf.Clamp((this.hasAnyGrip ? 1f : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
+                //return Mathf.Clamp((this.hasAnyGrip ? (this.alcedo.IsMiros ? 4f : 0.5f) : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
             }
             if (!(this.mode == AlcedoTentacle.Mode.Fly))
             {
@@ -593,11 +645,16 @@ namespace TheOutsider.CustomLore.CustomCreature
             (this.alcedo.State as Alcedo.AlcedoState).wingHealth[this.tentacleNumber] -= damage;
         }
 
+        public float Wave(int n)
+        {
+            return Mathf.Sin((float)Math.PI * 2f * (this.alcedo.wingFlap - this.tChunks[n].tPos * 0.5f));
+        }
+
         private DebugSprite[] grabGoalSprites;
         public int tentacleNumber;
         public AlcedoTentacle.Mode mode;
         public Vector2 desiredGrabPos;
-        private bool attachedAtTip;
+        private bool attachedAtClaw;
         public int segmentsGrippingTerrain;
         public int framesWithoutReaching;
         public int otherTentacleIsFlying;
@@ -608,6 +665,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         private float fm;
         public StaticSoundLoop wooshSound;
         private List<IntVector2> scratchPath;
+
         public class Mode : ExtEnum<AlcedoTentacle.Mode>
         {
             public Mode(string value, bool register = false) : base(value, register)

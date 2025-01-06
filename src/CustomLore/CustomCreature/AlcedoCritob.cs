@@ -33,31 +33,43 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 DefaultRelationship = new(CreatureTemplate.Relationship.Type.Ignores, 0.5f),
                 HasAI = true,
-                InstantDeathDamage = 15,
+                InstantDeathDamage = 7,
                 Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.Vulture),
                 //Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
-                    OffScreen = new(1f, Allowed),
-                    Floor = new(1f, Allowed),
-                    Corridor = new(1f, Allowed),
-                    Climb = new(2.5f, Allowed),
+                    Air = new PathCost(1f, Allowed),
+                    OffScreen = new PathCost(1f, Allowed),/*
+                    Floor = new PathCost(1f, Allowed),
+                    Corridor = new PathCost(1f, Allowed),
+                    Climb = new PathCost(2.5f, Allowed),*/
                 },
                 ConnectionResistances = new()
                 {
-                    Standard = new(1f, Allowed),
-                    OpenDiagonal = new(3f, Allowed),
-                    ReachOverGap = new(3f, Allowed),
-                    ReachUp = new(2f, Allowed),
-                    ReachDown = new(2f, Allowed),
-                    SemiDiagonalReach = new(2f, Allowed),
-                    DropToFloor = new(10f, Allowed),
-                    DropToClimb = new(20f, Allowed),
-                    DropToWater = new(10f, Allowed),
-                    ShortCut = new(2.5f, Allowed),
-                    BetweenRooms = new(4f, Allowed),
-                    Slope = new(1.5f, Allowed),
-                    NPCTransportation = new(20f, Allowed),
+                    //秃鹫寻路
+                    Standard = new PathCost(1f, Allowed),
+                    OutsideRoom = new PathCost(1f, Allowed),
+                    SkyHighway = new PathCost(1f, Allowed),
+                    OffScreenMovement = new PathCost(1f, Allowed),
+                    BetweenRooms = new PathCost(10f, Allowed),/*
+                    //蜥蜴寻路
+                    //Standard = new PathCost(1f, Allowed),
+                    OpenDiagonal = new PathCost(3f, Allowed),
+                    ReachOverGap = new PathCost(3f, Allowed),
+                    ReachUp = new PathCost(2f, Allowed),
+                    DoubleReachUp = new PathCost(2f, Allowed),
+                    ReachDown = new PathCost(2f, Allowed),
+                    SemiDiagonalReach = new PathCost(2f, Allowed),
+                    DropToFloor = new PathCost(20f, Allowed),
+                    DropToWater = new PathCost(20f, Allowed),
+                    ShortCut = new PathCost(1.5f, Allowed),
+                    NPCTransportation = new PathCost(25f, Allowed),
+                    //OffScreenMovement = new PathCost(1f, Allowed),
+                    //BetweenRooms = new PathCost(10f, Allowed),
+                    LizardTurn = new PathCost(10f, Allowed),
+                    Slope = new PathCost(1.5f, Allowed),
+                    //
+                    BigCreatureShortCutSqueeze = new PathCost(10f, Allowed),*/
                 },
                 DamageResistances = new()
                 {
@@ -85,26 +97,40 @@ namespace TheOutsider.CustomLore.CustomCreature
             // saveCreature         决定该生物是否在循环结束后被保存。对监视者和垃圾虫来说是false的
             // hibernateOffScreen   适用于雨鹿、钢鸟、利维坦、秃鹫和拾荒者
             // bodySize             蝙蝠是0.1，蛋虫是0.4，蓝香菇是5.5，蛞蝓是1
-            t.grasps = 2;//
-            t.offScreenSpeed = 0.5f;//生物在抽象房间之间移动的速度
-            t.bodySize = 1f;//蝙蝠是0.1，蛋虫是0.4，蓝香菇是5.5，蛞蝓是1
-            t.shortcutSegments = 2;
-            t.doPreBakedPathing = false;
-            t.waterRelationship = CreatureTemplate.WaterRelationship.Amphibious;//水生类型：两栖
-            t.waterPathingResistance = 0f;
-            t.canSwim = true;
+            t.baseDamageResistance = 5f;//生命值，普通秃鹫是8.5，钢鹫是20
+            t.baseDamageResistance = 3.5f;
+            t.abstractedLaziness = 7;
+            t.AI = true;
             t.requireAImap = true;
+            t.canSwim = true;
+            t.canFly = true;
+            t.doPreBakedPathing = true;
+            t.offScreenSpeed = 0.95f;//生物在抽象房间之间移动的速度
+            t.bodySize = 3.5f;//蝙蝠是0.1，蛋虫是0.4，蓝香菇是5.5，普通秃鹫是6，蛞蝓是1
+            t.grasps = 1;
+            t.stowFoodInDen = true;
+            t.shortcutSegments = 4;//穿过管道时显示的光点数？
+            t.visualRadius = 8000f;//7000f
+            t.movementBasedVision = 0.4f;//运动视力？
+            t.waterVision = 1f;//水中视野？
+            t.throughSurfaceVision = 1f;//透水视野？
+            t.hibernateOffScreen = true;
+            t.dangerousToPlayer = 0.6f;//0.7f
+            t.communityInfluence = 0.25f;
             t.socialMemory = true;
-            t.interestInOtherAncestorsCatches = 0f;
-            t.interestInOtherCreaturesCatches = 0f;
             t.meatPoints = 8;
-            t.jumpAction = "Jump";
-            t.pickupAction = "Pick up / Eat";
-            t.throwAction = "Throw";
-            t.visualRadius = 1200f;//猫崽是800f
-            t.saveCreature = false;//决定该生物是否在循环结束后被保存。对监视者和垃圾虫来说是false的
+            t.lungCapacity = 8000f;//750f
+            t.waterRelationship = CreatureTemplate.WaterRelationship.Amphibious;//水生类型：两栖
+            t.interestInOtherAncestorsCatches = 0.2f;
+            t.interestInOtherCreaturesCatches = 0.2f;
+            t.forbidStandardShortcutEntry = false;
+            t.jumpAction = "Fly";
+            t.pickupAction = "Ensnare";
+            t.throwAction = "Release";
 
+            t.saveCreature = true;//决定该生物是否在循环结束后被保存。对监视者和垃圾虫来说是false的
             t.smallCreature = false;//决定岩石是否会被破坏，大型捕食者是否会忽视它，等等
+            t.waterPathingResistance = 0f;
             /*t.abstractedLaziness = 200;//生物开始迁徙需要多长时间
             t.dangerousToPlayer = 0f;//蓝香菇为0.85，蜘蛛为0.1，拟态草为0.5
             t.waterVision = 0.75f;//生物在水中的视力
@@ -115,8 +141,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             t.roamBetweenRoomsChance = 0.5f;
             t.stowFoodInDen = false;
             t.movementBasedVision = 0.65f;
-            t.communityInfluence = 0.5f;
-            t.canFly = false;*/
+            t.communityInfluence = 0.5f;*/
 
             return t;
         }
