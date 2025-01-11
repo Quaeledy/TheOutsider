@@ -51,6 +51,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         public int startSprite;
         public RoomPalette palette;
         public AlcedoScaleTemplate.SpritesOverlap spritesOverlap;
+
         public class SpritesOverlap : ExtEnum<AlcedoScaleTemplate.SpritesOverlap>
         {
             public SpritesOverlap(string value, bool register = false) : base(value, register)

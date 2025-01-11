@@ -96,13 +96,15 @@ namespace TheOutsider.CustomLore.CustomCreature
         public Alcedo(AbstractCreature abstractCreature, World world) : base(abstractCreature, world)
         {
             this.wingLength = 5f;
-            base.bodyChunks = new BodyChunk[5];
+            base.bodyChunks = new BodyChunk[9];
             float num = 0.5f;//this.IsKing ? 1.4f : 1f;
-            base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
-            base.bodyChunks[1] = new BodyChunk(this, 1, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
-            //2，3可能是翅膀根部
-            base.bodyChunks[2] = new BodyChunk(this, 2, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
-            base.bodyChunks[3] = new BodyChunk(this, 3, new Vector2(0f, 0f), 6f, this.IsMiros ? 1.8f : (1.2f * num));
+            //胸部
+            base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 6f, 0.7f * num);
+            //背部
+            base.bodyChunks[1] = new BodyChunk(this, 1, new Vector2(0f, 0f), 6f, 0.7f * num);
+            //翅膀根部
+            base.bodyChunks[2] = new BodyChunk(this, 2, new Vector2(0f, 0f), 3f, 0.7f * num);
+            base.bodyChunks[3] = new BodyChunk(this, 3, new Vector2(0f, 0f), 3f, 0.7f * num);
             //4大概是头
             base.bodyChunks[4] = new BodyChunk(this, 4, new Vector2(0f, 0f), 3.5f, 0.3f * num);/*
             base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
@@ -110,37 +112,69 @@ namespace TheOutsider.CustomLore.CustomCreature
             base.bodyChunks[2] = new BodyChunk(this, 2, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[3] = new BodyChunk(this, 3, new Vector2(0f, 0f), 9.5f, this.IsMiros ? 1.8f : (1.2f * num));
             base.bodyChunks[4] = new BodyChunk(this, 4, new Vector2(0f, 0f), 6.5f, 0.3f * num);*/
+            //腹部
+            base.bodyChunks[5] = new BodyChunk(this, 5, new Vector2(0f, 0f), 6f, 0.7f * num);
+            //臀部
+            base.bodyChunks[6] = new BodyChunk(this, 6, new Vector2(0f, 0f), 6f, 0.7f * num);
+            //后腿根部
+            base.bodyChunks[7] = new BodyChunk(this, 7, new Vector2(0f, 0f), 3f, 0.7f * num);
+            base.bodyChunks[8] = new BodyChunk(this, 8, new Vector2(0f, 0f), 3f, 0.7f * num);
             for (int i = 0; i < base.bodyChunks.Length; i++)
             {
                 base.bodyChunks[i].restrictInRoomRange = 2400f;
                 base.bodyChunks[i].defaultRestrictInRoomRange = 2400f;
             }
-            this.bodyChunkConnections = new PhysicalObject.BodyChunkConnection[(ModManager.MMF && !this.IsMiros) ? 8 : 7];
-            float num2 = 40f * 0.6f;
-            float num3 = 26f * 0.6f;
-            float num4 = 10f * 0.6f;
-            this.bodyChunkConnections[0] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[0], base.bodyChunks[1], num3, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
-            this.bodyChunkConnections[1] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[3], num2, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
-            this.bodyChunkConnections[2] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[1], Mathf.Sqrt(Mathf.Pow(num4, 2f) + Mathf.Pow(num2 / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
-            this.bodyChunkConnections[3] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[1], base.bodyChunks[3], Mathf.Sqrt(Mathf.Pow(num4, 2f) + Mathf.Pow(num2 / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
-            this.bodyChunkConnections[4] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[0], Mathf.Sqrt(Mathf.Pow(num3 - num4, 2f) + Mathf.Pow(num2 / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
-            this.bodyChunkConnections[5] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[3], base.bodyChunks[0], Mathf.Sqrt(Mathf.Pow(num3 - num4, 2f) + Mathf.Pow(num2 / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
-            this.bodyChunkConnections[6] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[0], base.bodyChunks[4], this.IsKing ? 70f : 60f, PhysicalObject.BodyChunkConnection.Type.Pull, 0.6f, 0f);
+            this.bodyChunkConnections = new PhysicalObject.BodyChunkConnection[16];
+            float wingRootSpacing = 15f;//40f
+            float UpperAndLowerBodySpacing = 15f;//26f
+            float wingInBodyPos = Mathf.Lerp(0f, UpperAndLowerBodySpacing, 0.5f);//越接近0越靠上//10f
+            this.bodyChunkConnections[0] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[0], base.bodyChunks[1], UpperAndLowerBodySpacing, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+            this.bodyChunkConnections[1] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[3], wingRootSpacing, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+            this.bodyChunkConnections[2] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[1], Mathf.Sqrt(Mathf.Pow(wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+            this.bodyChunkConnections[3] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[1], base.bodyChunks[3], Mathf.Sqrt(Mathf.Pow(wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+            this.bodyChunkConnections[4] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[2], base.bodyChunks[0], Mathf.Sqrt(Mathf.Pow(UpperAndLowerBodySpacing - wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+            this.bodyChunkConnections[5] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[3], base.bodyChunks[0], Mathf.Sqrt(Mathf.Pow(UpperAndLowerBodySpacing - wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+            this.bodyChunkConnections[6] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[1], base.bodyChunks[4], 0.7f * (this.IsKing ? 70f : 60f), PhysicalObject.BodyChunkConnection.Type.Pull, 0.6f, 0f);
             if (ModManager.MMF && !this.IsMiros)
             {
-                this.bodyChunkConnections[7] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[4], base.bodyChunks[0], this.IsKing ? 75f : 65f, PhysicalObject.BodyChunkConnection.Type.Pull, 1f, -1f);
+                this.bodyChunkConnections[7] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[4], base.bodyChunks[1], 0.7f * (this.IsKing ? 75f : 65f), PhysicalObject.BodyChunkConnection.Type.Pull, 1f, -1f);
+                //下半身
+                this.bodyChunkConnections[8] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[0], base.bodyChunks[5], 20f, PhysicalObject.BodyChunkConnection.Type.Pull, 0.6f, 0f);
+                this.bodyChunkConnections[9] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[5], base.bodyChunks[0], 20f, PhysicalObject.BodyChunkConnection.Type.Pull, 0.6f, 0.5f);
+                //this.bodyChunkConnections[10] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[6], base.bodyChunks[1], 25f, PhysicalObject.BodyChunkConnection.Type.Pull, 0.6f, 0.5f);
+                this.bodyChunkConnections[10] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[5], base.bodyChunks[6], UpperAndLowerBodySpacing, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+                //后腿
+                this.bodyChunkConnections[11] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[7], base.bodyChunks[8], wingRootSpacing, PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+                this.bodyChunkConnections[12] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[7], base.bodyChunks[6], Mathf.Sqrt(Mathf.Pow(wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+                this.bodyChunkConnections[13] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[6], base.bodyChunks[8], Mathf.Sqrt(Mathf.Pow(wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+                this.bodyChunkConnections[14] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[7], base.bodyChunks[5], Mathf.Sqrt(Mathf.Pow(UpperAndLowerBodySpacing - wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
+                this.bodyChunkConnections[15] = new PhysicalObject.BodyChunkConnection(base.bodyChunks[8], base.bodyChunks[5], Mathf.Sqrt(Mathf.Pow(UpperAndLowerBodySpacing - wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), PhysicalObject.BodyChunkConnection.Type.Normal, 1f, 0.5f);
             }
             this.tentacles = new AlcedoTentacle[this.IsMiros ? 4 : 2];
             for (int j = 0; j < this.tentacles.Length; j++)
             {
-                this.tentacles[j] = new AlcedoTentacle(this, base.bodyChunks[2 + j % 2], (this.IsKing ? 9f : 7f) * wingLength * 4f, j);
+                this.tentacles[j] = new AlcedoTentacle(this, base.bodyChunks[2 + j % 2], base.bodyChunks[2 + (1 - j % 2)], (this.IsKing ? 9f : 7f) * wingLength * 4f, j);
             }
-            this.neck = new Tentacle(this, base.bodyChunks[0], (this.IsKing ? 6f : 5f) * 20f);
+            this.legs = new AlcedoLeg[2];
+            for (int j = 0; j < this.legs.Length; j++)
+            {
+                this.legs[j] = new AlcedoLeg(this, base.bodyChunks[7 + j % 2], base.bodyChunks[7 + (1 - j % 2)], (this.IsKing ? 9f : 7f) * wingLength * 1.5f, j);
+            }
+            this.waist = new Tentacle(this, base.bodyChunks[0], this.bodyChunkConnections[8].distance);
+            this.waist.tProps = new Tentacle.TentacleProps(false, false, true, 0.5f, 0f, 0.5f, 1.8f, 0.2f, 1.2f, 10f, 0.25f, 3f, 15, 20, 6, 0);
+            this.waist.tChunks = new Tentacle.TentacleChunk[4];
+            for (int k = 0; k < this.waist.tChunks.Length; k++)
+            {
+                this.waist.tChunks[k] = new Tentacle.TentacleChunk(this.waist, k, (float)(k + 1) / (float)this.waist.tChunks.Length, 9f);// (this.IsKing ? 6f : 5f)
+            }
+            this.waist.tChunks[this.waist.tChunks.Length - 1].rad = 11f;
+            this.waist.stretchAndSqueeze = 0f;
+            this.neck = new Tentacle(this, base.bodyChunks[0], 0.7f * (this.IsKing ? 6f : 5f) * 20f);
             this.neck.tProps = new Tentacle.TentacleProps(false, false, true, 0.5f, 0f, 0.5f, 1.8f, 0.2f, 1.2f, 10f, 0.25f, 3f, 15, 20, 6, 0);
             this.neck.tChunks = new Tentacle.TentacleChunk[4];
             for (int k = 0; k < this.neck.tChunks.Length; k++)
             {
-                this.neck.tChunks[k] = new Tentacle.TentacleChunk(this.neck, k, (float)(k + 1) / (float)this.neck.tChunks.Length, 0.7f * (this.IsKing ? 6f : 5f));
+                this.neck.tChunks[k] = new Tentacle.TentacleChunk(this.neck, k, (float)(k + 1) / (float)this.neck.tChunks.Length, 5f);// (this.IsKing ? 6f : 5f)
             }
             this.neck.tChunks[this.neck.tChunks.Length - 1].rad = 7f;
             this.neck.stretchAndSqueeze = 0f;
@@ -195,6 +229,11 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 this.tentacles[j].Reset(this.tentacles[j].connectedChunk.pos);
             }
+            for (int j = 0; j < this.legs.Length; j++)
+            {
+                this.legs[j].Reset(this.legs[j].connectedChunk.pos);
+            }
+            this.waist.Reset(base.mainBodyChunk.pos);
             this.neck.Reset(base.mainBodyChunk.pos);
             this.shortcutDelay = 80;
             if (base.graphicsModule != null)
@@ -222,6 +261,11 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 this.tentacles[i].NewRoom(room);
             }
+            for (int i = 0; i < this.legs.Length; i++)
+            {
+                this.legs[i].NewRoom(room);
+            }
+            this.waist.NewRoom(room);
             this.neck.NewRoom(room);/*
             if (this.kingTusks != null)
             {
@@ -293,6 +337,10 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 this.tentacles[j].Update();
             }
+            for (int j = 0; j < this.legs.Length; j++)
+            {
+                this.legs[j].Update();
+            }
             if (this.hangingInTentacle)
             {
                 this.cantFindNewGripCounter += 2;
@@ -305,6 +353,13 @@ namespace TheOutsider.CustomLore.CustomCreature
                             this.tentacles[k].ReleaseGrip();
                         }
                     }
+                    for (int k = 0; k < this.legs.Length; k++)
+                    {
+                        if (this.legs[k].hasAnyGrip)
+                        {
+                            this.legs[k].ReleaseGrip();
+                        }
+                    }
                 }
             }
             else if (this.cantFindNewGripCounter > 0)
@@ -314,6 +369,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             if (this.enteringShortCut == null)
             {
                 this.UpdateNeck();
+                this.UpdateWaist();
             }
             if (this.landingBrake > 0)
             {
@@ -491,6 +547,10 @@ namespace TheOutsider.CustomLore.CustomCreature
                 upForce += this.tentacles[j].Support() * (this.IsMiros ? 0.75f : 0.5f);
                 //upForce += this.tentacles[j].Support() * (this.IsMiros ? 0.75f : 0.5f);
             }
+            for (int j = 0; j < this.legs.Length; j++)
+            {
+                upForce += this.legs[j].Support() * (this.IsMiros ? 0.75f : 0.5f);
+            }
             upForce = Mathf.Pow(upForce, 0.5f);
             upForce = Mathf.Max(upForce, 0.1f);
             this.hoverStill = false;
@@ -643,10 +703,34 @@ namespace TheOutsider.CustomLore.CustomCreature
                     }
                 }
             }
+            for (int num3 = 5; num3 < 9; num3++)
+            {
+                if (this.AirBorne)
+                {
+                    base.bodyChunks[num3].vel *= 0.98f;
+
+                    base.bodyChunks[num3].vel.y -= 0.5f;
+                    base.bodyChunks[num3 - 5].vel.y += 0.5f;
+                }
+                else
+                {
+                    base.bodyChunks[num3].vel *= Mathf.Lerp(0.98f, 0.9f, upForce);
+                    if (upForce > 0.1f)
+                    {
+                        BodyChunk bodyChunk2 = base.bodyChunks[num3];
+                        bodyChunk2.vel.y = bodyChunk2.vel.y + Mathf.Lerp(1.2f, 0.5f, upForce);
+                    }
+                }
+            }
             BodyChunk bodyChunk3 = base.bodyChunks[1];
             bodyChunk3.vel.y = bodyChunk3.vel.y + 1.9f * upForce * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
             BodyChunk bodyChunk4 = base.bodyChunks[0];
             bodyChunk4.vel.y = bodyChunk4.vel.y - 1.9f * upForce * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
+            /*
+            BodyChunk bodyChunk3 = base.bodyChunks[1];
+            bodyChunk3.vel.y = bodyChunk3.vel.y + 1.9f * upForce * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
+            BodyChunk bodyChunk4 = base.bodyChunks[0];
+            bodyChunk4.vel.y = bodyChunk4.vel.y - 1.9f * upForce * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);*/
             if (!this.hoverStill && 
                 (movementConnection == default(MovementConnection) || (movementConnection.DestTile == this.lastConnection.DestTile && this.room.IsPositionInsideBoundries(base.abstractCreature.pos.Tile))))
             {
@@ -763,7 +847,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 */
                 else if (this.room.aimap.getTerrainProximity(movementConnection.DestTile) <= (this.IsMiros ? 4 : 8) && 
                     this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y != -1 && 
-                    this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 10 && 
+                    this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 5 && //this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 10 &&
                     this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Fly) && (!base.safariControlled || climb == AlcedoTentacle.Mode.Climb))
                 {
                     for (int num11 = 0; num11 < this.tentacles.Length; num11++)
@@ -771,7 +855,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                         this.tentacles[num11].SwitchMode(AlcedoTentacle.Mode.Climb);
                     }
                     this.AirBrake(30);
-                    this.dontSwitchModesCounter = 200;
+                    this.dontSwitchModesCounter = 100;//200
                 }
                 else if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 5 && 
                     this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && base.mainBodyChunk.vel.y > 4f && this.moveDirection.y > 0f && 
@@ -828,6 +912,11 @@ namespace TheOutsider.CustomLore.CustomCreature
                     base.bodyChunks[num15].vel *= Mathf.Lerp(1f, 0.9f, upForce);
                     base.bodyChunks[num15].vel += 0.6f * upForce * Vector2.ClampMagnitude(this.room.MiddleOfTile(this.hoverPos) - base.mainBodyChunk.pos, 10f) / 10f;
                 }
+                for (int num15 = 5; num15 < 9; num15++)
+                {
+                    base.bodyChunks[num15].vel *= Mathf.Lerp(1f, 0.9f, upForce);
+                    base.bodyChunks[num15].vel += 0.6f * upForce * Vector2.ClampMagnitude(this.room.MiddleOfTile(this.hoverPos) - base.mainBodyChunk.pos, 10f) / 10f;
+                }
             }
             else if (movementConnection != default(MovementConnection))
             {
@@ -851,7 +940,8 @@ namespace TheOutsider.CustomLore.CustomCreature
                     }
                     else if (movementConnection.destinationCoord.y < movementConnection.startCoord.y)
                     {
-                        this.wingFlap -= 0.014285714f;
+                        this.wingFlap -= 0.004285714f;
+                        //this.wingFlap -= 0.014285714f;
                     }
                 }
                 else if (!this.room.IsPositionInsideBoundries(movementConnection.DestTile))
@@ -942,6 +1032,10 @@ namespace TheOutsider.CustomLore.CustomCreature
                         for (int num24 = 0; num24 < 4; num24++)
                         {
                             base.bodyChunks[num24].vel *= Mathf.Lerp(1f, 0.2f, upForce);
+                        }
+                        for (int num24 = 5; num24 < 9; num24++)
+                        {
+                            base.bodyChunks[num24].vel *= 0.9f * Mathf.Lerp(1f, 0.2f, upForce);
                         }
                     }
                 }
@@ -1034,6 +1128,10 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 this.tentacles[i].SwitchMode(AlcedoTentacle.Mode.Fly);
             }
+            for (int i = 0; i < this.legs.Length; i++)
+            {
+                this.legs[i].ReleaseGrip();
+            }
             if (base.graphicsModule != null)
             {
                 (base.graphicsModule as AlcedoGraphics).MakeColorWave(UnityEngine.Random.Range(30, 60));
@@ -1071,6 +1169,54 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.room.PlaySound(SoundID.Vulture_Peck, base.bodyChunks[4]);
         }
 
+        private void UpdateWaist()
+        {
+            this.waist.Update();
+            this.waist.tChunks[this.waist.tChunks.Length - 1].pos = base.bodyChunks[5].pos;
+            this.waist.tChunks[this.waist.tChunks.Length - 1].vel = this.waist.tChunks[this.waist.tChunks.Length - 1].vel;
+            //base.bodyChunks[5].collideWithTerrain = true;
+            for (int j = 0; j < this.waist.tChunks.Length; j++)
+            {
+                this.waist.tChunks[j].vel *= 0.95f;
+                Tentacle.TentacleChunk tentacleChunk = this.waist.tChunks[j];
+                tentacleChunk.vel.y = tentacleChunk.vel.y - (this.waist.limp ? 0.7f : 0.1f);
+                this.waist.tChunks[j].vel += Custom.DirVec(base.bodyChunks[1].pos, base.bodyChunks[0].pos) * ((j == 0) ? 1.2f : 0.8f);
+                this.waist.tChunks[j].vel -= this.waist.connectedChunk.vel;
+                this.waist.tChunks[j].vel *= (this.AirBorne ? 0.2f : 0.75f);
+                this.waist.tChunks[j].vel += this.waist.connectedChunk.vel;
+            }
+            this.waist.limp = !base.Consious;
+            float num2 = (this.waist.backtrackFrom == -1) ? 0.5f : 0f;
+            if (base.grasps[0] == null)
+            {
+                Vector2 a = Custom.DirVec(base.bodyChunks[5].pos, this.waist.tChunks[this.waist.tChunks.Length - 1].pos);
+                float num3 = Vector2.Distance(base.bodyChunks[5].pos, this.waist.tChunks[this.waist.tChunks.Length - 1].pos);
+                //base.bodyChunks[5].pos -= (6f - num3) * a * (1f - num2);
+                //base.bodyChunks[5].vel -= (6f - num3) * a * (1f - num2);
+                this.waist.tChunks[this.waist.tChunks.Length - 1].pos += (6f - num3) * a * num2;
+                this.waist.tChunks[this.waist.tChunks.Length - 1].vel += (6f - num3) * a * num2;
+                //base.bodyChunks[5].vel += Custom.DirVec(this.waist.tChunks[this.waist.tChunks.Length - 2].pos, base.bodyChunks[5].pos) * (this.AirBorne ? 2f : 6f) * (1f - num2);
+                //base.bodyChunks[5].vel += Custom.DirVec(this.waist.tChunks[this.waist.tChunks.Length - 1].pos, base.bodyChunks[5].pos) * (this.AirBorne ? 2f : 6f) * (1f - num2);
+                this.waist.tChunks[this.waist.tChunks.Length - 1].vel -= Custom.DirVec(this.waist.tChunks[this.waist.tChunks.Length - 2].pos, base.bodyChunks[5].pos) * (this.AirBorne ? 1f : 3f) * num2;
+                this.waist.tChunks[this.waist.tChunks.Length - 2].vel -= Custom.DirVec(this.waist.tChunks[this.waist.tChunks.Length - 2].pos, base.bodyChunks[5].pos) * (this.AirBorne ? 1f : 3f) * num2;
+            }
+            if (!base.Consious)
+            {
+                return;
+            }
+            Vector2 a2 = Custom.DirVec(base.bodyChunks[5].pos, this.waist.connectedChunk.pos);
+            this.waist.tChunks[this.waist.tChunks.Length - 1].vel += a2 * num2;
+            this.waist.tChunks[this.waist.tChunks.Length - 2].vel -= a2 * 0.5f * num2;
+            //base.bodyChunks[5].vel += a2 * 4f * (1f - num2);
+            if (Custom.DistLess(base.bodyChunks[5].pos, this.waist.connectedChunk.pos, 80f))
+            {
+                for (int k = 0; k < this.waist.tChunks.Length; k++)
+                {
+                    this.waist.tChunks[k].vel -= a2 * Mathf.InverseLerp(80f, 20f, Vector2.Distance(base.bodyChunks[5].pos, this.waist.connectedChunk.pos)) * 8f * num2;
+                }
+            }
+        }
+
         private void UpdateNeck()
         {
             this.neck.Update();
@@ -1097,7 +1243,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 this.neck.tChunks[j].vel *= 0.95f;
                 Tentacle.TentacleChunk tentacleChunk = this.neck.tChunks[j];
                 tentacleChunk.vel.y = tentacleChunk.vel.y - (this.neck.limp ? 0.7f : 0.1f);
-                this.neck.tChunks[j].vel += Custom.DirVec(base.bodyChunks[1].pos, base.bodyChunks[0].pos) * ((j == 0) ? 1.2f : 0.8f);
+                this.neck.tChunks[j].vel += Custom.DirVec(base.bodyChunks[0].pos, base.bodyChunks[1].pos) * ((j == 0) ? 1.2f : 0.8f);
                 this.neck.tChunks[j].vel -= this.neck.connectedChunk.vel;
                 this.neck.tChunks[j].vel *= (this.AirBorne ? 0.2f : 0.75f);
                 this.neck.tChunks[j].vel += this.neck.connectedChunk.vel;
@@ -1283,7 +1429,10 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public override bool SpearStick(Weapon source, float dmg, BodyChunk chunk, PhysicalObject.Appendage.Pos appPos, Vector2 direction)
         {
-            return this.IsMiros || ((chunk == null || chunk.index != 4 || base.dead || !(base.State as Alcedo.AlcedoState).mask || Vector2.Dot(direction.normalized, Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 1].pos, chunk.pos)) >= -0.88f) && base.SpearStick(source, dmg, chunk, appPos, direction));
+            return this.IsMiros || 
+                ((chunk == null || chunk.index != 4 || base.dead || !(base.State as Alcedo.AlcedoState).mask || 
+                  Vector2.Dot(direction.normalized, Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 1].pos, chunk.pos)) >= -0.88f) && 
+                 base.SpearStick(source, dmg, chunk, appPos, direction));
         }
 
         public override void TerrainImpact(int chunk, IntVector2 direction, float speed, bool firstContact)
@@ -1685,7 +1834,10 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public AlcedoAI AI;
         public AlcedoTentacle[] tentacles;
+        public AlcedoLeg[] legs;
         public Tentacle neck;
+        public Tentacle waist;
+        public int tailSegments;
         public IntVector2 mouseTilePos;
         public Vector2 moveDirection;
         public bool hangingInTentacle;
@@ -1725,6 +1877,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         public bool controlledJawSnap;
         public float drown;
         public Vector2 snapAtPos;
+        public float swim;
 
         private class AlcedoThruster
         {

@@ -1,5 +1,7 @@
 ﻿using RWCustom;
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 
 namespace TheOutsider.CustomLore.CustomCreature
 {
@@ -20,7 +22,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             get
             {
-                return Mathf.Lerp(this.contractedLength, this.extendedLength, this.extendedFac);
+                return Mathf.Lerp(this.contractedLength, this.extendedLength, this.extendedFac) * ModifyFeatherContourFac();
             }
         }
         public Tentacle.TentacleChunk PreviousPreviousChunk
@@ -76,6 +78,14 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.width = width;
             this.lose = 0f;
             this.type = type;
+        }
+
+        //根据翅膀拍动来调整长度
+        public float ModifyFeatherContourFac()
+        {
+            float num = 1f;
+            num = Mathf.Lerp(0.5f + 0.5f * Mathf.Sin((float)Math.PI * 2f * (this.wing.alcedo.wingFlap - wingPosition * 0.5f)), 1f, 0.5f);
+            return num;
         }
 
         public override void Update()
