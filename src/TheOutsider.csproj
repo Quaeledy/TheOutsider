@@ -100,7 +100,6 @@
       <Compile Include="CustomLore\CustomCreature\Alcedo.cs" />
       <Compile Include="CustomLore\CustomCreature\AlcedoAbstractAI.cs" />
       <Compile Include="CustomLore\CustomCreature\AlcedoAI.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoAppendage.cs" />
       <Compile Include="CustomLore\CustomCreature\AlcedoCritob.cs" />
       <Compile Include="CustomLore\CustomCreature\AlcedoFeather.cs" />
       <Compile Include="CustomLore\CustomCreature\AlcedoGraphics.cs" />

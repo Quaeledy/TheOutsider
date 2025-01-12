@@ -275,14 +275,12 @@ namespace TheOutsider.HUD_Hooks
     class OutsiderJollyOffRoom
     {
         public static WeakReference<JollyPlayerSpecificHud.JollyOffRoom> jollyOffRoomRef;
-        private bool setColor;
         private int newSprite;
         private int i;
 
         public OutsiderJollyOffRoom(int i, JollyPlayerSpecificHud.JollyOffRoom jollyOffRoom)
         {
             jollyOffRoomRef = new WeakReference<JollyPlayerSpecificHud.JollyOffRoom>(jollyOffRoom);
-            setColor = false;
             this.i = i;
 
             foreach (var sprite in jollyOffRoom.sprites)
@@ -334,7 +332,6 @@ namespace TheOutsider.HUD_Hooks
                 Player player = jollyOffRoom.jollyHud.abstractPlayer.realizedCreature as Player;
                 if (player != null && PlayerHooks.PlayerData.TryGetValue(player, out var playerEX))//!setColor &&
                 {
-                    setColor = true;
                     jollyOffRoom.sprites[newSprite].color = playerEX.GetAntennaeColor();
                 }
             }

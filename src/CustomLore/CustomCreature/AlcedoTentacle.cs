@@ -80,7 +80,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             float num3 = Mathf.Lerp(0.85f, 0.6f, this.flyingMode);
 
             float num4 = Mathf.Lerp(6.5f, 5.5f, this.flyingMode);
-            float num5 = Mathf.Lerp(0.5f, 0.45f, this.flyingMode);
+            float num5 = Mathf.Lerp(1.5f, 1.45f, this.flyingMode);//float num5 = Mathf.Lerp(0.5f, 0.45f, this.flyingMode);
             float num6 = Mathf.Lerp(0.85f, 0.7f, this.flyingMode);
             float num7 = num6 + (1f - num6) * Mathf.Cos(Mathf.InverseLerp(num2, 1.2f, x) * 3.1415927f * 0.5f);
 
@@ -97,7 +97,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 return num4 * num7 * num8;
             }
-            return 2f * num4 * Mathf.Lerp(0.5f, 1f, Mathf.Cos(Mathf.Pow(Mathf.InverseLerp(num3, 1f, x), 4f) * 3.1415927f * 0.5f)) * num7 * num8;
+            return 3f * num4 * Mathf.Lerp(0.5f, 1f, Mathf.Cos(Mathf.Pow(Mathf.InverseLerp(num3, 1f, x), 4f) * 3.1415927f * 0.5f)) * num7 * num8;
         }
 
         public float FeatherContour(float x)
@@ -244,7 +244,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 if (this.mode == AlcedoTentacle.Mode.Climb)
                 {
-                    if (this.floatGrabDest != null && Custom.DistLess(this.tChunks[this.halfWingIndex].pos, this.floatGrabDest.Value, 40f) && this.backtrackFrom == -1)
+                    if (this.floatGrabDest != null && Custom.DistLess(this.tChunks[this.halfWingIndex].pos, this.floatGrabDest.Value, 0.2f * idealLength) && this.backtrackFrom == -1)
                     {
                         this.tChunks[this.halfWingIndex].pos = this.floatGrabDest.Value;
                         this.tChunks[this.halfWingIndex].vel *= 0f;
@@ -418,12 +418,14 @@ namespace TheOutsider.CustomLore.CustomCreature
                     {
                         for (int num4 = 0; num4 < 4; num4++)
                         {
-                            this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
+                            this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.alcedo.bodyChunks[num4].pos) * 
+                                Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                             //this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(base.Tip.pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                         }
                         for (int num4 = 5; num4 < 9; num4++)
                         {
-                            this.alcedo.bodyChunks[num4].vel += 0.9f * this.alcedo.wingLength / 20f * Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
+                            this.alcedo.bodyChunks[num4].vel += 0.9f * this.alcedo.wingLength / 20f * Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.alcedo.bodyChunks[num4].pos) *
+                                Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                             //this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(base.Tip.pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                         }
                     }
@@ -594,7 +596,8 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
             if (this.mode == AlcedoTentacle.Mode.Climb)
             {
-                return Mathf.Clamp((this.hasAnyGrip ? 1f : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
+                return this.hasAnyGrip ? 1f : 0f;
+                //return Mathf.Clamp((this.hasAnyGrip ? 1f : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
                 //return Mathf.Clamp((this.hasAnyGrip ? (this.alcedo.IsMiros ? 4f : 0.5f) : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
             }
             if (!(this.mode == AlcedoTentacle.Mode.Fly))
@@ -675,7 +678,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         public int stun;
         private float fm;
         public StaticSoundLoop wooshSound;
-        private List<IntVector2> scratchPath;
+        //private List<IntVector2> scratchPath;
         public BodyChunk otherTentacleChunk;
 
         public class Mode : ExtEnum<AlcedoTentacle.Mode>

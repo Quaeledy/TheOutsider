@@ -226,7 +226,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             return new Alcedo.AlcedoState(acrit);
         }
-
+        
         public override AbstractCreatureAI? CreateAbstractAI(AbstractCreature acrit)
         {
             return new AlcedoAbstractAI(acrit.world, acrit);
@@ -293,7 +293,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             return new Color(210f / 255f, 202f / 255f, 108f / 255f);
         }
-
+        
         public override ItemProperties? Properties(Creature crit)
         {
             // If you need to use the forObject parameter, pass it to your ItemProperties class's constructor.

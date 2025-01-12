@@ -84,7 +84,11 @@ namespace TheOutsider.CustomLore.CustomCreature
         public float ModifyFeatherContourFac()
         {
             float num = 1f;
-            num = Mathf.Lerp(0.5f + 0.5f * Mathf.Sin((float)Math.PI * 2f * (this.wing.alcedo.wingFlap - wingPosition * 0.5f)), 1f, 0.5f);
+            if (this.wing.mode == AlcedoTentacle.Mode.Fly)
+            {
+                num = Mathf.Lerp(0.5f + 0.5f * Mathf.Sin((float)Math.PI * 2f * (this.wing.alcedo.wingFlap - wingPosition * 0.5f)), 1f, 0.5f);
+                num = Mathf.Lerp(1f, num, this.wing.flyingMode);
+            }
             return num;
         }
 
@@ -101,8 +105,9 @@ namespace TheOutsider.CustomLore.CustomCreature
             Vector2 normalized = Vector2.Lerp(this.PreviousChunk.pos - this.PreviousPreviousChunk.pos, 
                                               this.NextChunk.pos - this.PreviousChunk.pos, 
                                               (this.PreviousPreviousChunk == this.PreviousChunk) ? 1f : this.BetweenChunksLerp).normalized;
-            Vector2 a = Custom.PerpendicularVector(normalized) * 
-                (this.kGraphics.alcedo.IsMiros ? this.GetTentacleAngle(this.wing.tentacleNumber) : ((this.wing.tentacleNumber == 1) ? -1f : 1f));
+            Vector2 a = Vector2.Lerp(Custom.PerpendicularVector(normalized) * (this.kGraphics.alcedo.IsMiros ? this.GetTentacleAngle(this.wing.tentacleNumber) : ((this.wing.tentacleNumber == 1) ? -1f : 1f)),
+                (this.kGraphics.alcedo.bodyChunks[5].pos - this.kGraphics.alcedo.bodyChunks[0].pos).normalized,
+                1f - this.wingPosition);
             float d = Mathf.Lerp(Mathf.Lerp(1f, 
                                             Mathf.Lerp(-0.2f, //-0.9f,//翅膀折叠，此时翅尖翅根距离为翅长的1/2
                                                         1.2f, //1.5f,//翅膀展开

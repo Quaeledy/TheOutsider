@@ -80,7 +80,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             float num3 = Mathf.Lerp(0.85f, 0.6f, this.flyingMode);
 
             float num4 = Mathf.Lerp(6.5f, 5.5f, this.flyingMode);
-            float num5 = Mathf.Lerp(0.5f, 0.45f, this.flyingMode);
+            float num5 = Mathf.Lerp(1.2f, 1.15f, this.flyingMode);
             float num6 = Mathf.Lerp(0.85f, 0.7f, this.flyingMode);
             float num7 = num6 + (1f - num6) * Mathf.Cos(Mathf.InverseLerp(num2, 1.2f, x) * 3.1415927f * 0.5f);
 
@@ -97,7 +97,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 return num4 * num7 * num8;
             }
-            return 2f * num4 * Mathf.Lerp(0.5f, 1f, Mathf.Cos(Mathf.Pow(Mathf.InverseLerp(num3, 1f, x), 4f) * 3.1415927f * 0.5f)) * num7 * num8;
+            return 1.2f * num4 * Mathf.Lerp(0.5f, 1f, Mathf.Cos(Mathf.Pow(Mathf.InverseLerp(num3, 1f, x), 4f) * 3.1415927f * 0.5f)) * num7 * num8;
         }
 
         public AlcedoLeg(Alcedo alcedo, BodyChunk chunk, BodyChunk otherTentacleChunk, float length, int tentacleNumber) : base(alcedo, chunk, length)
@@ -152,7 +152,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
             this.attachedAtClaw = false;
             idealLength = Mathf.Lerp(this.alcedo.wingLength * 4.5f,
-                                     this.alcedo.wingLength * 5f,
+                                     this.alcedo.wingLength * 4f,
                                      flyingMode);/*
             idealLength = Mathf.Lerp(this.alcedo.wingLength * (this.alcedo.IsKing ? 9f : 7f),
                                      this.alcedo.wingLength * (this.alcedo.IsKing ? 13.5f : 11f),
@@ -173,8 +173,12 @@ namespace TheOutsider.CustomLore.CustomCreature
                 for (int j = 0; j < this.tChunks.Length; j++)
                 {
                     this.tChunks[j].vel *= 0.9f;
-                    Tentacle.TentacleChunk tentacleChunk = this.tChunks[j];
-                    tentacleChunk.vel.y = tentacleChunk.vel.y - 0.5f;
+                    if (this.alcedo.AirBorne)
+                    {
+                        Tentacle.TentacleChunk tentacleChunk = this.tChunks[j];
+                        tentacleChunk.vel.y = tentacleChunk.vel.y - 0.5f;
+                        tentacleChunk.vel += (this.alcedo.bodyChunks[5].pos - this.alcedo.bodyChunks[0].pos).normalized;
+                    }
                 }
             }
             for (int k = 0; k < this.tChunks.Length; k++)
@@ -206,7 +210,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
             if (!this.limp)
             {
-                if (this.floatGrabDest != null && Custom.DistLess(this.tChunks[this.tChunks.Length - 1].pos, this.floatGrabDest.Value, 40f) && this.backtrackFrom == -1)
+                if (this.floatGrabDest != null && Custom.DistLess(this.tChunks[this.tChunks.Length - 1].pos, this.floatGrabDest.Value, 0.2f * idealLength) && this.backtrackFrom == -1)
                 {
                     this.tChunks[this.tChunks.Length - 1].pos = this.floatGrabDest.Value;
                     this.tChunks[this.tChunks.Length - 1].vel *= 0f;
@@ -427,7 +431,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
             if (!this.alcedo.AirBorne)
             {
-                return Mathf.Clamp((this.hasAnyGrip ? 1f : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
+                return this.hasAnyGrip ? 1f : 0f;
                 //return Mathf.Clamp((this.hasAnyGrip ? (this.alcedo.IsMiros ? 4f : 0.5f) : 0f) + (float)this.segmentsGrippingTerrain / (float)this.tChunks.Length, 0f, 1f);
             }
             if (!this.alcedo.IsMiros)
@@ -503,7 +507,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         public int stun;
         private float fm;
         public StaticSoundLoop wooshSound;
-        private List<IntVector2> scratchPath;
+        //private List<IntVector2> scratchPath;
         public BodyChunk otherTentacleChunk;
 
         public class Mode : ExtEnum<AlcedoLeg.Mode>
