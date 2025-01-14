@@ -19,6 +19,8 @@ using TheOutsider.World_Hooks;
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 #pragma warning restore CS0618 // Type or member is obsolete
 
+//暂时隐藏了翠鸟羽毛，拉长了翠鸟身体
+
 namespace TheOutsider
 {
     [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.12")]

@@ -242,6 +242,17 @@ namespace TheOutsider.CustomLore.CustomCreature
             return rgb2;
         }
 
+        public Color CurrentClawColor()
+        {
+            HSLColor colorB = this.kGraphics.ColorB;
+            HSLColor colorA = this.kGraphics.ColorA;
+            Color rgb2 = HSLColor.Lerp(new HSLColor(colorB.hue, Mathf.Lerp(colorB.saturation, 1f, this.saturationBonus), Mathf.Lerp(colorB.lightness, 1f, this.lightnessBonus)),
+                                       colorA,
+                                       Mathf.Cos(Mathf.Pow(this.wingPosition, 0.75f) * 3.1415927f)).rgb;
+            rgb2.a = Mathf.Max(this.forcedAlpha, 0.9f);
+            return rgb2;
+        }
+
         public float GetTentacleAngle(int id)
         {
             if (id == 0)
