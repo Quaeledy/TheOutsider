@@ -205,7 +205,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             return new PlayerNPCState(acrit, 0);
         }
-        
+
         public override AbstractCreatureAI? CreateAbstractAI(AbstractCreature acrit)
         {
             return new SlugNPCAbstractAI(acrit.world, acrit);

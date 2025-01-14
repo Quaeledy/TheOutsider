@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using MoreSlugcats;
 
 namespace TheOutsider.CustomLore.CustomCreature
 {
@@ -41,7 +40,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         public int tailSegments;
         public float tailLength;
         public float tailStiffness;
-        public float tailStiffnessDecline; 
+        public float tailStiffnessDecline;
         public float showDominance;
         private Vector2 tailDirection;
         public int featherLayersPerWing;
@@ -109,7 +108,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         private int HindPawSpriteStart => LegSpriteStart + LegSpriteLength;
         private int HindPawSpriteLength => alcedo.legs.Length * 2;
 
-        private int TentacleSpriteStart => HindPawSpriteStart + HindPawSpriteLength; 
+        private int TentacleSpriteStart => HindPawSpriteStart + HindPawSpriteLength;
         private int TentacleSpriteLength => alcedo.tentacles.Length;
 
         private int FeatherSpriteStart => TentacleSpriteStart + TentacleSpriteLength;
@@ -170,7 +169,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             return ForePawSpriteStart + i * 2 + 1;
         }
 
-        private  int BodySprite(int i)
+        private int BodySprite(int i)
         {
             return BodySpriteStart + i;
         }
@@ -233,9 +232,9 @@ namespace TheOutsider.CustomLore.CustomCreature
                         value = 0.8f;
                     }
                     //飞羽
-                    wings[j, 0, k] = new AlcedoFeather(this, alcedo.tentacles[j], value, 
-                        AlcedoTentacle.FeatherContour(num5, 0f) * 1.5f * Mathf.Lerp(45f, 50f, UnityEngine.Random.value), 
-                        AlcedoTentacle.FeatherContour(num5, 1f) * 1.5f * Mathf.Lerp(50f, 55f, UnityEngine.Random.value) * (IsKing ? 1.3f : 1f), 
+                    wings[j, 0, k] = new AlcedoFeather(this, alcedo.tentacles[j], value,
+                        AlcedoTentacle.FeatherContour(num5, 0f) * 1.5f * Mathf.Lerp(45f, 50f, UnityEngine.Random.value),
+                        AlcedoTentacle.FeatherContour(num5, 1f) * 1.5f * Mathf.Lerp(50f, 55f, UnityEngine.Random.value) * (IsKing ? 1.3f : 1f),
                         Mathf.Lerp(5f, 8f, AlcedoTentacle.FeatherWidth(num5)), "FlightFeather");
                     //覆羽
 
@@ -356,16 +355,16 @@ namespace TheOutsider.CustomLore.CustomCreature
             this.tailSegments = 16;//16
             this.tailLength = 8f;//160f
             this.tailStiffness = 200f;
-            this.tailStiffnessDecline = 0.2f; 
+            this.tailStiffnessDecline = 0.2f;
             this.tailDirection = Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value;
             this.tail = new TailSegment[this.tailSegments];
             for (int j = 0; j < this.tailSegments; j++)
             {
                 float t = (float)(this.tailSegments - j) / (float)this.tailSegments;
-                this.tail[j] = new TailSegment(this, 
+                this.tail[j] = new TailSegment(this,
                     8f * t,
                     (((j > 0) ? 1f : 2f) + 2f * t) / 2f * this.tailLength,//(((j > 0) ? 8f : 16f) + 8f * t) / 2f * this.tailLength,
-                    (j > 0) ? this.tail[j - 1] : null, 
+                    (j > 0) ? this.tail[j - 1] : null,
                     0.85f, 1f, 0.4f, false);
                 //bodyParts.Add(this.tail[j]);
             }
@@ -962,7 +961,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 }
                 else
                 {*/
-                    newContatiner.AddChild(sLeaser.sprites[k]);
+                newContatiner.AddChild(sLeaser.sprites[k]);
                 //}
             }
         }
@@ -1108,7 +1107,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             Vector2 bellyPos = Vector2.Lerp(base.owner.bodyChunks[5].lastPos, base.owner.bodyChunks[5].pos, timeStacker);
             Vector2 hipPos = Vector2.Lerp(base.owner.bodyChunks[6].lastPos, base.owner.bodyChunks[6].pos, timeStacker);
             #region 尾巴
-            Vector2 lastTailPos = Vector2.Lerp(bellyPos, hipPos, 0.5f); 
+            Vector2 lastTailPos = Vector2.Lerp(bellyPos, hipPos, 0.5f);
             float width = base.owner.bodyChunks[5].rad * 0.7f;
             for (int num11 = 0; num11 < this.tail.Length; num11++)
             {
@@ -1144,8 +1143,8 @@ namespace TheOutsider.CustomLore.CustomCreature
             {
                 headPos += Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value * 4f;
             }
-            float neckToHeadAngle = Custom.AimFromOneVectorToAnother(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, 
-                                                                                  alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker), 
+            float neckToHeadAngle = Custom.AimFromOneVectorToAnother(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos,
+                                                                                  alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker),
                 Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker));
             sLeaser.sprites[HeadSprite].x = headPos.x - camPos.x;
             sLeaser.sprites[HeadSprite].y = headPos.y - camPos.y;
@@ -1436,7 +1435,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
             if (!Custom.DistLess(this.tail[i].pos, base.owner.bodyChunks[5].pos, 15f * (float)(i + 1)))
             {
-                this.tail[i].pos =base.owner.bodyChunks[5].pos + Custom.DirVec(base.owner.bodyChunks[5].pos, this.tail[i].pos) * 15f * (float)(i + 1) * (ModManager.MMF ? base.owner.room.gravity : 1f);
+                this.tail[i].pos = base.owner.bodyChunks[5].pos + Custom.DirVec(base.owner.bodyChunks[5].pos, this.tail[i].pos) * 15f * (float)(i + 1) * (ModManager.MMF ? base.owner.room.gravity : 1f);
             }
             Vector2 vector = base.owner.bodyChunks[5].pos;
             if (i == 1)

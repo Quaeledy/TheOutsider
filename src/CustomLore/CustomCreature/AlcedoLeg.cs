@@ -1,7 +1,6 @@
 ﻿using RWCustom;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace TheOutsider.CustomLore.CustomCreature
@@ -356,8 +355,8 @@ namespace TheOutsider.CustomLore.CustomCreature
                 IntVector2? intVector2 = SharedPhysics.RayTraceTilesForTerrainReturnFirstSolid(this.room, base.BasePos, intVector.Value);
                 if (base.grabDest == null || this.GripPointAttractiveness(intVector2.Value) > this.GripPointAttractiveness(base.grabDest.Value))
                 {
-                    Vector2 newGrabDest = Custom.RestrictInRect(base.FloatBase, 
-                                                                FloatRect.MakeFromVector2(this.room.MiddleOfTile(intVector2.Value) - new Vector2(11f, 11f), 
+                    Vector2 newGrabDest = Custom.RestrictInRect(base.FloatBase,
+                                                                FloatRect.MakeFromVector2(this.room.MiddleOfTile(intVector2.Value) - new Vector2(11f, 11f),
                                                                                           this.room.MiddleOfTile(intVector2.Value) + new Vector2(11f, 11f)));
                     base.MoveGrabDest(newGrabDest, ref path);
                 }

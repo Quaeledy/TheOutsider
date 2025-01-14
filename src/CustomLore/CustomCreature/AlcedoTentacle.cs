@@ -1,7 +1,6 @@
 ﻿using RWCustom;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace TheOutsider.CustomLore.CustomCreature
@@ -316,7 +315,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                         if (this.attachedAtClaw && (this.backtrackFrom == -1 || l < this.backtrackFrom) && this.GripTerrain(l))
                         {
                             this.segmentsGrippingTerrain++;
-                            
+
                             for (int m = l - 1; m < this.tChunks.Length; m++)
                             {
                                 Vector2 vector = Custom.DirVec(tChunks[m].pos, tChunks[l].pos);
@@ -324,7 +323,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                                 float num2 = 10f;
                                 if (num < num2)
                                 {
-                                    if(m != this.halfWingIndex)
+                                    if (m != this.halfWingIndex)
                                     {
                                         tChunks[m].pos -= vector * (num2 - num) * 0.5f;
                                         tChunks[m].vel -= vector * (num2 - num) * 0.5f;
@@ -432,14 +431,14 @@ namespace TheOutsider.CustomLore.CustomCreature
                         /*float waveScale = Mathf.Lerp(Mathf.Pow(1 - this.tChunks[n].tPos, 1 - Mathf.Sqrt(this.alcedo.wingLength / 20f)), 1f, 0.5f) *
                                           this.alcedo.wingLength * Mathf.Lerp(10f, 30f, this.alcedo.wingFlapAmplitude);//Mathf.Lerp(200f, 600f, this.alcedo.wingFlapAmplitude);
                         */
-                        float line = (n >= halfWingIndex) ? Mathf.Lerp(Wave(halfWingIndex), Wave(this.tChunks.Length-1), Mathf.InverseLerp(halfWingIndex, this.tChunks.Length-1, n)) :
+                        float line = (n >= halfWingIndex) ? Mathf.Lerp(Wave(halfWingIndex), Wave(this.tChunks.Length - 1), Mathf.InverseLerp(halfWingIndex, this.tChunks.Length - 1, n)) :
                                                             Mathf.Lerp(Wave(0), Wave(halfWingIndex), Mathf.InverseLerp(0, halfWingIndex, n));
 
                         wantPos += perp * waveScale * Mathf.Lerp(wave, line, 0.5f);
                         this.tChunks[n].vel += Vector2.ClampMagnitude(wantPos - this.tChunks[n].pos, 1.5f * this.alcedo.wingLength) /
                             (1.5f * this.alcedo.wingLength) * 5f * Mathf.Lerp(0.2f, 1f, this.alcedo.wingFlapAmplitude);
-                        
-                        
+
+
                         if (this.tChunks[n].contactPoint.x != 0 || this.tChunks[n].contactPoint.y != 0)
                         {
                             contact = true;
@@ -458,7 +457,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     {
                         for (int num4 = 0; num4 < 4; num4++)
                         {
-                            this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.alcedo.bodyChunks[num4].pos) * 
+                            this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(this.tChunks[this.halfWingIndex].pos, this.alcedo.bodyChunks[num4].pos) *
                                 Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                             //this.alcedo.bodyChunks[num4].vel += this.alcedo.wingLength / 20f * Custom.DirVec(base.Tip.pos, this.alcedo.bodyChunks[num4].pos) * Mathf.Pow(num3 + num3 * Mathf.Sin(6.2831855f * this.alcedo.wingFlap), 2f) * 0.4f * Mathf.Lerp(0.5f, 1f, this.alcedo.wingFlapAmplitude);
                         }
@@ -561,13 +560,13 @@ namespace TheOutsider.CustomLore.CustomCreature
                 IntVector2? intVector2 = SharedPhysics.RayTraceTilesForTerrainReturnFirstSolid(this.room, base.BasePos, intVector.Value);
                 if (base.grabDest == null || this.GripPointAttractiveness(intVector2.Value) > this.GripPointAttractiveness(base.grabDest.Value))
                 {
-                    Vector2 newGrabDest = Custom.RestrictInRect(base.FloatBase, 
-                                                                FloatRect.MakeFromVector2(this.room.MiddleOfTile(intVector2.Value) - new Vector2(11f, 11f), 
+                    Vector2 newGrabDest = Custom.RestrictInRect(base.FloatBase,
+                                                                FloatRect.MakeFromVector2(this.room.MiddleOfTile(intVector2.Value) - new Vector2(11f, 11f),
                                                                                           this.room.MiddleOfTile(intVector2.Value) + new Vector2(11f, 11f)));
                     base.MoveGrabDest(newGrabDest, ref path);
                 }
             }
-            Vector2 pos = this.desiredGrabPos + Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value * this.idealLength * (float) this.halfWingIndex / (float) (this.tChunks.Length - 1);
+            Vector2 pos = this.desiredGrabPos + Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value * this.idealLength * (float)this.halfWingIndex / (float)(this.tChunks.Length - 1);
             //Vector2 pos = this.desiredGrabPos + Custom.DegToVec(UnityEngine.Random.value * 360f) * UnityEngine.Random.value * this.idealLength;
             int num = this.room.RayTraceTilesList(base.BasePos.x, base.BasePos.y, this.room.GetTilePosition(pos).x, this.room.GetTilePosition(pos).y, ref path);
             int num2 = 0;

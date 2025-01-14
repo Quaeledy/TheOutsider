@@ -78,7 +78,7 @@ namespace TheOutsider.Player_Hooks
         public static Dictionary<SlugcatStats.Name, CustomEdibleData> edibleDatas =
             new Dictionary<SlugcatStats.Name, CustomEdibleData>();
 
-        
+
         public static SlugcatStats.Name? AdditionalConditions(Player player)
         {
             if (PlayerHooks.PlayerData.TryGetValue(player, out var playerEX))

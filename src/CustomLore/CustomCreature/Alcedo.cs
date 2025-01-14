@@ -746,7 +746,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             bodyChunk3.vel.y = bodyChunk3.vel.y + 1.9f * upForceByWing * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);
             BodyChunk bodyChunk4 = base.bodyChunks[0];
             bodyChunk4.vel.y = bodyChunk4.vel.y - 1.9f * upForceByWing * Mathf.InverseLerp(1f, 7f, base.mainBodyChunk.vel.magnitude);*/
-            if (!this.hoverStill && 
+            if (!this.hoverStill &&
                 (movementConnection == default(MovementConnection) || (movementConnection.DestTile == this.lastConnection.DestTile && this.room.IsPositionInsideBoundries(base.abstractCreature.pos.Tile))))
             {
                 this.stuck++;
@@ -849,7 +849,7 @@ namespace TheOutsider.CustomLore.CustomCreature
 
 
 
-                if(this.hangingInTentacle && this.hangingInLeg && bothTentacleHasGrip && bothLegHasGrip)
+                if (this.hangingInTentacle && this.hangingInLeg && bothTentacleHasGrip && bothLegHasGrip)
                 {
                     this.releaseGrippingTentacle++;
                     if (this.releaseGrippingTentacle > 5)
@@ -857,10 +857,10 @@ namespace TheOutsider.CustomLore.CustomCreature
                         var limb = this.TentacleAndLegMaxRelease();
                         if (limb is AlcedoTentacle)
                         {
-                            if(this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) || this.releaseGrippingTentacle > 50)
-                            (limb as AlcedoTentacle).ReleaseGrip();
+                            if (this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) || this.releaseGrippingTentacle > 50)
+                                (limb as AlcedoTentacle).ReleaseGrip();
                         }
-                        else if(limb is AlcedoLeg)
+                        else if (limb is AlcedoLeg)
                         {
                             (limb as AlcedoLeg).ReleaseGrip();
                         }
@@ -923,8 +923,8 @@ namespace TheOutsider.CustomLore.CustomCreature
                     }
                 }
                 */
-                else if (this.room.aimap.getTerrainProximity(movementConnection.DestTile) <= (this.IsMiros ? 4 : 8) && 
-                    this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y != -1 && 
+                else if (this.room.aimap.getTerrainProximity(movementConnection.DestTile) <= (this.IsMiros ? 4 : 8) &&
+                    this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y != -1 &&
                     this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 5 && //this.room.aimap.getAItile(movementConnection.DestTile).fallRiskTile.y > movementConnection.DestTile.y - 10 &&
                     this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Fly) && (!base.safariControlled || climb == AlcedoTentacle.Mode.Climb))
                 {
@@ -935,9 +935,9 @@ namespace TheOutsider.CustomLore.CustomCreature
                     this.AirBrake(30);
                     this.dontSwitchModesCounter = 100;//200
                 }
-                else if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 5 && 
-                    this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && base.mainBodyChunk.vel.y > 4f && this.moveDirection.y > 0f && 
-                    SharedPhysics.RayTraceTilesForTerrain(this.room, this.room.GetTilePosition(base.mainBodyChunk.pos), this.room.GetTilePosition(base.mainBodyChunk.pos + this.moveDirection * 400f)) && 
+                else if (!this.hoverStill && this.room.aimap.getTerrainProximity(movementConnection.DestTile) > 5 &&
+                    this.CheckTentacleModeAnd(AlcedoTentacle.Mode.Climb) && base.mainBodyChunk.vel.y > 4f && this.moveDirection.y > 0f &&
+                    SharedPhysics.RayTraceTilesForTerrain(this.room, this.room.GetTilePosition(base.mainBodyChunk.pos), this.room.GetTilePosition(base.mainBodyChunk.pos + this.moveDirection * 400f)) &&
                     flag4 && (!base.safariControlled || climb == AlcedoTentacle.Mode.Fly))
                 {
                     this.TakeOff();
@@ -1287,7 +1287,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 Vector2 dir2 = Custom.DirVec(base.bodyChunks[4].pos, base.bodyChunks[0].pos);
                 if (!this.AirBorne && (this.hangingInTentacle || this.hoverStill))
                 {
-                    dir2 = new Vector2(dir2.x, 0).normalized; 
+                    dir2 = new Vector2(dir2.x, 0).normalized;
                     base.bodyChunks[5].collideWithObjects = false;
                 }
                 float num32 = Vector2.Distance(base.bodyChunks[5].pos, base.bodyChunkConnections[8].chunk1.pos);
@@ -1540,9 +1540,9 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public override bool SpearStick(Weapon source, float dmg, BodyChunk chunk, PhysicalObject.Appendage.Pos appPos, Vector2 direction)
         {
-            return this.IsMiros || 
-                ((chunk == null || chunk.index != 4 || base.dead || !(base.State as Alcedo.AlcedoState).mask || 
-                  Vector2.Dot(direction.normalized, Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 1].pos, chunk.pos)) >= -0.88f) && 
+            return this.IsMiros ||
+                ((chunk == null || chunk.index != 4 || base.dead || !(base.State as Alcedo.AlcedoState).mask ||
+                  Vector2.Dot(direction.normalized, Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 1].pos, chunk.pos)) >= -0.88f) &&
                  base.SpearStick(source, dmg, chunk, appPos, direction));
         }
 
@@ -1585,8 +1585,8 @@ namespace TheOutsider.CustomLore.CustomCreature
                 return;
             }
             (base.State as Alcedo.AlcedoState).mask = false;
-            AbstractPhysicalObject abstractPhysicalObject = new VultureMask.AbstractVultureMask(this.room.world, null, 
-                this.abstractPhysicalObject.pos, this.room.game.GetNewID(), 
+            AbstractPhysicalObject abstractPhysicalObject = new VultureMask.AbstractVultureMask(this.room.world, null,
+                this.abstractPhysicalObject.pos, this.room.game.GetNewID(),
                 base.abstractCreature.ID.RandomSeed, this.IsKing);
             this.room.abstractRoom.AddEntity(abstractPhysicalObject);
             abstractPhysicalObject.pos = base.abstractCreature.pos;
