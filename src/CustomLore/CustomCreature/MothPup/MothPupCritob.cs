@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static PathCost.Legality;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.MothPup
 {
     internal sealed class MothPupCritob : Critob
     {
@@ -17,7 +17,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             SandboxPerformanceCost = new(linear: 0.6f, exponential: 0.1f);
             ShelterDanger = ShelterDanger.Safe;
             CreatureName = "Mothpup";
-            base.Icon = new MothPupIcon();
+            Icon = new MothPupIcon();
             RegisterUnlock(killScore: KillScore.Configurable(2), OutsiderEnums.CreatureTemplateType.MothPupUnlock, parent: MoreSlugcatsEnums.SandboxUnlockID.SlugNPC, data: 0);
         }
 
@@ -206,7 +206,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             return new PlayerNPCState(acrit, 0);
         }
 
-        public override AbstractCreatureAI? CreateAbstractAI(AbstractCreature acrit)
+        public override AbstractCreatureAI CreateAbstractAI(AbstractCreature acrit)
         {
             return new SlugNPCAbstractAI(acrit.world, acrit);
         }
@@ -273,7 +273,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             return new Color(40f / 255f, 102f / 255f, 141f / 255f);
         }
 
-        public override ItemProperties? Properties(Creature crit)
+        public override ItemProperties Properties(Creature crit)
         {
             // If you need to use the forObject parameter, pass it to your ItemProperties class's constructor.
             // The Mosquitoes example demonstrates this.

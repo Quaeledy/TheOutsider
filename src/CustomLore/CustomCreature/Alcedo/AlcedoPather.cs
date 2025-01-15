@@ -1,7 +1,7 @@
 ﻿using RWCustom;
 using UnityEngine;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 {
     internal class AlcedoPather : BorderExitPather
     {
@@ -21,11 +21,11 @@ namespace TheOutsider.CustomLore.CustomCreature
         {
             if (InThisRealizedRoom(cell.worldCoordinate))
             {
-                if (base.lookingForImpossiblePath && !cell.reachable)
+                if (lookingForImpossiblePath && !cell.reachable)
                 {
                     return new PathCost(costToGoal.resistance * 2f, costToGoal.legality);
                 }
-                return new PathCost(costToGoal.resistance * (alcedo.AirBorne ? 0.5f : 0.1f) + Vector2.Distance(cell.worldCoordinate.Tile.ToVector2(), base.creaturePos.Tile.ToVector2()), costToGoal.legality);
+                return new PathCost(costToGoal.resistance * (alcedo.AirBorne ? 0.5f : 0.1f) + Vector2.Distance(cell.worldCoordinate.Tile.ToVector2(), creaturePos.Tile.ToVector2()), costToGoal.legality);
             }
             return costToGoal;
         }
@@ -37,7 +37,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             WorldCoordinate worldCoordinate = originPos;
             if (!originPos.TileDefined && !originPos.NodeDefined)
             {
-                return default(MovementConnection);
+                return default;
             }
             WorldCoordinate coord = RestrictedOriginPos(originPos);
             if (actuallyFollowingThisPath && debugDrawer != null)
@@ -51,7 +51,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 {
                     OutOfElement();
                 }
-                MovementConnection movementConnection = default(MovementConnection);
+                MovementConnection movementConnection = default;
                 PathCost pathCost2 = new PathCost(0f, PathCost.Legality.Unallowed);
                 int num2 = -acceptablePathAge;
                 PathCost.Legality legality = PathCost.Legality.Unallowed;
@@ -62,7 +62,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 {
                     MovementConnection movementConnection2 = ConnectionAtCoordinate(outGoing: true, coord, num5);
                     num5++;
-                    if (movementConnection2 == default(MovementConnection))
+                    if (movementConnection2 == default)
                     {
                         break;
                     }
@@ -123,7 +123,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                 {
                     if (actuallyFollowingThisPath)
                     {
-                        if (movementConnection != default(MovementConnection) && movementConnection.type == MovementConnection.MovementType.ShortCut && realizedRoom.shortcutData(movementConnection.StartTile).shortCutType == ShortcutData.Type.RoomExit)
+                        if (movementConnection != default && movementConnection.type == MovementConnection.MovementType.ShortCut && realizedRoom.shortcutData(movementConnection.StartTile).shortCutType == ShortcutData.Type.RoomExit)
                         {
                             LeavingRoom();
                         }
@@ -137,7 +137,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                         num7 = 15;
                     }
                     bool flag = Custom.InsideRect(originPos.Tile, new IntRect(-num6, -num7, realizedRoom.TileWidth + num6, realizedRoom.TileHeight + 100));
-                    if ((actuallyFollowingThisPath && movementConnection != default(MovementConnection) && movementConnection.type == MovementConnection.MovementType.OutsideRoom && !movementConnection.destinationCoord.TileDefined && alcedo.shortcutDelay < 1) || (alcedo.safariControlled && !flag && movementConnection != default(MovementConnection)))
+                    if (actuallyFollowingThisPath && movementConnection != default && movementConnection.type == MovementConnection.MovementType.OutsideRoom && !movementConnection.destinationCoord.TileDefined && alcedo.shortcutDelay < 1 || alcedo.safariControlled && !flag && movementConnection != default)
                     {
                         if (!flag)
                         {
@@ -160,7 +160,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                             if (!worldCoordinate.CompareDisregardingTile(movementConnection.destinationCoord))
                             {
                                 alcedo.AccessSkyGate(movementConnection.destinationCoord, worldCoordinate);
-                                if (worldCoordinate.room != base.creaturePos.room)
+                                if (worldCoordinate.room != creaturePos.room)
                                 {
                                     LeavingRoom();
                                 }
@@ -189,7 +189,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                                     }
                                 }
                             }
-                            return default(MovementConnection);
+                            return default;
                         }
                         IntVector2 intVector = new IntVector2(0, 1);
                         if (movementConnection.startCoord.x == 0)
@@ -209,7 +209,7 @@ namespace TheOutsider.CustomLore.CustomCreature
                     return movementConnection;
                 }
             }
-            return default(MovementConnection);
+            return default;
         }
     }
 }

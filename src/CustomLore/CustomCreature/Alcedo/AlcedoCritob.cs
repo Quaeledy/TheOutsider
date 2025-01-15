@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static PathCost.Legality;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 {
     internal sealed class AlcedoCritob : Critob
     {
@@ -18,7 +18,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             SandboxPerformanceCost = new(linear: 0.6f, exponential: 0.1f);
             ShelterDanger = ShelterDanger.Safe;
             CreatureName = "Alcedo";
-            base.Icon = new AlcedoIcon();
+            Icon = new AlcedoIcon();
             RegisterUnlock(killScore: KillScore.Configurable(15), OutsiderEnums.CreatureTemplateType.AlcedoUnlock, parent: MoreSlugcatsEnums.SandboxUnlockID.MirosVulture, data: 0);
         }
 
@@ -179,8 +179,12 @@ namespace TheOutsider.CustomLore.CustomCreature
             self.FearedBy(OutsiderEnums.CreatureTemplateType.Mothpup, 0.9f);
 
             //被攻击
+            self.AttackedBy(CreatureTemplate.Type.Scavenger, 0.8f);
 
             //捕食
+            self.Eats(CreatureTemplate.Type.JetFish, 1f);
+            self.Eats(CreatureTemplate.Type.Leech, 0.1f);
+            self.Eats(CreatureTemplate.Type.Scavenger, 0.4f);
             self.Eats(CreatureTemplate.Type.LizardTemplate, 0.5f);
             self.Eats(CreatureTemplate.Type.GreenLizard, 0f);
             self.Eats(CreatureTemplate.Type.RedLizard, 0f);
@@ -190,19 +194,20 @@ namespace TheOutsider.CustomLore.CustomCreature
             self.Eats(CreatureTemplate.Type.BigSpider, 1f);
             self.Eats(CreatureTemplate.Type.SpitterSpider, 0.9f);
             self.Eats(MoreSlugcatsEnums.CreatureTemplateType.TrainLizard, 0f);
+            self.Eats(MoreSlugcatsEnums.CreatureTemplateType.SpitLizard, 0f);
             self.Eats(MoreSlugcatsEnums.CreatureTemplateType.MotherSpider, 0.7f);
             self.Eats(OutsiderEnums.CreatureTemplateType.Mothpup, 0.4f);
 
             //被捕食
             self.EatenBy(CreatureTemplate.Type.DaddyLongLegs, 1f);
-            self.EatenBy(CreatureTemplate.Type.Vulture, 0.1f);
-            self.EatenBy(CreatureTemplate.Type.KingVulture, 0.3f);
+            //self.EatenBy(CreatureTemplate.Type.Vulture, 0.1f);
+            self.EatenBy(CreatureTemplate.Type.KingVulture, 0.1f);
             self.EatenBy(CreatureTemplate.Type.MirosBird, 0.3f);
             self.EatenBy(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 0.3f);
 
             //害怕
-            self.Fears(CreatureTemplate.Type.Vulture, 0.3f);
-            self.Fears(CreatureTemplate.Type.KingVulture, 0.8f);
+            self.Fears(CreatureTemplate.Type.Vulture, 0.1f);
+            self.Fears(CreatureTemplate.Type.KingVulture, 0.6f);
             self.Fears(CreatureTemplate.Type.BigEel, 1f);
             self.Fears(CreatureTemplate.Type.DaddyLongLegs, 1f);
             self.Fears(CreatureTemplate.Type.TentaclePlant, 1f);
@@ -227,7 +232,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             return new Alcedo.AlcedoState(acrit);
         }
 
-        public override AbstractCreatureAI? CreateAbstractAI(AbstractCreature acrit)
+        public override AbstractCreatureAI CreateAbstractAI(AbstractCreature acrit)
         {
             return new AlcedoAbstractAI(acrit.world, acrit);
         }
@@ -294,7 +299,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             return new Color(210f / 255f, 202f / 255f, 108f / 255f);
         }
 
-        public override ItemProperties? Properties(Creature crit)
+        public override ItemProperties Properties(Creature crit)
         {
             // If you need to use the forObject parameter, pass it to your ItemProperties class's constructor.
             // The Mosquitoes example demonstrates this.

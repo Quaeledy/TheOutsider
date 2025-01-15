@@ -1,7 +1,7 @@
 ﻿using Fisobs.Core;
 using UnityEngine;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 {
     sealed class AlcedoIcon : Icon
     {

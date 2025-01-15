@@ -1,30 +1,30 @@
 ﻿using Fisobs.Properties;
 using MoreSlugcats;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 {
-    sealed class MothPupProperties : ItemProperties
+    sealed class AlcedoProperties : ItemProperties
     {
-        private readonly Player mothPup;
+        private readonly Alcedo alcedo;
         private readonly int FoodPoints;
 
-        public MothPupProperties(Player mothPup)
+        public AlcedoProperties(Alcedo alcedo)
         {
-            this.mothPup = mothPup;
-            this.FoodPoints = 2;
+            this.alcedo = alcedo;
+            FoodPoints = 8;
         }
-        /*
+
         public override void Grabability(Player player, ref Player.ObjectGrabability grabability)
         {
-            if (mothPup.State.alive)
+            if (alcedo.State.alive)
             {
-                grabability = Player.ObjectGrabability.OneHand;
+                grabability = Player.ObjectGrabability.CantGrab;
             }
             else
             {
-                grabability = Player.ObjectGrabability.OneHand;
+                grabability = Player.ObjectGrabability.Drag;
             }
-        }*/
+        }
 
         public override void Nourishment(Player player, ref int quarterPips)
         {

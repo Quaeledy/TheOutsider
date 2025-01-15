@@ -1,5 +1,7 @@
 ﻿using Fisobs.Core;
-using TheOutsider.CustomLore.CustomCreature;
+using TheOutsider.CustomLore.CustomCreature.Alcedo;
+using TheOutsider.CustomLore.CustomCreature.MothPup;
+using TheOutsider.CustomLore.CustomObject.AlcedoMask;
 
 namespace TheOutsider
 {
@@ -7,16 +9,17 @@ namespace TheOutsider
     {
         public static void RegisterValues()
         {
+            AbstractObjectType.RegisterValues();
             CreatureTemplateType.RegisterValues();
-
-            MothBuzz = new SoundID("mothbuzz", true);
+            OutsiderSoundID.RegisterValues();
 
             Plugin.Log("OutsiderEnums RegisterValues!");
         }
 
         public static void UnregisterValues()
         {
-            Unregister(MothBuzz);
+            AbstractObjectType.UnregisterValues();
+            OutsiderSoundID.UnregisterValues();
         }
 
         private static void Unregister<T>(ExtEnum<T> extEnum) where T : ExtEnum<T>
@@ -27,7 +30,6 @@ namespace TheOutsider
             }
         }
 
-        public static SoundID MothBuzz;
 
         internal class CreatureTemplateType
         {
@@ -46,6 +48,11 @@ namespace TheOutsider
                 Coral = new CreatureTemplate.Type("Coral", true);
                 CoralMatrix = new CreatureTemplate.Type("CoralMatrix", true);
                 FluorescentButterfly = new CreatureTemplate.Type("FluorescentButterfly", true);*/
+            }
+            public static void UnregisterValues()
+            {
+                Unregister(Mothpup);
+                Unregister(Alcedo);
             }
 
             public static readonly CreatureTemplate.Type Mothpup = new("Mothpup", true);
@@ -136,6 +143,40 @@ namespace TheOutsider
             public static CreatureTemplate.Type Coral;
             public static CreatureTemplate.Type CoralMatrix;
             public static CreatureTemplate.Type FluorescentButterfly;*/
+        }
+
+        internal class AbstractObjectType
+        {
+            public static void RegisterValues()
+            {
+                Content.Register(new AlcedoMaskFisob());
+                //AlcedoMask = new AbstractPhysicalObject.AbstractObjectType("AlcedoMask", true);
+            }
+
+            public static void UnregisterValues()
+            {
+                Unregister(AlcedoMask);
+            }
+
+            public static readonly AbstractPhysicalObject.AbstractObjectType AlcedoMask = new("AlcedoMask", true);
+            //public static AbstractPhysicalObject.AbstractObjectType AlcedoMask;
+
+            public static readonly MultiplayerUnlocks.SandboxUnlockID AlcedoMaskUnlock = new("AlcedoMask", true);
+        }
+
+        internal class OutsiderSoundID
+        {
+            public static void RegisterValues()
+            {
+                MothBuzz = new SoundID("mothbuzz", true);
+            }
+
+            public static void UnregisterValues()
+            {
+                Unregister(MothBuzz);
+            }
+
+            public static SoundID MothBuzz;
         }
     }
 }

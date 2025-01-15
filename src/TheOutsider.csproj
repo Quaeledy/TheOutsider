@@ -97,21 +97,31 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Compile Include="CustomLore\CustomCreature\Alcedo.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoAbstractAI.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoAI.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoCritob.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoFeather.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoGraphics.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoPather.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoScale.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoLeg.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoTentacle.cs" />
-      <Compile Include="CustomLore\CustomCreature\MothPupCritob.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoIcon.cs" />
-      <Compile Include="CustomLore\CustomCreature\MothPupIcon.cs" />
-      <Compile Include="CustomLore\CustomCreature\AlcedoProperties.cs" />
-      <Compile Include="CustomLore\CustomCreature\MothPupProperties.cs" />
+      <Compile Include="CustomLore\CustomCosmetics\AlcedoBodyScales.cs" />
+      <Compile Include="CustomLore\CustomCosmetics\AlcedoLongBodyScales.cs" />
+      <Compile Include="CustomLore\CustomCosmetics\AlcedoLongHeadScales.cs" />
+      <Compile Include="CustomLore\CustomCosmetics\AlcedoSpineSpikes.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\Alcedo.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoAbstractAI.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoAI.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoCritob.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoFeather.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoGraphics.cs" />
+      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMask.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoPather.cs" />
+      <Compile Include="CustomLore\CustomCosmetics\AlcedoScaleTemplate.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoLeg.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoScale.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoTentacle.cs" />
+      <Compile Include="CustomLore\CustomCreature\MothPup\MothPupCritob.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoIcon.cs" />
+      <Compile Include="CustomLore\CustomCreature\MothPup\MothPupIcon.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoProperties.cs" />
+      <Compile Include="CustomLore\CustomCreature\MothPup\MothPupProperties.cs" />
+      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskAbstract.cs" />
+      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskFisob.cs" />
+      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskIcon.cs" />
+      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskProperties.cs" />
     </ItemGroup>
     
 </Project>
