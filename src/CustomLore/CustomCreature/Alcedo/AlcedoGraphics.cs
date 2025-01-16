@@ -1146,7 +1146,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-            UpdateSpritesLevel(sLeaser);
             darkness = rCam.room.Darkness(Vector2.Lerp(alcedo.mainBodyChunk.lastPos, alcedo.mainBodyChunk.pos, timeStacker));
             darkness *= 1f - 0.5f * rCam.room.LightSourceExposure(Vector2.Lerp(alcedo.mainBodyChunk.lastPos, alcedo.mainBodyChunk.pos, timeStacker));
             spritesInShadowMode = sLeaser.sprites[BodySprite(0)].color == new Color(0.003921569f, 0f, 0f);
@@ -1444,6 +1443,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 sLeaser.sprites[BackShieldSprite(num15)].y = Mathf.Lerp(Mathf.Lerp(shells[num15 * 2, 2].y, shells[num15 * 2, 0].y, timeStacker), Mathf.Lerp(shells[num15 * 2 + 1, 2].y, shells[num15 * 2 + 1, 0].y, timeStacker), 0.1f) - camPos.y;
                 sLeaser.sprites[BackShieldSprite(num15)].rotation = Custom.AimFromOneVectorToAnother(Vector2.Lerp(shells[num15 * 2 + 1, 2], shells[num15 * 2 + 1, 0], timeStacker), Vector2.Lerp(shells[num15 * 2, 2], shells[num15 * 2, 0], timeStacker));
             }*/
+            UpdateSpritesLevel(sLeaser);
         }
 
         public Vector2 EyePos(float timeStacker)
@@ -1551,19 +1551,19 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         private void UpdateSpritesLevel(RoomCamera.SpriteLeaser sLeaser)
         {
-            int frontWing = alcedo.moveDirection.x >= 0 ? 0 : 1;
+            int frontWing = Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x >= 0 ? 0 : 1;
             int behindWing = 1 - frontWing;
-            FNode frontPos = alcedo.AirBorne ? sLeaser.sprites[TentacleSprite(behindWing)] : sLeaser.sprites[TailSpriteStart];
-            FNode behindPos = sLeaser.sprites[HindPawSprite(frontWing)];
+            FNode frontPos = alcedo.AirBorne ? sLeaser.sprites[TentacleSprite(behindWing)] : sLeaser.sprites[HindPawSprite(frontWing)];
+            FNode behindPos = sLeaser.sprites[HindPawSprite(behindWing)];
             for (int i = 0; i < alcedo.tentacles.Length; i++)
             {
-                if (i % 2 == frontWing)
+                if (i % 2 == frontWing && Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.tentacles[i].tChunks[0].pos).x * Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x < 0)
                 {
                     for (int j = featherLayersPerWing - 1; j >= 0; j--)
                         for (int k = feathersPerLayer - 1; k >= 0; k--)
                         {
-                            sLeaser.sprites[FeatherSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
                             sLeaser.sprites[FeatherColorSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
+                            sLeaser.sprites[FeatherSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
                         }
                 }
                 else
@@ -1571,8 +1571,8 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     for (int j = featherLayersPerWing - 1; j >= 0; j--)
                         for (int k = feathersPerLayer - 1; k >= 0; k--)
                         {
-                            sLeaser.sprites[FeatherSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
-                            sLeaser.sprites[FeatherColorSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
+                            sLeaser.sprites[FeatherColorSprite(i, j, k)].MoveInFrontOfOtherNode(behindPos);
+                            sLeaser.sprites[FeatherSprite(i, j, k)].MoveInFrontOfOtherNode(behindPos);
                         }
                 }
             }
@@ -1580,11 +1580,13 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 if (i % 2 == frontWing)
                 {
-                    sLeaser.sprites[HindPawSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[HindPawSprite(behindWing)]);
-                    sLeaser.sprites[LegSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[LegSprite(behindWing)]);
+                    sLeaser.sprites[HindPawColorSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[BodySprite(2)]);
+                    sLeaser.sprites[HindPawSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[BodySprite(2)]);
+                    sLeaser.sprites[LegSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[BodySprite(2)]);
                 }
                 else
                 {
+                    sLeaser.sprites[HindPawColorSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
                     sLeaser.sprites[HindPawSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
                     sLeaser.sprites[LegSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
                 }
