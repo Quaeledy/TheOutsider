@@ -292,11 +292,13 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                                 float num2 = 10f;
                                 if (num < num2)
                                 {
-                                    if (m != halfWingIndex)
+                                    if (m == halfWingIndex)
                                     {
-                                        tChunks[m].pos -= vector * (num2 - num) * 0.5f;
-                                        tChunks[m].vel -= vector * (num2 - num) * 0.5f;
+                                        tChunks[m].pos -= vector * (num2 - num) * 1f;
+                                        tChunks[m].vel -= vector * (num2 - num) * 1f;
                                     }
+                                    tChunks[m].pos -= vector * (num2 - num) * 0.5f;
+                                    tChunks[m].vel -= vector * (num2 - num) * 0.5f;
                                     tChunks[l].pos += vector * (num2 - num) * 0.5f;
                                     tChunks[l].vel += vector * (num2 - num) * 0.5f;
                                 }

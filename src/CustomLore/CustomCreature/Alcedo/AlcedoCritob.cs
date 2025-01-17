@@ -97,7 +97,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             // saveCreature         决定该生物是否在循环结束后被保存。对监视者和垃圾虫来说是false的
             // hibernateOffScreen   适用于雨鹿、钢鸟、利维坦、秃鹫和拾荒者
             // bodySize             蝙蝠是0.1，蛋虫是0.4，蓝香菇是5.5，蛞蝓是1
-            t.baseDamageResistance = 5f;//生命值，普通秃鹫是8.5，钢鹫是20
+            t.baseDamageResistance = 4.5f;//生命值，普通秃鹫是8.5，钢鹫是20
             t.baseDamageResistance = 3.5f;
             t.abstractedLaziness = 7;
             t.AI = true;

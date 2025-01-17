@@ -28,7 +28,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             float num = Mathf.Lerp(5f, 8f, Mathf.Pow(UnityEngine.Random.value, 0.7f));
             spineLength = Mathf.Lerp(0.5f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
             //spineLength = Mathf.Lerp(0.2f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
-            sizeRangeMin = Mathf.Lerp(0.2f, 0.4f, Mathf.Pow(UnityEngine.Random.value, 2f));
+            sizeRangeMin = Mathf.Lerp(0.4f, 0.6f, Mathf.Pow(UnityEngine.Random.value, 2f));
             sizeRangeMax = Mathf.Lerp(sizeRangeMin, 1.1f, UnityEngine.Random.value);/*
             sizeRangeMin = Mathf.Lerp(0.1f, 0.5f, Mathf.Pow(UnityEngine.Random.value, 2f));
             sizeRangeMax = Mathf.Lerp(sizeRangeMin, 1.1f, UnityEngine.Random.value);*/
@@ -116,11 +116,11 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             for (int num = startSprite + bumps - 1; num >= startSprite; num--)
             {
                 sLeaser.sprites[num] = new FSprite("AlcedoScaleA" + graphic);
-                sLeaser.sprites[num].anchorY = 0.15f;
+                sLeaser.sprites[num].anchorY = 0.05f;
                 if (colored > 0f)
                 {
                     sLeaser.sprites[num + bumps] = new FSprite("AlcedoScaleB" + graphic);
-                    sLeaser.sprites[num + bumps].anchorY = 0.15f;
+                    sLeaser.sprites[num + bumps].anchorY = 0.05f;
                 }
             }
         }
@@ -136,8 +136,8 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                 sLeaser.sprites[num].y = alcedoSpineData.outerPos.y - camPos.y;
                 sLeaser.sprites[num].rotation = rotation;//Custom.AimFromOneVectorToAnother(-alcedoSpineData.perp * alcedoSpineData.depthRotation, alcedoSpineData.perp * alcedoSpineData.depthRotation);
                 float num3 = Mathf.Lerp(sizeRangeMin, sizeRangeMax, Mathf.Sin(Mathf.Pow(num2, sizeSkewExponent) * (float)Math.PI));
-                sLeaser.sprites[num].scaleX = 0.7f * Mathf.Sign(aGraphics.depthRotation) * scaleX * num3;
-                sLeaser.sprites[num].scaleY = num3 * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(aGraphics.depthRotation)));
+                sLeaser.sprites[num].scaleX = Mathf.Lerp(sLeaser.sprites[num + bumps].scaleX, 0.7f * Mathf.Sign(alcedoSpineData.depthRotation) * scaleX * num3, 0.2f);
+                sLeaser.sprites[num].scaleY = Mathf.Lerp(sLeaser.sprites[num + bumps].scaleY, num3 * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(alcedoSpineData.depthRotation))), 0.2f);
                 //sLeaser.sprites[num].scaleX = Mathf.Sign(aGraphics.depthRotation) * scaleX * num3;
                 //sLeaser.sprites[num].scaleY = num3 * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(aGraphics.depthRotation)));
                 if (colored > 0f)
@@ -145,8 +145,8 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                     sLeaser.sprites[num + bumps].x = alcedoSpineData.outerPos.x - camPos.x;
                     sLeaser.sprites[num + bumps].y = alcedoSpineData.outerPos.y - camPos.y;
                     sLeaser.sprites[num + bumps].rotation = rotation;//Custom.AimFromOneVectorToAnother(-alcedoSpineData.perp * alcedoSpineData.depthRotation, alcedoSpineData.perp * alcedoSpineData.depthRotation);
-                    sLeaser.sprites[num + bumps].scaleX = 0.7f * Mathf.Sign(aGraphics.depthRotation) * scaleX * num3;
-                    sLeaser.sprites[num + bumps].scaleY = num3 * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(aGraphics.depthRotation)));
+                    sLeaser.sprites[num + bumps].scaleX = Mathf.Lerp(sLeaser.sprites[num + bumps].scaleX, 0.7f * Mathf.Sign(alcedoSpineData.depthRotation) * scaleX * num3, 0.2f);
+                    sLeaser.sprites[num + bumps].scaleY = Mathf.Lerp(sLeaser.sprites[num + bumps].scaleY, num3 * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(alcedoSpineData.depthRotation))), 0.2f);
                     //sLeaser.sprites[num + bumps].scaleX = Mathf.Sign(aGraphics.depthRotation) * scaleX * num3;
                     //sLeaser.sprites[num + bumps].scaleY = num3 * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(aGraphics.depthRotation)));
                     sLeaser.sprites[num + bumps].color = base.CurrentScaleColor(num - startSprite, (float)(num - startSprite) / (float)bumps);
