@@ -117,36 +117,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             return num4 * Mathf.Lerp(0.5f, 1f, Mathf.Cos(Mathf.Pow(Mathf.InverseLerp(num3, 1f, x), 4f) * 3.1415927f * 0.5f)) * num7 * num8;
         }
 
-        public float FeatherContour(float x)
-        {
-            return FeatherContour(x, flyingMode);
-        }
-
-        //羽毛长度
-        public static float FeatherContour(float x, float k)
-        {
-            float num = 0.25f * Mathf.Sin(Mathf.Pow(Mathf.Abs(x - 0.5f), 0.8f) * 5f);
-            num *= Mathf.Pow(x + 0.5f, 2.5f) + 0.5f;
-            //羽毛分布
-            /*
-            float num = Mathf.Lerp(0.2f, 1f, Custom.SCurve(Mathf.Pow(x, 1.5f), 0.1f));//SCurve: 增函数，越接近1增幅越大，0处约0.5，1处为1
-            if (Mathf.Pow(x, 1.5f) > 0.5f)
-            {
-                num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));//右侧为减函数，越接近1增幅越大，0处约1，1处为0
-                //整体：减函数，越接近1增幅越大，0处约0.5，1处为0
-                //num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));
-            }
-            //羽毛长度
-            float num2 = 1f;
-            num2 *= Mathf.Pow(Mathf.Sin(Mathf.Pow(x, 0.5f) * 3.1415927f), 0.7f);
-            if (x < 0.3f)
-            {
-                num2 *= Mathf.Lerp(0.7f, 1f, Custom.SCurve(Mathf.InverseLerp(0f, 0.3f, x), 0.5f));
-            }*/
-            num = Mathf.Lerp(num, 1f, 0.5f);
-            return Mathf.Lerp(num * 0.5f, num, k);
-        }
-
         public AlcedoTentacle(Alcedo alcedo, BodyChunk chunk, BodyChunk otherTentacleChunk, float length, int tentacleNumber) : base(alcedo, chunk, length)
         {
             this.tentacleNumber = tentacleNumber;
@@ -159,12 +129,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             mode = Mode.Climb;
             debugViz = false;
             this.otherTentacleChunk = otherTentacleChunk;
-        }
-
-        //羽毛宽度
-        public static float FeatherWidth(float x)
-        {
-            return Mathf.Pow(Mathf.Sin(Mathf.InverseLerp(-0.45f, 1f, x) * 3.1415927f), 2.6f);
         }
 
         public override void NewRoom(Room room)
@@ -440,7 +404,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                         float line = n >= halfWingIndex ? Mathf.Lerp(Wave(halfWingIndex), Wave(tChunks.Length - 1), Mathf.InverseLerp(halfWingIndex, tChunks.Length - 1, n)) :
                                                             Mathf.Lerp(Wave(0), Wave(halfWingIndex), Mathf.InverseLerp(0, halfWingIndex, n));
 
-                        wantPos += perp * waveScale * Mathf.Lerp(wave, line, 0.5f);
+                        wantPos += perp * waveScale * Mathf.Lerp(wave, line, 0.9f);
                         tChunks[n].vel += Vector2.ClampMagnitude(wantPos - tChunks[n].pos, 1.5f * alcedo.wingLength) /
                             (1.5f * alcedo.wingLength) * 5f * Mathf.Lerp(0.2f, 1f, alcedo.wingFlapAmplitude);
 

@@ -67,7 +67,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }
         }
 
-        public AlcedoFeather(AlcedoGraphics kGraphics, AlcedoTentacle wing, float wingPosition, float contractedLength, float extendedLength, float width, string type) : base(kGraphics)
+        public AlcedoFeather(AlcedoGraphics kGraphics, AlcedoTentacle wing, float wingPosition, float contractedLength, float extendedLength, float width, AlcedoFeather.Type type) : base(kGraphics)
         {
             this.kGraphics = kGraphics;
             this.wing = wing;
@@ -75,8 +75,45 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             this.contractedLength = contractedLength;
             this.extendedLength = extendedLength;
             this.width = width;
-            lose = 0f;
+            this.lose = 0f;
             this.type = type;
+        }
+
+
+        public float FeatherContour(float x)
+        {
+            return FeatherContour(x, wing.flyingMode);
+        }
+
+        //羽毛长度
+        public static float FeatherContour(float x, float k)
+        {
+            float num = 0.25f * Mathf.Sin(Mathf.Pow(Mathf.Abs(x - 0.5f), 0.8f) * 5f);
+            num *= Mathf.Pow(x + 0.5f, 2.5f) + 0.5f;
+            //羽毛分布
+            /*
+            float num = Mathf.Lerp(0.2f, 1f, Custom.SCurve(Mathf.Pow(x, 1.5f), 0.1f));//SCurve: 增函数，越接近1增幅越大，0处约0.5，1处为1
+            if (Mathf.Pow(x, 1.5f) > 0.5f)
+            {
+                num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));//右侧为减函数，越接近1增幅越大，0处约1，1处为0
+                //整体：减函数，越接近1增幅越大，0处约0.5，1处为0
+                //num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));
+            }
+            //羽毛长度
+            float num2 = 1f;
+            num2 *= Mathf.Pow(Mathf.Sin(Mathf.Pow(x, 0.5f) * 3.1415927f), 0.7f);
+            if (x < 0.3f)
+            {
+                num2 *= Mathf.Lerp(0.7f, 1f, Custom.SCurve(Mathf.InverseLerp(0f, 0.3f, x), 0.5f));
+            }*/
+            num = Mathf.Lerp(num, 1f, 0.5f);
+            return Mathf.Lerp(num * 0.5f, num, k);
+        }
+
+        //羽毛宽度
+        public static float FeatherWidth(float x)
+        {
+            return Mathf.Pow(Mathf.Sin(Mathf.InverseLerp(-0.45f, 1f, x) * 3.1415927f), 2.6f);
         }
 
         //根据翅膀拍动来调整长度
@@ -85,7 +122,8 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             float num = 1f;
             if (wing.mode == AlcedoTentacle.Mode.Fly)
             {
-                num = Mathf.Lerp(0.5f + 0.5f * Mathf.Sin((float)Math.PI * 2f * (wing.alcedo.wingFlap - wingPosition * 0.5f)), 1f, 0.5f);
+                float delay = 0.1f;
+                num = Mathf.Lerp(0.5f + 0.5f * Mathf.Sin((float)Math.PI * 2f * (wing.alcedo.wingFlap - wingPosition * 0.5f) - delay), 1f, 0.5f);
                 num = Mathf.Lerp(1f, num, wing.flyingMode);
             }
             return num;
@@ -214,7 +252,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }
             HSLColor colorB = kGraphics.ColorB;
             HSLColor colorA = kGraphics.ColorA;
-            if (type == "Covert")
+            if (type == AlcedoFeather.Type.Covert)
             {
                 colorB.hue -= 0.1f;
                 colorA.hue -= 0.1f;
@@ -271,7 +309,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         public AlcedoGraphics kGraphics;
         public AlcedoTentacle wing;
-        public string type;
+        public AlcedoFeather.Type type;
         public float wingPosition;
         private float ef;
         public float width;
@@ -291,6 +329,15 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             Even,
             Jerky,
             Jammed
+        }
+
+        public class Type : ExtEnum<Type>
+        {
+            public Type(string value, bool register = false) : base(value, register)
+            {
+            }
+            public static readonly Type FlightFeather = new Type("FlightFeather", true);//飞羽
+            public static readonly Type Covert = new Type("Covert", true);//覆羽
         }
     }
 }

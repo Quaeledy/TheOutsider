@@ -174,7 +174,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }
             waist.tChunks[waist.tChunks.Length - 1].rad = 11f;
             waist.stretchAndSqueeze = 0f;
-            neck = new Tentacle(this, bodyChunks[1], 70f); //0.7f * (this.IsKing ? 6f : 5f) * 20f
+            neck = new Tentacle(this, bodyChunks[1], 50f); //0.7f * (this.IsKing ? 6f : 5f) * 20f
             neck.tProps = new Tentacle.TentacleProps(false, false, true, 0.5f, 0f, 0.5f, 1.8f, 0.2f, 1.2f, 10f, 0.25f, 3f, 15, 20, 6, 0);
             neck.tChunks = new Tentacle.TentacleChunk[4];
             for (int k = 0; k < neck.tChunks.Length; k++)
@@ -2004,6 +2004,20 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         public float upForceByWing;
         public float upForceByLeg;
 
+        public float limbSize;
+        public float limbThickness;
+        public float stepLength;
+        public float liftFeet;
+        public float feetDown;
+        public float noGripSpeed;
+        public float limbSpeed;
+        public float limbQuickness;
+        public int limbGripDelay;
+        public bool smoothenLegMovement;
+        public float legPairDisplacement;
+        public float bodySizeFac; 
+        public Vector2 limbsAimFor;
+
         private class AlcedoThruster
         {
             public Vector2 ThrustVector
@@ -2174,6 +2188,11 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 {
                     wingHealth[i] = 1f;
                 }
+                limbHealth = new float[4];
+                for (int i = 0; i < wingHealth.Length; i++)
+                {
+                    limbHealth[i] = 1f;
+                }
                 mask = !flag;
             }
             public override string ToString()
@@ -2206,7 +2225,8 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 unrecognizedSaveStrings.Remove("NOMASK");
             }
 
-            public float[] wingHealth;
+            public float[] wingHealth; 
+            public float[] limbHealth;
             public bool mask;
         }
     }

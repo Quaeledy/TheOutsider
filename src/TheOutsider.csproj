@@ -107,6 +107,7 @@
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoCritob.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoFeather.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoGraphics.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoLimb.cs" />
       <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMask.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoPather.cs" />
       <Compile Include="CustomLore\CustomCosmetics\AlcedoScaleTemplate.cs" />
