@@ -73,7 +73,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                 //sLeaser.sprites[num].color = base.CurrentScaleColor();//aGraphics.HeadColor(timeStacker);
                 if (colored > 0f)
                 {
-                    sLeaser.sprites[num + scalesPositions.Length].color = base.CurrentScaleColor(num - startSprite, this.ScalesPos(num - startSprite)); //aGraphics.effectColor;
+                    sLeaser.sprites[num + scalesPositions.Length].color = Color.red;//base.CurrentScaleColor(num - startSprite, this.ScalesPos(num - startSprite)); //aGraphics.effectColor;
                 }
             }
         }
