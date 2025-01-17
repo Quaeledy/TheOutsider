@@ -28,7 +28,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             float num = Mathf.Lerp(5f, 8f, Mathf.Pow(UnityEngine.Random.value, 0.7f));
             spineLength = Mathf.Lerp(0.5f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
             //spineLength = Mathf.Lerp(0.2f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
-            sizeRangeMin = Mathf.Lerp(0.5f, 0.9f, Mathf.Pow(UnityEngine.Random.value, 2f));
+            sizeRangeMin = Mathf.Lerp(0.2f, 0.4f, Mathf.Pow(UnityEngine.Random.value, 2f));
             sizeRangeMax = Mathf.Lerp(sizeRangeMin, 1.1f, UnityEngine.Random.value);/*
             sizeRangeMin = Mathf.Lerp(0.1f, 0.5f, Mathf.Pow(UnityEngine.Random.value, 2f));
             sizeRangeMax = Mathf.Lerp(sizeRangeMin, 1.1f, UnityEngine.Random.value);*/

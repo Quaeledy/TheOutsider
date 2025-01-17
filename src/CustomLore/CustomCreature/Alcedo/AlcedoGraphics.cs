@@ -551,42 +551,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 }
             }
             #endregion
-            if (IsMiros)
-            {
-                lastHeadFlip = headFlip;
-                if (Custom.DistanceToLine(alcedo.Head().pos, alcedo.bodyChunks[1].pos, alcedo.bodyChunks[0].pos) < 0f)
-                {
-                    headFlip = Mathf.Min(1f, headFlip + 1f / 6f);
-                }
-                else
-                {
-                    headFlip = Mathf.Max(-1f, headFlip - 1f / 6f);
-                }
-                if (soundLoop == null && laserActive > 0f)
-                {
-                    soundLoop = new ChunkDynamicSoundLoop(alcedo.bodyChunks[4]);
-                    soundLoop.sound = SoundID.Vulture_Grub_Laser_LOOP;
-                }
-                else if (soundLoop != null)
-                {
-                    soundLoop.Volume = Mathf.InverseLerp(0.3f, 1f, laserActive);
-                    soundLoop.Pitch = 0.2f + 0.8f * Mathf.Pow(laserActive, 0.6f);
-                    soundLoop.Update();
-                    if (laserActive == 0f)
-                    {
-                        if (soundLoop.emitter != null)
-                        {
-                            soundLoop.emitter.slatedForDeletetion = true;
-                        }
-                        soundLoop = null;
-                    }
-                }
-                lastLaserActive = laserActive;
-                laserActive = Custom.LerpAndTick(laserActive, !alcedo.isLaserActive() ? 0f : 1f, 0.05f, 0.05f);
-                lastLaserColor = laserColor;
-                lastFlash = flash;
-                flash = Custom.LerpAndTick(flash, 0f, 0.02f, 0.025f);
-            }
             if (DEBUGLABELS != null)
             {
                 DEBUGLABELS[0].label.text = alcedo.abstractCreature.pos.x + " " + alcedo.abstractCreature.pos.y + "   " + alcedo.AI.behavior.ToString();
@@ -1101,17 +1065,17 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 }
             }
             sLeaser.RemoveAllSpritesFromContainer();
+            for (int j = 0; j < cosmetics.Count; j++)
+            {
+                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Behind || cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead)
+                {
+                    cosmetics[j].AddToContainer(sLeaser, rCam, newContatiner);
+                }
+            }
             for (int k = 0; k < sLeaser.sprites.Length; k++)
             {
                 //sLeaser.sprites[k].RemoveFromContainer();
                 newContatiner.AddChild(sLeaser.sprites[k]);
-            }
-            for (int j = 0; j < cosmetics.Count; j++)
-            {
-                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Behind)
-                {
-                    cosmetics[j].AddToContainer(sLeaser, rCam, newContatiner);
-                }
             }
             for (int num4 = 0; num4 < cosmetics.Count; num4++)
             {
@@ -1629,7 +1593,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             int frontWing = Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x >= 0 ? 0 : 1;
             int behindWing = 1 - frontWing;
             FNode frontPos = alcedo.AirBorne ? sLeaser.sprites[TentacleSprite(behindWing)] : sLeaser.sprites[HindPawSprite(frontWing)];
-            FNode behindPos = sLeaser.sprites[HindPawSprite(behindWing)];
+            FNode behindPos = sLeaser.sprites[TailSpriteStart];
             for (int i = 0; i < alcedo.tentacles.Length; i++)
             {
                 if (i % 2 == frontWing && Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.tentacles[i].tChunks[0].pos).x * Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x < 0)
@@ -1670,6 +1634,17 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     sLeaser.sprites[HindPawColorSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
                     sLeaser.sprites[HindPawSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
                     sLeaser.sprites[LegSprite(i)].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
+                }
+            }
+            sLeaser.sprites[TailSpriteStart].MoveInFrontOfOtherNode(sLeaser.sprites[HindPawColorSprite(behindWing)]);
+            for (int j = 0; j < cosmetics.Count; j++)
+            {
+                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead)
+                {
+                    for(int i = cosmetics[j].startSprite + cosmetics[j].numberOfSprites - 1; i >= cosmetics[j].startSprite; i--)
+                    {
+                        sLeaser.sprites[i].MoveInFrontOfOtherNode(sLeaser.sprites[HindPawColorSprite(behindWing)]);
+                    }
                 }
             }
         }
