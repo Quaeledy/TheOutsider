@@ -1,5 +1,6 @@
 ﻿using TheOutsider.CustomLore.CustomCreature.Alcedo;
 using UnityEngine;
+using static TheOutsider.CustomLore.CustomCreature.Alcedo.AlcedoGraphics;
 using Random = UnityEngine.Random;
 
 namespace TheOutsider.CustomLore.CustomCosmetics
@@ -70,10 +71,16 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
             for (int num = startSprite + scalesPositions.Length - 1; num >= startSprite; num--)
             {
+                AlcedoGraphics.AlcedoSpineData alcedoSpineData = aGraphics.SpinePosition(scalesPositions[num - startSprite].y, timeStacker);
+                float sizeFac = 0.6f;//Mathf.Lerp(sizeRangeMin, sizeRangeMax, Mathf.Sin(Mathf.Pow(num2, sizeSkewExponent) * (float)Math.PI));
+                sLeaser.sprites[num].scaleX = Mathf.Lerp(sLeaser.sprites[num].scaleX, 0.7f * Mathf.Sign(alcedoSpineData.depthRotation) * scaleX * sizeFac, 0.2f);
+                sLeaser.sprites[num].scaleY = Mathf.Lerp(sLeaser.sprites[num].scaleY, sizeFac * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(alcedoSpineData.depthRotation))), 0.2f);
                 //sLeaser.sprites[num].color = base.CurrentScaleColor();//aGraphics.HeadColor(timeStacker);
                 if (colored > 0f)
                 {
-                    sLeaser.sprites[num + scalesPositions.Length].color = Color.red;//base.CurrentScaleColor(num - startSprite, this.ScalesPos(num - startSprite)); //aGraphics.effectColor;
+                    sLeaser.sprites[num + scalesPositions.Length].color = base.CurrentScaleColor(Mathf.Abs(num - startSprite - Mathf.FloorToInt((float)scalesPositions.Length / 2f) + 0.5f), this.ScalesPos(Mathf.RoundToInt(Mathf.Abs(num - startSprite - Mathf.FloorToInt((float)scalesPositions.Length / 2f) + 0.5f)))); //aGraphics.effectColor;
+                    sLeaser.sprites[num + scalesPositions.Length].scaleX = Mathf.Lerp(sLeaser.sprites[num + scalesPositions.Length].scaleX, 0.7f * Mathf.Sign(alcedoSpineData.depthRotation) * scaleX * sizeFac, 0.2f);
+                    sLeaser.sprites[num + scalesPositions.Length].scaleY = Mathf.Lerp(sLeaser.sprites[num + scalesPositions.Length].scaleY, sizeFac * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(alcedoSpineData.depthRotation))), 0.2f);
                 }
             }
         }

@@ -218,7 +218,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                         {
                             BodyChunk bodyChunk = realizedCreature.bodyChunks[Random.Range(0, realizedCreature.bodyChunks.Length)];
                             preyInTuskChargeRange = Custom.DistLess(alcedo.mainBodyChunk.pos, bodyChunk.pos, 230f);
-                            if ((!alcedo.AirBorne || Random.value < 0.016666668f) && alcedo.tuskCharge == 1f && alcedo.snapFrames == 0 && !alcedo.isLaserActive() && !alcedo.safariControlled && Custom.DistLess(alcedo.mainBodyChunk.pos, bodyChunk.pos, 130f) && alcedo.room.VisualContact(alcedo.bodyChunks[4].pos, bodyChunk.pos))
+                            if ((!alcedo.AirBorne || Random.value < 0.016666668f) && alcedo.tuskCharge == 1f && alcedo.snapFrames == 0 && !alcedo.safariControlled && Custom.DistLess(alcedo.mainBodyChunk.pos, bodyChunk.pos, 130f) && alcedo.room.VisualContact(alcedo.bodyChunks[4].pos, bodyChunk.pos))
                             {
                                 alcedo.Snap(bodyChunk);
                             }

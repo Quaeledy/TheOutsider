@@ -141,8 +141,8 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             bodyChunkConnections[4] = new BodyChunkConnection(bodyChunks[2], bodyChunks[0], Mathf.Sqrt(Mathf.Pow(UpperAndLowerBodySpacing - wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), BodyChunkConnection.Type.Normal, 1f, 0.5f);
             bodyChunkConnections[5] = new BodyChunkConnection(bodyChunks[3], bodyChunks[0], Mathf.Sqrt(Mathf.Pow(UpperAndLowerBodySpacing - wingInBodyPos, 2f) + Mathf.Pow(wingRootSpacing / 2f, 2f)), BodyChunkConnection.Type.Normal, 1f, 0.5f);
             //头
-            bodyChunkConnections[6] = new BodyChunkConnection(bodyChunks[1], bodyChunks[4], 0.7f * (IsKing ? 70f : 60f), BodyChunkConnection.Type.Pull, 0.6f, 0f);
-            bodyChunkConnections[7] = new BodyChunkConnection(bodyChunks[4], bodyChunks[1], 0.7f * (IsKing ? 75f : 65f), BodyChunkConnection.Type.Pull, 1f, -1f);
+            bodyChunkConnections[6] = new BodyChunkConnection(bodyChunks[1], bodyChunks[4], 42f * bodySizeFac, BodyChunkConnection.Type.Pull, 0.6f, 0f);
+            bodyChunkConnections[7] = new BodyChunkConnection(bodyChunks[4], bodyChunks[1], 45.5f * bodySizeFac, BodyChunkConnection.Type.Pull, 1f, -1f);
             //下半身
             bodyChunkConnections[8] = new BodyChunkConnection(bodyChunks[0], bodyChunks[5], ForeAndHindBodySpacing, BodyChunkConnection.Type.Normal, 0.8f, 0.5f);
             bodyChunkConnections[9] = new BodyChunkConnection(bodyChunks[5], bodyChunks[0], ForeAndHindBodySpacing, BodyChunkConnection.Type.Normal, 0.8f, 0.5f);
@@ -426,71 +426,13 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }
             if (Consious)
             {
-                Act(eu);
+                //Act(eu);
             }
         }
 
         public void Act(bool eu)
         {
             AI.Update();
-            if (IsMiros)
-            {
-                lastJawOpen = jawOpen;
-                if (grasps[0] != null)
-                {
-                    jawOpen = 0.15f;
-                }
-                else if (jawSlamPause > 0)
-                {
-                    jawSlamPause--;
-                }
-                else
-                {
-                    if (isLaserActive())
-                    {
-                        jawKeepOpenPause = 10;
-                        keepJawOpenPos = 1f;
-                    }
-                    if (jawVel == 0f)
-                    {
-                        jawVel = 0.15f;
-                    }
-                    if (abstractCreature.controlled && jawVel >= 0f && jawVel < 1f && !controlledJawSnap)
-                    {
-                        jawVel = 0f;
-                        jawOpen = 0f;
-                    }
-                    jawOpen += jawVel;
-                    if (jawKeepOpenPause > 0)
-                    {
-                        jawKeepOpenPause--;
-                        jawOpen = Mathf.Clamp(Mathf.Lerp(jawOpen, keepJawOpenPos, UnityEngine.Random.value * 0.5f), 0f, 1f);
-                    }
-                    else if (UnityEngine.Random.value < 1f / (!Blinded ? 40f : 15f) && !abstractCreature.controlled)
-                    {
-                        jawKeepOpenPause = UnityEngine.Random.Range(10, UnityEngine.Random.Range(10, 60));
-                        keepJawOpenPos = UnityEngine.Random.value >= 0.5f ? 1f : 0f;
-                        jawVel = Mathf.Lerp(-0.4f, 0.4f, UnityEngine.Random.value);
-                        jawOpen = Mathf.Clamp(jawOpen, 0f, 1f);
-                    }
-                    else if (jawOpen <= 0f)
-                    {
-                        jawOpen = 0f;
-                        if (jawVel < -0.4f)
-                        {
-                            JawSlamShut();
-                            controlledJawSnap = false;
-                        }
-                        jawVel = 0.15f;
-                        jawSlamPause = 5;
-                    }
-                    else if (jawOpen >= 1f)
-                    {
-                        jawOpen = 1f;
-                        jawVel = -0.5f;
-                    }
-                }
-            }
             if (!AirBorne)
             {
                 float num = 100f;
@@ -570,7 +512,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 }
                 if (inputWithDiagonals != null)
                 {
-                    if ((!IsMiros || isLaserActive()) && inputWithDiagonals.Value.thrw && (inputWithDiagonals.Value.x != 0 || inputWithDiagonals.Value.y != 0))
+                    if (inputWithDiagonals.Value.thrw && (inputWithDiagonals.Value.x != 0 || inputWithDiagonals.Value.y != 0))
                     {
                         Vector2 p = bodyChunks[4].pos + new Vector2(inputWithDiagonals.Value.x, inputWithDiagonals.Value.y) * 200f;
                         bodyChunks[4].vel += Custom.DirVec(bodyChunks[4].pos, p) * 15f;
@@ -633,10 +575,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                         if (grasps[0] != null)
                         {
                             LoseAllGrasps();
-                        }
-                        else if (IsMiros && !isLaserActive())
-                        {
-                            FireLaser();
                         }
                     }
                     if (flag)
@@ -833,21 +771,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 for (int num7 = 0; num7 < tentacles.Length; num7++)
                 {
                     flag4 = flag4 && tentacles[num7].WingSpace();
-                }
-                if (!safariControlled && IsMiros && isLaserActive() && CheckTentacleModeOr(AlcedoTentacle.Mode.Climb))
-                {
-                    if (timeSinceLastTakeoff >= 40)
-                    {
-                        TakeOff();
-                    }
-                    else
-                    {
-                        for (int num8 = 0; num8 < tentacles.Length; num8++)
-                        {
-                            tentacles[num8].SwitchMode(AlcedoTentacle.Mode.Fly);
-                        }
-                    }
-                    dontSwitchModesCounter = 200;
                 }
                 timeSinceLastTakeoff++;
                 if (dontSwitchModesCounter > 0)
@@ -1226,7 +1149,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             waist.tChunks[waist.tChunks.Length - 1].vel = bodyChunks[5].vel;
             waist.Update();
             //base.bodyChunks[5].collideWithTerrain = true;
-            return;
+            //return;
             for (int j = 0; j < waist.tChunks.Length; j++)
             {
                 waist.tChunks[j].vel *= 0.95f;/*
@@ -1313,10 +1236,10 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 neck.tChunks[j].vel *= 0.95f;
                 Tentacle.TentacleChunk tentacleChunk = neck.tChunks[j];
-                tentacleChunk.vel.y = tentacleChunk.vel.y + (neck.limp ? 0.1f : 0.7f);
+                tentacleChunk.vel.y = tentacleChunk.vel.y + (neck.limp ? 0.7f : 0.1f);
                 //tentacleChunk.vel.y = tentacleChunk.vel.y - (neck.limp ? 0.7f : 0.1f);
                 neck.tChunks[j].vel += Custom.DirVec(bodyChunks[0].pos, bodyChunks[1].pos) * (j == 0 ? 1.2f : 0.8f) * 1f;
-                neck.tChunks[j].vel += Custom.DirVec(bodyChunks[5].pos, bodyChunks[0].pos) * (j == 0 ? 1.2f : 0.8f) * 0.8f;
+                //neck.tChunks[j].vel += Custom.DirVec(bodyChunks[5].pos, bodyChunks[0].pos) * (j == 0 ? 1.2f : 0.8f) * 0.8f;
                 neck.tChunks[j].vel -= neck.connectedChunk.vel;
                 neck.tChunks[j].vel *= (this.AirBorne ? 0.85f : 0.75f);//(this.AirBorne ? 0.2f : 0.75f);
                 neck.tChunks[j].vel += neck.connectedChunk.vel;
@@ -1325,15 +1248,16 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             float num2 = neck.backtrackFrom == -1 ? 0.5f : 0f;
             if (grasps[0] == null)
             {
-                Vector2 a = Custom.DirVec(bodyChunks[4].pos, neck.tChunks[neck.tChunks.Length - 1].pos);
-                float num3 = Vector2.Distance(bodyChunks[4].pos, neck.tChunks[neck.tChunks.Length - 1].pos);
-                bodyChunks[4].pos -= (6f - num3) * a * (1f - num2);
-                bodyChunks[4].vel -= (6f - num3) * a * (1f - num2);
-                neck.tChunks[neck.tChunks.Length - 1].pos += (6f - num3) * a * num2;
-                neck.tChunks[neck.tChunks.Length - 1].vel += (6f - num3) * a * num2;
-                bodyChunks[4].vel += Custom.DirVec(neck.tChunks[neck.tChunks.Length - 2].pos, bodyChunks[4].pos) * (AirBorne ? 5f : 6f) * (1f - num2);
+                Vector2 headToNeck = Custom.DirVec(bodyChunks[4].pos, neck.tChunks[neck.tChunks.Length - 1].pos);
+                float distance = Vector2.Distance(bodyChunks[4].pos, neck.tChunks[neck.tChunks.Length - 1].pos);
+                float idealDist = 4f;//6f;
+                bodyChunks[4].pos -= (idealDist - distance) * headToNeck * (1f - num2);
+                bodyChunks[4].vel -= (idealDist - distance) * headToNeck * (1f - num2);
+                neck.tChunks[neck.tChunks.Length - 1].pos += (idealDist - distance) * headToNeck * num2;
+                neck.tChunks[neck.tChunks.Length - 1].vel += (idealDist - distance) * headToNeck * num2;
                 bodyChunks[4].vel += Custom.DirVec(neck.tChunks[neck.tChunks.Length - 1].pos, bodyChunks[4].pos) * (AirBorne ? 5f : 6f) * (1f - num2);
                 neck.tChunks[neck.tChunks.Length - 1].vel -= Custom.DirVec(neck.tChunks[neck.tChunks.Length - 1].pos, bodyChunks[4].pos) * (AirBorne ? 2.5f : 3f) * num2;
+                bodyChunks[4].vel += Custom.DirVec(neck.tChunks[neck.tChunks.Length - 2].pos, bodyChunks[4].pos) * (AirBorne ? 5f : 6f) * (1f - num2);
                 neck.tChunks[neck.tChunks.Length - 2].vel -= Custom.DirVec(neck.tChunks[neck.tChunks.Length - 2].pos, bodyChunks[4].pos) * (AirBorne ? 2.5f : 3f) * num2;/*
                 base.bodyChunks[4].vel += Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 2].pos, base.bodyChunks[4].pos) * (this.AirBorne ? 2f : 6f) * (1f - num2);
                 base.bodyChunks[4].vel += Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 1].pos, base.bodyChunks[4].pos) * (this.AirBorne ? 2f : 6f) * (1f - num2);
@@ -1344,6 +1268,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 return;
             }
+            return;
             Vector2 pos = snapAtPos;
             if (snapAt != null)
             {
@@ -1645,69 +1570,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             return base.ShortCutColor();
         }
 
-        public Vector2 AppendagePosition(int appendage, int segment)
-        {
-            segment--;
-            if (appendage == 0)
-            {
-                if (segment < 0)
-                {
-                    return mainBodyChunk.pos;
-                }
-                if (segment >= neck.tChunks.Length)
-                {
-                    return bodyChunks[4].pos;
-                }
-                return neck.tChunks[segment].pos;
-            }
-            else
-            {
-                if (segment < 0)
-                {
-                    return tentacles[appendage - 1].connectedChunk.pos;
-                }
-                return tentacles[appendage - 1].tChunks[segment].pos;
-            }
-        }
-
-        public void ApplyForceOnAppendage(Appendage.Pos pos, Vector2 momentum)
-        {
-            if (pos.appendage.appIndex != 0)
-            {
-                if (pos.prevSegment > 0)
-                {
-                    tentacles[pos.appendage.appIndex - 1].tChunks[pos.prevSegment - 1].pos += momentum / 0.04f * (1f - pos.distanceToNext);
-                    tentacles[pos.appendage.appIndex - 1].tChunks[pos.prevSegment - 1].vel += momentum / 0.04f * (1f - pos.distanceToNext);
-                }
-                else
-                {
-                    tentacles[pos.appendage.appIndex - 1].connectedChunk.pos += momentum / tentacles[pos.appendage.appIndex - 1].connectedChunk.mass * (1f - pos.distanceToNext);
-                    tentacles[pos.appendage.appIndex - 1].connectedChunk.vel += momentum / tentacles[pos.appendage.appIndex - 1].connectedChunk.mass * (1f - pos.distanceToNext);
-                }
-                tentacles[pos.appendage.appIndex - 1].tChunks[pos.prevSegment].pos += momentum / 0.04f * pos.distanceToNext;
-                tentacles[pos.appendage.appIndex - 1].tChunks[pos.prevSegment].vel += momentum / 0.04f * pos.distanceToNext;
-                return;
-            }
-            if (pos.prevSegment > 0)
-            {
-                neck.tChunks[pos.prevSegment - 1].pos += momentum / 0.1f * (1f - pos.distanceToNext);
-                neck.tChunks[pos.prevSegment - 1].vel += momentum / 0.05f * (1f - pos.distanceToNext);
-            }
-            else
-            {
-                mainBodyChunk.pos += momentum / mainBodyChunk.mass * (1f - pos.distanceToNext);
-                mainBodyChunk.vel += momentum / mainBodyChunk.mass * (1f - pos.distanceToNext);
-            }
-            if (pos.prevSegment < neck.tChunks.Length - 1)
-            {
-                neck.tChunks[pos.prevSegment].pos += momentum / 0.1f * pos.distanceToNext;
-                neck.tChunks[pos.prevSegment].vel += momentum / 0.05f * pos.distanceToNext;
-                return;
-            }
-            bodyChunks[4].pos += momentum / bodyChunks[4].mass * pos.distanceToNext;
-            bodyChunks[4].vel += momentum / bodyChunks[4].mass * pos.distanceToNext;
-        }
-
         public void SnapTowards(Vector2 pos)
         {
             snapAtPos = pos;
@@ -1803,90 +1665,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             return result;
         }
 
-        public BodyChunk Head()
-        {
-            return bodyChunks[4];
-        }
-
-        public void JawSlamShut()
-        {
-            Vector2 a = Custom.DirVec(neck.Tip.pos, Head().pos);
-            neck.Tip.vel -= a * 10f;
-            neck.Tip.pos += a * 20f;
-            Head().pos += a * 20f;
-            int num = 0;
-            int num2 = 0;
-            while (num2 < room.abstractRoom.creatures.Count && grasps[0] == null)
-            {
-                Creature realizedCreature = room.abstractRoom.creatures[num2].realizedCreature;
-                if (room.abstractRoom.creatures[num2] != abstractCreature && AI.DoIWantToBiteCreature(room.abstractRoom.creatures[num2]) && realizedCreature != null && realizedCreature.enteringShortCut == null && !realizedCreature.inShortcut)
-                {
-                    int num3 = 0;
-                    while (num3 < realizedCreature.bodyChunks.Length && grasps[0] == null)
-                    {
-                        if (Custom.DistLess(Head().pos + a * 20f, realizedCreature.bodyChunks[num3].pos, 20f + realizedCreature.bodyChunks[num3].rad) && room.VisualContact(Head().pos, realizedCreature.bodyChunks[num3].pos))
-                        {
-                            if (realizedCreature == null)
-                            {
-                                break;
-                            }
-                            num = !(realizedCreature is Player) ? 1 : 2;
-                            if (!AI.OnlyHurtDontGrab(realizedCreature))
-                            {
-                                Grab(realizedCreature, 0, num3, Grasp.Shareability.CanOnlyShareWithNonExclusive, 1f, true, true);
-                                AI.creatureLooker.LookAtNothing();
-                                jawOpen = 0.15f;
-                                jawVel = 0f;
-                                realizedCreature.Violence(Head(), new Vector2?(Custom.DirVec(Head().pos, realizedCreature.bodyChunks[num3].pos) * 4f), realizedCreature.bodyChunks[num3], null, DamageType.Bite, 1.2f, 30f);
-                                break;
-                            }
-                            realizedCreature.Violence(Head(), new Vector2?(Custom.DirVec(Head().pos, realizedCreature.bodyChunks[num3].pos) * 4f), realizedCreature.bodyChunks[num3], null, DamageType.Bite, 1.2f, 20f);
-                            break;
-                        }
-                        else
-                        {
-                            num3++;
-                        }
-                    }
-                    if (realizedCreature is DaddyLongLegs)
-                    {
-                        for (int i = 0; i < (realizedCreature as DaddyLongLegs).tentacles.Length; i++)
-                        {
-                            for (int j = 0; j < (realizedCreature as DaddyLongLegs).tentacles[i].tChunks.Length; j++)
-                            {
-                                if (Custom.DistLess(Head().pos + a * 20f, (realizedCreature as DaddyLongLegs).tentacles[i].tChunks[j].pos, 20f))
-                                {
-                                    (realizedCreature as DaddyLongLegs).tentacles[i].stun = UnityEngine.Random.Range(10, 70);
-                                    for (int k = j; k < (realizedCreature as DaddyLongLegs).tentacles[i].tChunks.Length; k++)
-                                    {
-                                        (realizedCreature as DaddyLongLegs).tentacles[i].tChunks[k].vel += Custom.DirVec((realizedCreature as DaddyLongLegs).tentacles[i].tChunks[k].pos, (realizedCreature as DaddyLongLegs).tentacles[i].connectedChunk.pos) * Mathf.Lerp(10f, 50f, UnityEngine.Random.value);
-                                    }
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                num2++;
-            }
-            if (num == 0)
-            {
-                room.PlaySound(SoundID.Miros_Beak_Snap_Miss, Head());
-                return;
-            }
-            if (num == 1)
-            {
-                room.PlaySound(SoundID.Miros_Beak_Snap_Hit_Slugcat, Head());
-                return;
-            }
-            room.PlaySound(SoundID.Miros_Beak_Snap_Hit_Other, Head());
-        }
-
-        public bool isLaserActive()
-        {
-            return !dead && laserCounter > 0 && grasps[0] == null;
-        }
-
         private void FireLaser()
         {
             if (laserCounter <= 0 && !dead && MostlyConsious && graphicsModule != null && !(graphicsModule as AlcedoGraphics).shadowMode)
@@ -1899,59 +1677,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     LaserLight.HardSetAlpha(1f);
                     LaserLight.HardSetRad(200f);
                 }
-            }
-        }
-
-        public void LaserExplosion()
-        {
-            if (room == null)
-            {
-                return;
-            }
-            Vector2 pos = Head().pos;
-            Vector2 a = Custom.DirVec(neck.Tip.pos, pos);
-            a *= -1f;
-            Vector2 corner = Custom.RectCollision(pos, pos - a * 100000f, room.RoomRect.Grow(200f)).GetCorner(FloatRect.CornerLabel.D);
-            IntVector2? intVector = SharedPhysics.RayTraceTilesForTerrainReturnFirstSolid(room, pos, corner);
-            if (intVector != null)
-            {
-                Color color = new Color(1f, 0.4f, 0.3f);
-                corner = Custom.RectCollision(corner, pos, room.TileRect(intVector.Value)).GetCorner(FloatRect.CornerLabel.D);
-                room.AddObject(new Explosion(room, this, corner, 7, 250f, 6.2f, 2f, 280f, 0.25f, this, 0.3f, 160f, 1f));
-                room.AddObject(new Explosion.ExplosionLight(corner, 280f, 1f, 7, color));
-                room.AddObject(new Explosion.ExplosionLight(corner, 230f, 1f, 3, new Color(1f, 1f, 1f)));
-                room.AddObject(new ShockWave(corner, 330f, 0.045f, 5, false));
-                for (int i = 0; i < 25; i++)
-                {
-                    Vector2 a2 = Custom.RNV();
-                    if (room.GetTile(corner + a2 * 20f).Solid)
-                    {
-                        if (!room.GetTile(corner - a2 * 20f).Solid)
-                        {
-                            a2 *= -1f;
-                        }
-                        else
-                        {
-                            a2 = Custom.RNV();
-                        }
-                    }
-                    for (int j = 0; j < 3; j++)
-                    {
-                        room.AddObject(new Spark(corner + a2 * Mathf.Lerp(30f, 60f, UnityEngine.Random.value), a2 * Mathf.Lerp(7f, 38f, UnityEngine.Random.value) + Custom.RNV() * 20f * UnityEngine.Random.value, Color.Lerp(color, new Color(1f, 1f, 1f), UnityEngine.Random.value), null, 11, 28));
-                    }
-                    room.AddObject(new Explosion.FlashingSmoke(corner + a2 * 40f * UnityEngine.Random.value, a2 * Mathf.Lerp(4f, 20f, Mathf.Pow(UnityEngine.Random.value, 2f)), 1f + 0.05f * UnityEngine.Random.value, new Color(1f, 1f, 1f), color, UnityEngine.Random.Range(3, 11)));
-                }
-                for (int k = 0; k < 6; k++)
-                {
-                    room.AddObject(new ScavengerBomb.BombFragment(corner, Custom.DegToVec((k + UnityEngine.Random.value) / 6f * 360f) * Mathf.Lerp(18f, 38f, UnityEngine.Random.value)));
-                }
-                room.ScreenMovement(new Vector2?(corner), default, 0.9f);
-                for (int l = 0; l < abstractPhysicalObject.stuckObjects.Count; l++)
-                {
-                    abstractPhysicalObject.stuckObjects[l].Deactivate();
-                }
-                room.PlaySound(SoundID.Bomb_Explode, corner);
-                room.InGameNoise(new InGameNoise(corner, 9000f, this, 1f));
             }
         }
 

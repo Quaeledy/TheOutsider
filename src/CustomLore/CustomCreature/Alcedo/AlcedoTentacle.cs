@@ -291,12 +291,12 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                                 float num = Vector2.Distance(tChunks[m].pos, tChunks[l].pos);
                                 float num2 = 10f;
                                 if (num < num2)
-                                {
-                                    if (m == halfWingIndex)
+                                {/*
+                                    if (m != halfWingIndex)
                                     {
                                         tChunks[m].pos -= vector * (num2 - num) * 1f;
                                         tChunks[m].vel -= vector * (num2 - num) * 1f;
-                                    }
+                                    }*/
                                     tChunks[m].pos -= vector * (num2 - num) * 0.5f;
                                     tChunks[m].vel -= vector * (num2 - num) * 0.5f;
                                     tChunks[l].pos += vector * (num2 - num) * 0.5f;
@@ -339,6 +339,8 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                                 connectedChunk.vel += a * (num2 - num) * 0.11f;
                                 otherTentacleChunk.pos += a * (num2 - num) * 0.09f;//设置this.otherTentacleChunk是为了让身体平衡
                                 otherTentacleChunk.vel += a * (num2 - num) * 0.09f;
+                                tChunks[halfWingIndex].pos -= a * (num2 - num) * 0.2f;
+                                tChunks[halfWingIndex].vel -= a * (num2 - num) * 0.2f;
                                 /*
                                 for (int i = 0; i < this.alcedo.legs.Length; i++)
                                 {

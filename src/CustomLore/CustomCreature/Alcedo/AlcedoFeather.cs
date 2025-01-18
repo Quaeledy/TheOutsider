@@ -244,10 +244,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     forcedAlpha,
                     Mathf.Lerp(0.4f, 0.8f, Mathf.Cos(Mathf.Pow(wingPosition, 1.7f) * 3.1415927f))
                 }) * (extendedFac + wing.flyingMode) * 0.5f * (1f - brokenColor);
-                if (kGraphics.alcedo.isLaserActive())
-                {
-                    rgb.a = UnityEngine.Random.value;
-                }
                 return rgb;
             }
             HSLColor colorB = kGraphics.ColorB;

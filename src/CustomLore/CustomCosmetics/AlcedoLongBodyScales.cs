@@ -80,15 +80,16 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             for (int num = startSprite + scalesPositions.Length - 1; num >= startSprite; num--)
             {
                 AlcedoGraphics.AlcedoSpineData backPos = GetBackPos(num - startSprite, timeStacker, changeDepthRotation: true);
+                float rotation = Custom.AimFromOneVectorToAnother(backPos.outerPos, Vector2.Lerp(scaleObjects[num - startSprite].lastPos, scaleObjects[num - startSprite].pos, timeStacker));
                 sLeaser.sprites[num].x = backPos.outerPos.x - camPos.x;
                 sLeaser.sprites[num].y = backPos.outerPos.y - camPos.y;
-                sLeaser.sprites[num].rotation = Custom.AimFromOneVectorToAnother(backPos.outerPos, Vector2.Lerp(scaleObjects[num - startSprite].lastPos, scaleObjects[num - startSprite].pos, timeStacker));
+                sLeaser.sprites[num].rotation = rotation;
                 sLeaser.sprites[num].scaleX = scaleObjects[num - startSprite].width * Mathf.Sign(backPos.depthRotation);
                 if (colored > 0f)
                 {
                     sLeaser.sprites[num + scalesPositions.Length].x = backPos.outerPos.x - camPos.x;
                     sLeaser.sprites[num + scalesPositions.Length].y = backPos.outerPos.y - camPos.y;
-                    sLeaser.sprites[num + scalesPositions.Length].rotation = Custom.AimFromOneVectorToAnother(backPos.outerPos, Vector2.Lerp(scaleObjects[num - startSprite].lastPos, scaleObjects[num - startSprite].pos, timeStacker));
+                    sLeaser.sprites[num + scalesPositions.Length].rotation = rotation;
                     sLeaser.sprites[num + scalesPositions.Length].scaleX = scaleObjects[num - startSprite].width * Mathf.Sign(backPos.depthRotation); 
                     sLeaser.sprites[num + scalesPositions.Length].color = base.CurrentScaleColor(num - startSprite, this.ScalesPos(num - startSprite));
                 }

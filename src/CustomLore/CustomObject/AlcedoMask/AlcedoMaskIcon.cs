@@ -15,7 +15,7 @@ namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
 
         public override Color SpriteColor(int data)
         {
-            return new Color(210f / 255f, 202f / 255f, 108f / 255f);
+            return new Color(169f / 255f, 164f / 255f, 178f / 255f);
             //return RWCustom.Custom.HSL2RGB(data / 1000f, 0.65f, 0.4f);
         }
 

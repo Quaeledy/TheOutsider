@@ -98,7 +98,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             }
         }
 
-        public Color CurrentScaleColor(int i, float scalePosition)
+        public Color CurrentScaleColor(float i, float scalePosition)
         {
             if (this.saturationBonus == null)
                 this.saturationBonus = new float[scalesCount];
@@ -114,7 +114,9 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                 colorA.saturation = 0.8f;
                 colorA.lightness = 0.6f;
             }
-            Color rgb2 = HSLColor.Lerp(new HSLColor(colorB.hue, Mathf.Lerp(colorB.saturation, 1f, this.saturationBonus[i]), Mathf.Lerp(colorB.lightness, 1f, this.lightnessBonus[i])),
+            float s = Mathf.Lerp(this.saturationBonus[Mathf.FloorToInt(i)], this.saturationBonus[Mathf.CeilToInt(i)], i - Mathf.FloorToInt(i));
+            float l = Mathf.Lerp(this.lightnessBonus[Mathf.FloorToInt(i)], this.lightnessBonus[Mathf.CeilToInt(i)], i - Mathf.FloorToInt(i));
+            Color rgb2 = HSLColor.Lerp(new HSLColor(colorB.hue, Mathf.Lerp(colorB.saturation, 1f, s), Mathf.Lerp(colorB.lightness, 1f, l)),
                                        colorA,
                                        Mathf.Cos(Mathf.Pow(scalePosition, 0.75f) * 3.1415927f)).rgb;
             rgb2.a = Mathf.Max(this.forcedAlpha,
