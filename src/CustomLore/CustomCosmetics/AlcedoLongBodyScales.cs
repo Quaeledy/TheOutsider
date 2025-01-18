@@ -34,9 +34,10 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             {
                 AlcedoGraphics.AlcedoSpineData backPos = GetBackPos(i, 1f, changeDepthRotation: true);
                 Vector2 a = Vector2.Lerp(backPos.dir, Custom.DirVec(backPos.pos, backPos.outerPos), Mathf.Abs(backPos.depthRotation));
+                float neckToHeadAngle = Custom.AimFromOneVectorToAnother(aGraphics.alcedo.neck.tChunks[aGraphics.alcedo.neck.tChunks.Length - 1].pos, aGraphics.alcedo.bodyChunks[4].pos);
                 if (scalesPositions[i].y < 0.2f)
                 {
-                    a -= Custom.DegToVec(aGraphics.HeadRotation(1f)) * Mathf.Pow(Mathf.InverseLerp(0.2f, 0f, scalesPositions[i].y), 2f) * 2f;
+                    a -= Custom.DegToVec(aGraphics.HeadRotation(1f) - 90f * (neckToHeadAngle > 0f ? -1f : 1f)) * Mathf.Pow(Mathf.InverseLerp(0.2f, 0f, scalesPositions[i].y), 2f) * 2f;
                 }
                 a = Vector2.Lerp(a, backPos.dir, Mathf.Pow(backwardsFactors[i], Mathf.Lerp(1f, 15f, aGraphics.showDominance))).normalized;
                 Vector2 vector = backPos.outerPos + a * scaleObjects[i].length;

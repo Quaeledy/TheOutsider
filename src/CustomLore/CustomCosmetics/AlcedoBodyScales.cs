@@ -14,7 +14,9 @@ namespace TheOutsider.CustomLore.CustomCosmetics
         public AlcedoBodyScales(AlcedoGraphics aGraphics, int startSprite)
             : base(aGraphics, startSprite)
         {
-            spritesOverlap = ((this is AlcedoLongHeadScales) ? SpritesOverlap.InFront : SpritesOverlap.BehindHead);
+            scaleX = 1f;
+            spritesOverlap = SpritesOverlap.InFront;
+            //spritesOverlap = ((this is AlcedoLongHeadScales) ? SpritesOverlap.InFront : SpritesOverlap.BehindHead);
         }
 
         protected void GeneratePatchPattern(float startPoint, int numOfScales, float maxLength, float lengthExponent)

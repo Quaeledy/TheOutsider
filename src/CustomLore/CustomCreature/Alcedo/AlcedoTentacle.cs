@@ -97,7 +97,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             float num3 = Mathf.Lerp(0.85f, 0.6f, flyingMode);
 
             float num4 = Mathf.Lerp(5.5f, 4.5f, flyingMode);
-            float num5 = Mathf.Lerp(1.5f, 1.45f, flyingMode);//float num5 = Mathf.Lerp(0.5f, 0.45f, this.flyingMode);
+            float num5 = Mathf.Lerp(1.5f, 2f, flyingMode);//float num5 = Mathf.Lerp(0.5f, 0.45f, this.flyingMode);
             float num6 = Mathf.Lerp(0.85f, 0.7f, flyingMode);
             float num7 = num6 + (1f - num6) * Mathf.Cos(Mathf.InverseLerp(num2, 1.2f, x) * 3.1415927f * 0.5f);
 

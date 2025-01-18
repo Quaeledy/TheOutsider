@@ -24,18 +24,19 @@ namespace TheOutsider.CustomLore.CustomCosmetics
         public AlcedoSpineSpikes(AlcedoGraphics aGraphics, int startSprite)
             : base(aGraphics, startSprite)
         {
-            spritesOverlap = SpritesOverlap.BehindHead;
+            spritesOverlap = SpritesOverlap.Behind;
+            //spritesOverlap = SpritesOverlap.BehindHead;
             float num = Mathf.Lerp(5f, 8f, Mathf.Pow(UnityEngine.Random.value, 0.7f));
-            spineLength = Mathf.Lerp(0.5f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
+            spineLength = Mathf.Lerp(0.75f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
             //spineLength = Mathf.Lerp(0.2f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
-            sizeRangeMin = Mathf.Lerp(0.4f, 0.6f, Mathf.Pow(UnityEngine.Random.value, 2f));
-            sizeRangeMax = Mathf.Lerp(sizeRangeMin, 1.1f, UnityEngine.Random.value);/*
+            sizeRangeMin = Mathf.Lerp(0.25f, 0.4f, Mathf.Pow(UnityEngine.Random.value, 2f));
+            sizeRangeMax = Mathf.Lerp(sizeRangeMin + 0.2f, 0.9f, UnityEngine.Random.value);/*
             sizeRangeMin = Mathf.Lerp(0.1f, 0.5f, Mathf.Pow(UnityEngine.Random.value, 2f));
-            sizeRangeMax = Mathf.Lerp(sizeRangeMin, 1.1f, UnityEngine.Random.value);*/
+            sizeRangeMax = Mathf.Lerp(sizeRangeMin, 1.1f, UnityEngine.Random.value);*//*
             if (UnityEngine.Random.value < 0.5f)
             {
                 sizeRangeMax = 1f;
-            }/*
+            }
             if (aGraphics.alcedo.Template.type == CreatureTemplate.Type.BlueAlcedo)
             {
                 sizeRangeMin = Mathf.Min(sizeRangeMin, 0.3f);
@@ -51,7 +52,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                 sizeRangeMin = Mathf.Lerp(sizeRangeMin, 1.1f, 0.1f);
                 sizeRangeMax = Mathf.Lerp(sizeRangeMax, 1.1f, 0.4f);
             }*/
-            sizeSkewExponent = Mathf.Lerp(0.1f, 0.9f, UnityEngine.Random.value);
+            sizeSkewExponent = Mathf.Lerp(0.5f, 0.9f, UnityEngine.Random.value);//Mathf.Lerp(0.1f, 0.9f, UnityEngine.Random.value);
             bumps = (int)(spineLength / num);
             scaleX = 1f;/*
             graphic = UnityEngine.Random.Range(0, 5);
@@ -131,7 +132,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             {
                 float num2 = Mathf.InverseLerp(startSprite, startSprite + bumps - 1, num);
                 AlcedoGraphics.AlcedoSpineData alcedoSpineData = aGraphics.SpinePosition(Mathf.Lerp(0.05f, spineLength / aGraphics.SpineLength, num2), timeStacker);
-                Vector2 natureDir = Vector2.Lerp(alcedoSpineData.perp * alcedoSpineData.depthRotation, alcedoSpineData.dir, 0.3f).normalized;
+                Vector2 natureDir = Vector2.Lerp(alcedoSpineData.perp * alcedoSpineData.depthRotation, alcedoSpineData.dir, 0.3f + 0.5f * (float)(num - startSprite) / (float)bumps).normalized;
                 float rotation = Custom.VecToDeg(natureDir);
                 //float rotation = Custom.VecToDeg(Vector2.Lerp(natureDir, -alcedoSpineData.vel.normalized, Mathf.Clamp(alcedoSpineData.vel.magnitude / 7f + 0.1f, 0.1f, 0.9f))) - 90f;
                 sLeaser.sprites[num].x = alcedoSpineData.outerPos.x - camPos.x;
