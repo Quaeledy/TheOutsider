@@ -10,11 +10,11 @@ namespace TheOutsider.CustomLore.CustomCosmetics
         public int bumps;
 
         public float spineLength;
+        public float spineStartLength;
 
         public float sizeSkewExponent;
-
+        public float sizeStartFac;
         public float sizeRangeMin;
-
         public float sizeRangeMax;
 
         public int graphic;
@@ -26,8 +26,9 @@ namespace TheOutsider.CustomLore.CustomCosmetics
         {
             spritesOverlap = SpritesOverlap.Behind;
             //spritesOverlap = SpritesOverlap.BehindHead;
-            float num = Mathf.Lerp(5f, 8f, Mathf.Pow(UnityEngine.Random.value, 0.7f));
-            spineLength = Mathf.Lerp(0.75f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
+            float scaleDist = Mathf.Lerp(5f, 8f, Mathf.Pow(UnityEngine.Random.value, 0.7f));
+            spineStartLength = aGraphics.NeckLength;
+            spineLength = Mathf.Lerp(0.75f, 0.95f, UnityEngine.Random.value) * (aGraphics.BodyLength + aGraphics.TailLength);
             //spineLength = Mathf.Lerp(0.2f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
             sizeRangeMin = Mathf.Lerp(0.25f, 0.4f, Mathf.Pow(UnityEngine.Random.value, 2f));
             sizeRangeMax = Mathf.Lerp(sizeRangeMin + 0.2f, 0.9f, UnityEngine.Random.value);/*
@@ -52,8 +53,9 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                 sizeRangeMin = Mathf.Lerp(sizeRangeMin, 1.1f, 0.1f);
                 sizeRangeMax = Mathf.Lerp(sizeRangeMax, 1.1f, 0.4f);
             }*/
-            sizeSkewExponent = Mathf.Lerp(0.5f, 0.9f, UnityEngine.Random.value);//Mathf.Lerp(0.1f, 0.9f, UnityEngine.Random.value);
-            bumps = (int)(spineLength / num);
+            sizeSkewExponent = Mathf.Lerp(0.1f, 0.9f, UnityEngine.Random.value);//Mathf.Lerp(0.1f, 0.9f, UnityEngine.Random.value);
+            sizeStartFac = Mathf.Lerp(0.3f, 0.5f, UnityEngine.Random.value);
+            bumps = (int)(spineLength / scaleDist);
             scaleX = 1f;/*
             graphic = UnityEngine.Random.Range(0, 5);
             if (graphic == 1)
@@ -131,14 +133,17 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             for (int num = startSprite + bumps - 1; num >= startSprite; num--)
             {
                 float num2 = Mathf.InverseLerp(startSprite, startSprite + bumps - 1, num);
-                AlcedoGraphics.AlcedoSpineData alcedoSpineData = aGraphics.SpinePosition(Mathf.Lerp(0.05f, spineLength / aGraphics.SpineLength, num2), timeStacker);
-                Vector2 natureDir = Vector2.Lerp(alcedoSpineData.perp * alcedoSpineData.depthRotation, alcedoSpineData.dir, 0.3f + 0.5f * (float)(num - startSprite) / (float)bumps).normalized;
+                AlcedoGraphics.AlcedoSpineData alcedoSpineData = aGraphics.SpinePosition(spineStartLength / aGraphics.SpineLength + Mathf.Lerp(0.05f, spineLength / aGraphics.SpineLength, num2), timeStacker);
+                //AlcedoGraphics.AlcedoSpineData alcedoSpineData = aGraphics.SpinePosition(Mathf.Lerp(0.05f, spineLength / aGraphics.SpineLength, num2), timeStacker);
+                float dirFac = 0.3f + 0.5f * num2;
+                //float dirFac = 0.3f + 0.5f * Mathf.Max(Mathf.Pow(1f - num2, 3f), num2);
+                Vector2 natureDir = Vector2.Lerp(alcedoSpineData.perp * alcedoSpineData.depthRotation, alcedoSpineData.dir, dirFac).normalized;
                 float rotation = Custom.VecToDeg(natureDir);
                 //float rotation = Custom.VecToDeg(Vector2.Lerp(natureDir, -alcedoSpineData.vel.normalized, Mathf.Clamp(alcedoSpineData.vel.magnitude / 7f + 0.1f, 0.1f, 0.9f))) - 90f;
                 sLeaser.sprites[num].x = alcedoSpineData.outerPos.x - camPos.x;
                 sLeaser.sprites[num].y = alcedoSpineData.outerPos.y - camPos.y;
                 sLeaser.sprites[num].rotation = rotation;//Custom.AimFromOneVectorToAnother(-alcedoSpineData.perp * alcedoSpineData.depthRotation, alcedoSpineData.perp * alcedoSpineData.depthRotation);
-                float sizeFac = Mathf.Lerp(sizeRangeMin, sizeRangeMax, Mathf.Sin(Mathf.Pow(num2, sizeSkewExponent) * (float)Math.PI));
+                float sizeFac = Mathf.Lerp(sizeRangeMin, sizeRangeMax, Mathf.Sin(Mathf.Pow(num2, sizeSkewExponent) * (float)Math.PI * sizeStartFac + (float)Math.PI * (1f - sizeStartFac)));
                 sLeaser.sprites[num].scaleX = Mathf.Lerp(sLeaser.sprites[num].scaleX, 0.7f * Mathf.Sign(alcedoSpineData.depthRotation) * scaleX * sizeFac, 0.2f);
                 sLeaser.sprites[num].scaleY = Mathf.Lerp(sLeaser.sprites[num].scaleY, sizeFac * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(alcedoSpineData.depthRotation))), 0.2f);
                 //sLeaser.sprites[num].scaleX = Mathf.Sign(aGraphics.depthRotation) * scaleX * sizeFac;

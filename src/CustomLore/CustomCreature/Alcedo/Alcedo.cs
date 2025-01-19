@@ -426,6 +426,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 Carry();
             }
+            return;
             if (Consious)
             {
                 Act(eu);
