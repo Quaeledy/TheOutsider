@@ -1,10 +1,4 @@
-﻿using Fisobs.Core;
-using UnityEngine;
-using Fisobs.Items;
-using Fisobs.Properties;
-using Fisobs.Sandbox;
-using System;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
 {

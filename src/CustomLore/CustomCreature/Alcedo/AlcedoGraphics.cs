@@ -1,9 +1,9 @@
-﻿using RWCustom;
+﻿using MoreSlugcats;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using TheOutsider.CustomLore.CustomCosmetics;
 using UnityEngine;
-using MoreSlugcats;
 
 namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 {
@@ -47,8 +47,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         private Vector2 tailDirection;
         public int featherLayersPerWing;
         public int feathersPerLayer;
-        public GenericBodyPart[] tusks;
-        public float[] tuskRotations;
         public int headGraphic;
         public int changeHeadGraphicCounter;
         public Vector2[,] shells;
@@ -59,14 +57,10 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         public bool shadowMode;
         public bool spritesInShadowMode;
         public RoomPalette palette;
-        public Vector2[,,] neckTubes;
         public bool albino;
         public float darkness;
         private List<WingColorWave> colorWaves;
         private SharedPhysics.TerrainCollisionData scratchTerrainCollisionData;
-        private Vector2[] _cachedTusk1;
-        private Vector2[] _cachedTusk2;
-        private Vector2[] _cachedTuskConPos;
         public float headFlip;
         public float lastHeadFlip;
         public float eyeSize;
@@ -75,17 +69,13 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         public Color laserColor;
         public Color lastLaserColor;
         public ChunkDynamicSoundLoop soundLoop;
-        private float laserActive;
-        private float lastLaserActive;
-        public float flash;
-        public float lastFlash;
         public float depthRotation;
         public float lastDepthRotation;
         public float headDepthRotation;
         public float lastHeadDepthRotation;
         public int extraSprites;
-        public List<AlcedoScaleTemplate> cosmetics; 
-        public AlcedoLimb[] limbs; 
+        public List<AlcedoScaleTemplate> cosmetics;
+        public AlcedoLimb[] limbs;
         public int legsGrabbing;
         public int frontLegsGrabbing;
         public int hindLegsGrabbing;
@@ -115,17 +105,26 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         }
         public BodyChunk head => alcedo.bodyChunks[4];
 
-        public float SpineLength => NeckLength + BodyLength + TailLength;
-        public float NeckLength => alcedo.neck.idealLength + 10f;
-        public float BodyLength
+        public float SpineLength => NeckLength + ForeBodyLength + WaistLength + HindBodyLength + TailLength;
+        public float BodyLength => WaistLength;// ForeBodyLength + WaistLength + HindBodyLength;
+        public float NeckLength => alcedo.neck.idealLength;
+        public float ForeBodyLength
         {
             get
             {
-                float bodyLength = (alcedo.bodyChunkConnections[8].distance + alcedo.bodyChunkConnections[10].distance) * 0.5f + 
-                    (alcedo.bodyChunks[0].rad + alcedo.bodyChunks[1].rad + alcedo.bodyChunks[5].rad + alcedo.bodyChunks[6].rad) * 0.5f;
+                float bodyLength = 2f * (alcedo.bodyChunks[0].rad + alcedo.bodyChunks[1].rad) * 0.5f; ;
                 return bodyLength;
             }
         }
+        public float HindBodyLength
+        {
+            get
+            {
+                float bodyLength = 2f * (alcedo.bodyChunks[5].rad + alcedo.bodyChunks[6].rad) * 0.5f; ;
+                return bodyLength;
+            }
+        }
+        public float WaistLength => alcedo.waist.idealLength;
         public float TailLength
         {
             get
@@ -165,7 +164,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         public int HeadSprite => NeckSprite + 1;
 
-        private int EyesSprite => HeadSprite + 3;
+        private int EyesSprite => HeadSprite + 1;
 
         private int MaskSprite => EyesSprite + 1;
 
@@ -216,11 +215,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         {
             return BodySpriteStart + i;
         }
-
-        private int TuskSprite(int i)
-        {
-            return HeadSprite + 1 + i;
-        }
         #endregion
 
         public void MakeColorWave(int delay)
@@ -239,17 +233,14 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 this.limbs[i] = new AlcedoLimb(this, base.owner.bodyChunks[connectChunk], i, 2.5f, 0.7f, 0.99f, this.alcedo.limbSpeed, this.alcedo.limbQuickness, (i % 2 == 1) ? this.limbs[i - 1] : null);
                 //list.Add(this.limbs[i]);
             }
-            _cachedTusk1 = new Vector2[4];
-            _cachedTusk2 = new Vector2[4];
-            _cachedTuskConPos = new Vector2[4];
             cullRange = 1400f;
             UnityEngine.Random.State state = UnityEngine.Random.state;
             UnityEngine.Random.InitState(alcedo.abstractCreature.ID.RandomSeed);
-            ColorA = new HSLColor(Mathf.Lerp(120f / 360f, 170f / 360f, Mathf.Lerp(UnityEngine.Random.value, 1f, this.alcedo.bodySizeFac - 0.5f)), 
-                Mathf.Lerp(0.5f, 0.7f, UnityEngine.Random.value), 
+            ColorA = new HSLColor(Mathf.Lerp(120f / 360f, 170f / 360f, Mathf.Lerp(UnityEngine.Random.value, 1f, this.alcedo.bodySizeFac - 0.5f)),
+                Mathf.Lerp(0.5f, 0.7f, UnityEngine.Random.value),
                 Mathf.Lerp(0.7f, 0.8f, UnityEngine.Random.value));
-            ColorB = new HSLColor(ColorA.hue + Mathf.Lerp(Mathf.Lerp(-0.05f, 0.25f, UnityEngine.Random.value), 0.25f, this.alcedo.bodySizeFac - 0.5f), 
-                Mathf.Lerp(0.8f, 1f, 1f - UnityEngine.Random.value * UnityEngine.Random.value), 
+            ColorB = new HSLColor(ColorA.hue + Mathf.Lerp(Mathf.Lerp(-0.05f, 0.25f, UnityEngine.Random.value), 0.25f, this.alcedo.bodySizeFac - 0.5f),
+                Mathf.Lerp(0.8f, 1f, 1f - UnityEngine.Random.value * UnityEngine.Random.value),
                 Mathf.Lerp(0.45f, 1f, UnityEngine.Random.value * UnityEngine.Random.value));
             //ColorA = new HSLColor(Mathf.Lerp(120f / 360f, 170f / 360f, UnityEngine.Random.value), Mathf.Lerp(0.5f, 0.7f, UnityEngine.Random.value), Mathf.Lerp(0.7f, 0.8f, UnityEngine.Random.value));
             //ColorB = new HSLColor(ColorA.hue + Mathf.Lerp(-0.25f, 0.25f, UnityEngine.Random.value), Mathf.Lerp(0.8f, 1f, 1f - UnityEngine.Random.value * UnityEngine.Random.value), Mathf.Lerp(0.45f, 1f, UnityEngine.Random.value * UnityEngine.Random.value));
@@ -295,7 +286,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                         Mathf.Lerp(5f, 8f, AlcedoFeather.FeatherWidth(num5)), AlcedoFeather.Type.FlightFeather);
                     //覆羽
                     wings[j, 1, k] = new AlcedoFeather(this, alcedo.tentacles[j], value + 0.05f * UnityEngine.Random.value,
-                        alcedo.bodySizeFac * 1.5f * AlcedoFeather.FeatherContour(num5, 0f) * Mathf.Pow(Mathf.Lerp(1f, 0.25f, (float)(k + 0.5f)/(float)feathersPerLayer), 0.2f) * Mathf.Lerp(35f, 40f, UnityEngine.Random.value),
+                        alcedo.bodySizeFac * 1.5f * AlcedoFeather.FeatherContour(num5, 0f) * Mathf.Pow(Mathf.Lerp(1f, 0.25f, (float)(k + 0.5f) / (float)feathersPerLayer), 0.2f) * Mathf.Lerp(35f, 40f, UnityEngine.Random.value),
                         alcedo.bodySizeFac * 1.5f * AlcedoFeather.FeatherContour(num5, 1f) * Mathf.Pow(Mathf.Lerp(1f, 0.25f, (float)(k + 0.5f) / (float)feathersPerLayer), 0.2f) * Mathf.Lerp(40f, 45f, UnityEngine.Random.value) * (IsKing ? 1.3f : 1f),
                         Mathf.Lerp(5f, 8f, AlcedoFeather.FeatherWidth(num5)), AlcedoFeather.Type.Covert);
                     wings[j, 2, k] = new AlcedoFeather(this, alcedo.tentacles[j], value + 0.05f * UnityEngine.Random.value,
@@ -375,16 +366,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 albino = false;
             }
             UnityEngine.Random.state = state;
-            if (!IsMiros)
-            {
-                tusks = new GenericBodyPart[2];
-                tuskRotations = new float[2];
-                for (int n = 0; n < 2; n++)
-                {
-                    tusks[n] = new GenericBodyPart(this, 2f, 0.5f, 0.95f, alcedo.bodyChunks[4]);
-                    tuskRotations[n] = 0f;
-                }
-            }
             shells = new Vector2[4, 3];
             for (int num9 = 0; num9 < 4; num9++)
             {
@@ -403,10 +384,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 bodyParts[appendages[0].Length + num11] = appendages[1][num11];
             }*/
-            if (IsKing)
-            {
-                neckTubes = new Vector2[2, 15, 3];
-            }
             //尾巴
             tailSegments = 16;//16
             tailLength = 8f;//160f
@@ -433,13 +410,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         public override void Reset()
         {
-            if (!IsMiros)
-            {
-                for (int i = 0; i < 2; i++)
-                {
-                    tusks[i].Reset(alcedo.bodyChunks[4].pos);
-                }
-            }
             for (int j = 0; j < 4; j++)
             {
                 shells[j, 0] = alcedo.mainBodyChunk.pos;
@@ -457,18 +427,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             for (int j = 0; j < tail.Length; j++)
             {
                 tail[j].Reset(owner.bodyChunks[1].pos);
-            }
-            if (neckTubes != null)
-            {
-                for (int num = 0; num < neckTubes.GetLength(0); num++)
-                {
-                    for (int num2 = 0; num2 < neckTubes.GetLength(1); num2++)
-                    {
-                        neckTubes[num, num2, 0] = alcedo.mainBodyChunk.pos + Custom.RNV() * UnityEngine.Random.value;
-                        neckTubes[num, num2, 1] = neckTubes[num, num2, 0];
-                        neckTubes[num, num2, 2] *= 0f;
-                    }
-                }
             }
             for (int l = 0; l < cosmetics.Count; l++)
             {
@@ -631,39 +589,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 changeHeadGraphicCounter = 0;
             }
-            if (!IsMiros)
-            {
-                if (alcedo.TusksStuck > 0.5f)
-                {
-                    tuskRotations[0] = Mathf.Lerp(tuskRotations[0], 0f, 0.05f);
-                    tuskRotations[1] = Mathf.Lerp(tuskRotations[1], 0f, 0.05f);
-                }
-                else if (Mathf.Abs(num3) < 30f || Mathf.Abs(num3) > 150f)
-                {
-                    tuskRotations[0] = Mathf.Lerp(tuskRotations[0], 1f, 0.1f);
-                    tuskRotations[1] = Mathf.Lerp(tuskRotations[1], -1f, 0.1f);
-                }
-                else if (Mathf.Abs(num3) > 60f && Mathf.Abs(num3) < 120f)
-                {
-                    tuskRotations[0] = Mathf.Lerp(tuskRotations[0], 2f * Mathf.Sign(num3), 0.1f);
-                    tuskRotations[1] = Mathf.Lerp(tuskRotations[1], 2f * Mathf.Sign(num3), 0.1f);
-                }
-                else
-                {
-                    tuskRotations[!(num3 < 0f) ? 1u : 0u] = Mathf.Lerp(tuskRotations[!(num3 < 0f) ? 1u : 0u], 1f * Mathf.Sign(num3), 0.1f);
-                    tuskRotations[num3 < 0f ? 1u : 0u] = Mathf.Lerp(tuskRotations[num3 < 0f ? 1u : 0u], 2f * Mathf.Sign(num3), 0.1f);
-                }
-                for (int num7 = 0; num7 < 2; num7++)
-                {
-                    tusks[num7].Update();
-                    tusks[num7].PushOutOfTerrain(alcedo.room, alcedo.bodyChunks[4].pos);
-                    tusks[num7].vel.y -= 0.6f;
-                    TuskConnectionPositions(num7, 1f, ref _cachedTusk1);
-                    tusks[num7].vel += _cachedTusk1[1] * 0.7f * (-1f + 2f * Mathf.Pow(Mathf.InverseLerp(0f, 180f, Mathf.Abs(num5)), 0.5f)) + _cachedTusk1[2] * 0.3f;
-                    tusks[num7].ConnectToPoint(_cachedTusk1[0], 20f, push: true, 0f, alcedo.bodyChunks[4].vel, 0f, 0f);
-                    tusks[num7].vel = Vector2.Lerp(tusks[num7].vel, _cachedTusk1[3] - tusks[num7].pos, alcedo.TusksStuck);
-                }
-            }
             Vector2 vector = Custom.DirVec(alcedo.bodyChunks[0].pos, alcedo.bodyChunks[1].pos);
             Vector2 vector2 = Custom.PerpendicularVector(vector);
             for (int num8 = 0; num8 < 4; num8++)
@@ -731,40 +656,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 b += alcedo.bodyChunks[num13].pos - alcedo.bodyChunks[num13].lastPos;
             }
             b /= alcedo.bodyChunks.Length;
-            if (neckTubes != null)
-            {
-                for (int num14 = 0; num14 < neckTubes.GetLength(0); num14++)
-                {
-                    TuskConnectionPositions(num14, 1f, ref _cachedTusk2);
-                    ConnectNeckTubes(num14, _cachedTusk2);
-                    Vector2 vector5 = Custom.DirVec(alcedo.bodyChunks[1].pos, Vector2.Lerp(alcedo.bodyChunks[2 + num14].pos, alcedo.bodyChunks[0].pos, 0.5f));
-                    for (int num15 = 0; num15 < neckTubes.GetLength(1); num15++)
-                    {
-                        float value = Mathf.InverseLerp(0f, neckTubes.GetLength(1) - 1, num15);
-                        neckTubes[num14, num15, 2] += vector5 * Mathf.InverseLerp(0.6f, 1f, value) * 2f;
-                        neckTubes[num14, num15, 2] -= _cachedTusk2[1] * Mathf.InverseLerp(0.25f, 0f, value) * 2f;
-                        neckTubes[num14, num15, 1] = neckTubes[num14, num15, 0];
-                        neckTubes[num14, num15, 0] += neckTubes[num14, num15, 2];
-                        neckTubes[num14, num15, 2] = Vector2.Lerp(neckTubes[num14, num15, 2], b, 0.05f);
-                        neckTubes[num14, num15, 2].y -= 0.9f;
-                        if (num15 > 1)
-                        {
-                            Vector2 vector6 = Custom.DirVec(neckTubes[num14, num15, 0], neckTubes[num14, num15 - 2, 0]);
-                            neckTubes[num14, num15, 2] -= vector6;
-                            neckTubes[num14, num15 - 2, 2] += vector6;
-                        }
-                        if (num15 > 2 && num15 < neckTubes.GetLength(1) - 3)
-                        {
-                            SharedPhysics.TerrainCollisionData cd = scratchTerrainCollisionData.Set(neckTubes[num14, num15, 0], neckTubes[num14, num15, 1], neckTubes[num14, num15, 2], 1f, new IntVector2(0, 0), goThroughFloors: true);
-                            cd = SharedPhysics.VerticalCollision(alcedo.room, cd);
-                            cd = SharedPhysics.HorizontalCollision(alcedo.room, cd);
-                            neckTubes[num14, num15, 0] = cd.pos;
-                            neckTubes[num14, num15, 2] = cd.vel;
-                        }
-                    }
-                    ConnectNeckTubes(num14, _cachedTusk2);
-                }
-            }
             if (!shadowMode && alcedo.mainBodyChunk.pos.y > alcedo.room.PixelHeight + 400f)
             {
                 shadowMode = true;
@@ -852,31 +743,10 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             #endregion
         }
 
-        private void ConnectNeckTubes(int s, Vector2[] tuskCon)
-        {
-            Vector2 vector = Vector2.Lerp(alcedo.bodyChunks[2 + s].pos, alcedo.bodyChunks[0].pos, 0.5f);
-            vector += Custom.DirVec(alcedo.bodyChunks[1].pos, vector) * 11f;
-            neckTubes[s, 0, 0] = tuskCon[0] + tuskCon[1] * 5f - tuskCon[2] * 10f;
-            neckTubes[s, 0, 2] *= 0f;
-            neckTubes[s, neckTubes.GetLength(1) - 1, 0] = vector;
-            neckTubes[s, neckTubes.GetLength(1) - 1, 2] *= 0f;
-            for (int i = 0; i < neckTubes.GetLength(1) - 1; i++)
-            {
-                Vector2 vector2 = Custom.DirVec(neckTubes[s, i, 0], neckTubes[s, i + 1, 0]) * (Vector2.Distance(neckTubes[s, i, 0], neckTubes[s, i + 1, 0]) - 5f);
-                neckTubes[s, i, 0] += vector2 / 2f;
-                neckTubes[s, i, 2] += vector2 / 2f;
-                neckTubes[s, i + 1, 0] -= vector2 / 2f;
-                neckTubes[s, i + 1, 2] -= vector2 / 2f;
-            }
-            neckTubes[s, 0, 0] = tuskCon[0] + tuskCon[1] * 5f - tuskCon[2] * 10f;
-            neckTubes[s, 0, 2] *= 0f;
-            neckTubes[s, neckTubes.GetLength(1) - 1, 0] = vector;
-            neckTubes[s, neckTubes.GetLength(1) - 1, 2] *= 0f;
-        }
-
         public void TuskConnectionPositions(int tusk, float timeStacker, ref Vector2[] resVec)
         {
-            Vector2 vector = Custom.DirVec(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker), Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker));
+            Vector2 vector = Custom.DirVec(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker), 
+                Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker));
             Vector2 vector2 = Custom.PerpendicularVector(vector);
             float num = Custom.AimFromOneVectorToAnother(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker), Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker)) - Custom.AimFromOneVectorToAnother(Vector2.Lerp(alcedo.bodyChunks[0].lastPos, alcedo.bodyChunks[0].pos, timeStacker), Vector2.Lerp(alcedo.bodyChunks[1].lastPos, alcedo.bodyChunks[1].pos, timeStacker));
             if (num > 180f)
@@ -938,12 +808,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 //后爪
                 sLeaser.sprites[HindPawSprite(i)] = new FSprite("JetFishFlipper1");
                 sLeaser.sprites[HindPawColorSprite(i)] = new FSprite("AlcedoClawColorA");
-                if (!IsMiros)
-                {
-                    sLeaser.sprites[TuskSprite(i)] = new FSprite("pixel");
-                    sLeaser.sprites[TuskSprite(i)].anchorY = 1f;
-                    sLeaser.sprites[TuskSprite(i)].isVisible = false;
-                }
                 if (i == 1)
                 {
                     sLeaser.sprites[ForePawSprite(i)].scaleX = IsKing ? -1.15f : -1f;
@@ -1071,30 +935,26 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     newContatiner = rCam.ReturnFContainer("Midground");
                 }
             }
-            sLeaser.RemoveAllSpritesFromContainer();/*
-            for (int j = 0; j < cosmetics.Count; j++)
-            {
-                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Behind || cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead)
-                {
-                    cosmetics[j].AddToContainer(sLeaser, rCam, newContatiner);
-                }
-            }*/
+            sLeaser.RemoveAllSpritesFromContainer();
             /*
             for (int j = 0; j < cosmetics.Count; j++)
             {
-                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Behind || cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead)
+                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Behind || 
+                    cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead || 
+                    cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Discretion)
                 {
                     cosmetics[j].AddToContainer(sLeaser, rCam, newContatiner);
                 }
             }*/
             for (int k = 0; k < sLeaser.sprites.Length; k++)
             {
-                //sLeaser.sprites[k].RemoveFromContainer();
                 newContatiner.AddChild(sLeaser.sprites[k]);
             }
             for (int j = 0; j < cosmetics.Count; j++)
             {
-                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Behind || cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead)
+                if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Behind ||
+                    cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead ||
+                    cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.Discretion)
                 {
                     cosmetics[j].AddToContainer(sLeaser, rCam, newContatiner);
                 }
@@ -1235,16 +1095,17 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             float lastNeckStretchedRad = 9f;// * alcedo.bodySizeFac;//(IsKing ? 11f : 8f);
             for (int j = 0; j < alcedo.neck.tChunks.Length; j++)
             {
-                Vector2 neckPos = Vector2.Lerp(alcedo.neck.tChunks[j].lastPos, alcedo.neck.tChunks[j].pos, timeStacker);
+                Vector2 neckPos = Vector2.Lerp(alcedo.neck.tChunks[j].lastPos, alcedo.neck.tChunks[j].pos, timeStacker);/*
                 if (ModManager.MMF && !IsMiros)
                 {
                     neckPos = Vector2.Lerp(neckPos, Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker), Mathf.Pow(j / (alcedo.neck.tChunks.Length - 1), 7f));
                     //neckPos = Vector2.Lerp(neckPos, Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker), Mathf.Pow(j / (alcedo.neck.tChunks.Length - 1), 7f));
-                }
+                }*/
+                /*
                 if (j == alcedo.neck.tChunks.Length - 1)
                 {
                     neckPos = headPos;//Vector2.Lerp(neckPos, headPos, 0.5f) - Custom.DegToVec(neckToHeadAngle) * (IsKing ? 1f : 5f);
-                }
+                }*/
                 Vector2 normalized = (neckPos - lastNeckPos).normalized;
                 Vector2 neckPerp = Custom.PerpendicularVector(normalized);
                 float segLength = Vector2.Distance(neckPos, lastNeckPos) / 5f;
@@ -1350,7 +1211,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                             sLeaser.sprites[FeatherColorSprite(k, l, n)].color = Color.Lerp(wings[k, l, n].CurrentColor(), palette.blackColor, ModManager.MMF && !IsMiros ? darkness : 0f);
                         }
                         //暂时隐藏了羽毛
-                        
+
                         sLeaser.sprites[FeatherSprite(k, l, n)].isVisible = false;
                         sLeaser.sprites[FeatherColorSprite(k, l, n)].isVisible = false;
                     }
@@ -1393,32 +1254,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 sLeaser.sprites[HindPawColorSprite(k)].color = sLeaser.sprites[MaskSprite].color;//Color.Lerp(wings[k, 0, 0].CurrentClawColor(), palette.blackColor, ModManager.MMF && !IsMiros ? darkness : 0f);
             }
             #endregion
-            if (!IsMiros)
-            {
-                for (int num13 = 0; num13 < 2; num13++)
-                {
-                    sLeaser.sprites[TuskSprite(num13)].scaleX = 0.8f * (tuskRotations[num13] < 0f ? 1f : -1f);
-                    sLeaser.sprites[TuskSprite(num13)].scaleY = 0.8f;
-                    int num14 = Custom.IntClamp(Mathf.RoundToInt(Mathf.Abs(tuskRotations[num13])), 0, 2);
-                    sLeaser.sprites[TuskSprite(num13)].element = Futile.atlasManager.GetElementWithName("KrakenTusk" + num14);
-                    Vector2 p3 = Vector2.Lerp(tusks[num13].lastPos, tusks[num13].pos, timeStacker);
-                    TuskConnectionPositions(num13, timeStacker, ref _cachedTuskConPos);
-                    sLeaser.sprites[TuskSprite(num13)].rotation = Custom.AimFromOneVectorToAnother(p3, _cachedTuskConPos[0]);
-                    sLeaser.sprites[TuskSprite(num13)].x = _cachedTuskConPos[0].x - camPos.x;
-                    sLeaser.sprites[TuskSprite(num13)].y = _cachedTuskConPos[0].y - camPos.y;
-                }
-            }/*
-            for (int num15 = 0; num15 < 2; num15++)
-            {
-                sLeaser.sprites[FrontShieldSprite(num15)].x = Mathf.Lerp(Mathf.Lerp(shells[num15 * 2, 2].x, shells[num15 * 2, 0].x, timeStacker), Mathf.Lerp(shells[num15 * 2 + 1, 2].x, shells[num15 * 2 + 1, 0].x, timeStacker), 0.1f) - camPos.x;
-                sLeaser.sprites[FrontShieldSprite(num15)].y = Mathf.Lerp(Mathf.Lerp(shells[num15 * 2, 2].y, shells[num15 * 2, 0].y, timeStacker), Mathf.Lerp(shells[num15 * 2 + 1, 2].y, shells[num15 * 2 + 1, 0].y, timeStacker), 0.1f) - camPos.y;
-                sLeaser.sprites[FrontShieldSprite(num15)].rotation = Custom.AimFromOneVectorToAnother(Vector2.Lerp(shells[num15 * 2 + 1, 2], shells[num15 * 2 + 1, 0], timeStacker), Vector2.Lerp(shells[num15 * 2, 2], shells[num15 * 2, 0], timeStacker));
-                sLeaser.sprites[FrontShieldSprite(num15)].scaleY = Mathf.Lerp(1f, 0.5f, Mathf.Lerp(Mathf.Lerp(shellModes[num15, 1], shellModes[num15, 0], timeStacker), alcedo.tentacles[num15].flyingMode, 0.35f)) * (IsKing ? 1.15f : 1f);
-                sLeaser.sprites[BackShieldSprite(num15)].scaleY = Mathf.Lerp(1f, 1.2f, Mathf.Lerp(Mathf.Lerp(shellModes[num15, 1], shellModes[num15, 0], timeStacker), alcedo.tentacles[num15].flyingMode, 0.35f)) * (IsKing ? 1.15f : 1f);
-                sLeaser.sprites[BackShieldSprite(num15)].x = Mathf.Lerp(Mathf.Lerp(shells[num15 * 2, 2].x, shells[num15 * 2, 0].x, timeStacker), Mathf.Lerp(shells[num15 * 2 + 1, 2].x, shells[num15 * 2 + 1, 0].x, timeStacker), 0.1f) - camPos.x;
-                sLeaser.sprites[BackShieldSprite(num15)].y = Mathf.Lerp(Mathf.Lerp(shells[num15 * 2, 2].y, shells[num15 * 2, 0].y, timeStacker), Mathf.Lerp(shells[num15 * 2 + 1, 2].y, shells[num15 * 2 + 1, 0].y, timeStacker), 0.1f) - camPos.y;
-                sLeaser.sprites[BackShieldSprite(num15)].rotation = Custom.AimFromOneVectorToAnother(Vector2.Lerp(shells[num15 * 2 + 1, 2], shells[num15 * 2 + 1, 0], timeStacker), Vector2.Lerp(shells[num15 * 2, 2], shells[num15 * 2, 0], timeStacker));
-            }*/
             UpdateSpritesLevel(sLeaser);
         }
         #endregion
@@ -1675,7 +1510,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 if (cosmetics[j].spritesOverlap == AlcedoScaleTemplate.SpritesOverlap.BehindHead)
                 {
-                    for(int i = cosmetics[j].startSprite; i < cosmetics[j].startSprite + cosmetics[j].numberOfSprites; i++)
+                    for (int i = cosmetics[j].startSprite; i < cosmetics[j].startSprite + cosmetics[j].numberOfSprites; i++)
                     {
                         if (headGraphic < 5)
                         {
@@ -1718,25 +1553,24 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 float neckToHeadAngle = Custom.AimFromOneVectorToAnother(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos,
                                                                                       alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker),
                                                                          Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker));
-                //float shouldMirror = neckToHeadAngle > 0f ? -1f : 1f;
-                lastChunkPos = Vector2.Lerp(head.lastPos, head.pos, timeStacker) + Custom.DegToVec(neckToHeadAngle);// * shouldMirror;
+                lastChunkPos = Vector2.Lerp(head.lastPos, head.pos, timeStacker) + Custom.DegToVec(neckToHeadAngle);
                 lastChunkVel = head.vel;
                 lastRad = head.rad;
-                nextChunkPos = Vector2.Lerp(head.lastPos, head.pos, timeStacker);//Vector2.Lerp(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker), Vector2.Lerp(head.lastPos, head.pos, timeStacker), 0.5f);
-                nextChunkVel = Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].vel, head.vel, 0.85f); 
-                nextNextChunkPos = Vector2.Lerp(head.lastPos, head.pos, timeStacker) - Custom.DegToVec(neckToHeadAngle);// * shouldMirror;
+                nextChunkPos = Vector2.Lerp(head.lastPos, head.pos, timeStacker);
+                nextChunkVel = Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].vel, head.vel, 0.85f);
+                nextNextChunkPos = Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker) - Custom.DegToVec(neckToHeadAngle);
                 nextRad = head.rad;
                 t = 0.5f;
             }
             else if (s < NeckLength / SpineLength)
             {
                 float inBodyRatio = Mathf.InverseLerp(0f, NeckLength / SpineLength, s);
-                int lastIndex = alcedo.neck.tChunks.Length - 0 - Mathf.FloorToInt(inBodyRatio * alcedo.neck.tChunks.Length);
-                int nextIndex = alcedo.neck.tChunks.Length - 1 - Mathf.FloorToInt(inBodyRatio * alcedo.neck.tChunks.Length);
+                int lastIndex = alcedo.neck.tChunks.Length - 1 - Mathf.FloorToInt(inBodyRatio * alcedo.neck.tChunks.Length);
+                int nextIndex = alcedo.neck.tChunks.Length - 2 - Mathf.FloorToInt(inBodyRatio * alcedo.neck.tChunks.Length);
+
                 if (lastIndex > alcedo.neck.tChunks.Length - 1)
                 {
                     lastChunkPos = Vector2.Lerp(head.lastPos, head.pos, timeStacker);
-                    //lastChunkPos = Vector2.Lerp(Vector2.Lerp(this.alcedo.neck.tChunks[this.alcedo.neck.tChunks.Length - 1].lastPos, this.alcedo.neck.tChunks[this.alcedo.neck.tChunks.Length - 1].pos, timeStacker), Vector2.Lerp(this.head.lastPos, this.head.pos, timeStacker), 0.5f);
                     lastRad = alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].rad;
                     lastChunkVel = head.vel;
                 }
@@ -1747,88 +1581,65 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     lastChunkVel = alcedo.neck.tChunks[lastIndex].vel;
                 }
 
-                if (nextIndex < 1)
+                if (nextIndex < 0)
                 {
-                    nextNextChunkPos = Vector2.Lerp(alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].lastPos, alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].pos, timeStacker);/*
-                    nextNextChunkPos = Vector2.Lerp(Vector2.Lerp(alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].lastPos, alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].pos, timeStacker),
-                        Vector2.Lerp(alcedo.neck.tChunks[0].lastPos, alcedo.neck.tChunks[0].pos, timeStacker), 0.5f);*/
+                    nextChunkPos = Vector2.Lerp(alcedo.neck.connectedChunk.lastPos, alcedo.neck.connectedChunk.pos, timeStacker);
+                    nextChunkVel = alcedo.neck.connectedChunk.vel;
+                    nextRad = alcedo.neck.connectedChunk.rad;
+
+                    float neckPosRatio = Vector2.Distance(Vector2.Lerp(alcedo.neck.tChunks[0].lastPos, alcedo.neck.tChunks[0].pos, timeStacker), Vector2.Lerp(alcedo.neck.connectedChunk.lastPos, alcedo.neck.connectedChunk.pos, timeStacker));
+                    float ratio = Mathf.InverseLerp(0f, BodyLength, neckPosRatio);
+                    nextNextChunkPos = Vector2.Lerp(Vector2.Lerp(alcedo.neck.connectedChunk.lastPos, alcedo.neck.connectedChunk.pos, timeStacker),
+                                                Vector2.Lerp(this.tail[0].lastPos, this.tail[0].pos, timeStacker),
+                                                ratio);
                 }
                 else
                 {
-                    nextNextChunkPos = Vector2.Lerp(alcedo.neck.tChunks[nextIndex - 1].lastPos, alcedo.neck.tChunks[nextIndex - 1].pos, timeStacker);
-                }
+                    nextChunkPos = Vector2.Lerp(alcedo.neck.tChunks[nextIndex].lastPos, alcedo.neck.tChunks[nextIndex].pos, timeStacker);
+                    nextChunkVel = alcedo.neck.tChunks[nextIndex].vel;
+                    nextRad = alcedo.neck.tChunks[nextIndex].rad;
 
-                nextChunkPos = Vector2.Lerp(alcedo.neck.tChunks[nextIndex].lastPos, alcedo.neck.tChunks[nextIndex].pos, timeStacker);
-                nextChunkVel = alcedo.neck.tChunks[nextIndex].vel;
-                nextRad = alcedo.neck.tChunks[nextIndex].rad;
+                    if (nextIndex < 1)
+                    {
+                        nextNextChunkPos = Vector2.Lerp(alcedo.neck.connectedChunk.lastPos, alcedo.neck.connectedChunk.pos, timeStacker);
+                    }
+                    else
+                    {
+                        nextNextChunkPos = Vector2.Lerp(alcedo.neck.tChunks[nextIndex - 1].lastPos, alcedo.neck.tChunks[nextIndex - 1].pos, timeStacker);
+                    }
+                }
                 t = Mathf.InverseLerp(lastIndex + 1, nextIndex + 1, (1f - inBodyRatio) * alcedo.neck.tChunks.Length);
             }
             else if (s < (NeckLength + BodyLength) / SpineLength)
             {
                 float inBodyRatio = Mathf.InverseLerp(NeckLength / SpineLength, (NeckLength + BodyLength) / SpineLength, s);
-                int lastIndex = Mathf.FloorToInt(inBodyRatio * alcedo.waist.tChunks.Length - 1f);
-                int nextIndex = Mathf.FloorToInt(inBodyRatio * alcedo.waist.tChunks.Length); 
 
-                if (lastIndex < 0)
-                {/*
-                    lastChunkPos = Vector2.Lerp(Vector2.Lerp(alcedo.neck.tChunks[1].lastPos, alcedo.neck.tChunks[1].pos, timeStacker),
-                        Vector2.Lerp(alcedo.neck.tChunks[0].lastPos, alcedo.neck.tChunks[0].pos, timeStacker),
-                        0.5f);*/
-                    lastChunkPos = Vector2.Lerp(alcedo.neck.tChunks[0].lastPos, alcedo.neck.tChunks[0].pos, timeStacker);
-                    lastRad = alcedo.neck.tChunks[0].rad;
-                    lastChunkVel = alcedo.neck.tChunks[0].vel;
-                }
-                else
-                {
-                    lastChunkPos = Vector2.Lerp(alcedo.waist.tChunks[lastIndex].lastPos, alcedo.waist.tChunks[lastIndex].pos, timeStacker);//lastChunkPos = Vector2.Lerp(BodyPosition(0, timeStacker), BodyPosition(1, timeStacker), 0.5f);
-                    lastRad = alcedo.waist.tChunks[lastIndex].rad;//this.BodyChunkDisplayRad((lastIndex < 2) ? 1 : 2) * this.iVars.fatness;
-                    lastChunkVel = alcedo.waist.tChunks[lastIndex].vel;
-                }
-
-                if (nextIndex >= alcedo.waist.tChunks.Length - 1)
-                {
-                    nextNextChunkPos = Vector2.Lerp(tail[0].lastPos, tail[0].pos, timeStacker);/*
-                    nextNextChunkPos = Vector2.Lerp(Vector2.Lerp(tail[0].lastPos, tail[0].pos, timeStacker), 
-                        Vector2.Lerp(alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].lastPos, alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].pos, timeStacker), 0.5f);*/
-                }
-                else
-                {
-                    nextNextChunkPos = Vector2.Lerp(alcedo.waist.tChunks[nextIndex + 1].lastPos, alcedo.waist.tChunks[nextIndex + 1].pos, timeStacker);
-                    //nextNextChunkPos = Vector2.Lerp(BodyPosition(5, timeStacker), BodyPosition(6, timeStacker), 0.5f); //Vector2.Lerp(BodyPosition(0, timeStacker), BodyPosition(5, timeStacker), 0.85f);
-                }
-                nextChunkPos = Vector2.Lerp(alcedo.waist.tChunks[nextIndex].lastPos, alcedo.waist.tChunks[nextIndex].pos, timeStacker);
-                nextChunkVel = alcedo.waist.tChunks[nextIndex].vel;
-                nextRad = alcedo.waist.tChunks[nextIndex].rad;
-                t = Mathf.InverseLerp(lastIndex + 1, nextIndex + 1, inBodyRatio * alcedo.waist.tChunks.Length);
+                lastChunkPos = Vector2.Lerp(alcedo.neck.connectedChunk.lastPos, alcedo.neck.connectedChunk.pos, timeStacker);
+                lastRad = alcedo.neck.connectedChunk.rad;
+                lastChunkVel = alcedo.neck.connectedChunk.vel;
+                nextChunkPos = Vector2.Lerp(this.tail[0].lastPos, this.tail[0].pos, timeStacker);
+                nextRad = this.tail[0].rad;
+                nextChunkVel = this.tail[0].vel;
+                nextNextChunkPos = Vector2.Lerp(this.tail[1].lastPos, this.tail[1].pos, timeStacker);
+                t = inBodyRatio;
             }
             else
             {
-                float num5 = Mathf.InverseLerp((NeckLength + BodyLength) / SpineLength, 1f, s);
-                int num6 = Mathf.FloorToInt(num5 * tail.Length - 1f);
-                int num7 = Mathf.FloorToInt(num5 * tail.Length);
-                if (num7 > tail.Length - 1)
+                float inBodyRatio = Mathf.InverseLerp((NeckLength + BodyLength) / SpineLength, 1f, s);
+                int lastIndex = Mathf.FloorToInt(inBodyRatio * (tail.Length - 1f));
+                int nextIndex = Mathf.FloorToInt(inBodyRatio * (tail.Length - 1f)) + 1;
+                if (nextIndex > tail.Length - 1)
                 {
-                    num7 = tail.Length - 1;
+                    nextIndex = tail.Length - 1;
                 }
-
-                if (num6 < 0)
-                {
-                    lastChunkPos = Vector2.Lerp(alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].lastPos, alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].pos, timeStacker);//Vector2.Lerp(BodyPosition(5, timeStacker), BodyPosition(6, timeStacker), 0.5f);
-                    //lastChunkPos = Vector2.Lerp(Vector2.Lerp(tail[0].lastPos, tail[0].pos, timeStacker), Vector2.Lerp(BodyPosition(5, timeStacker), BodyPosition(6, timeStacker), 0.5f), 0.5f);
-                    lastRad = alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].rad;// Mathf.Lerp(tail[0].StretchedRad, alcedo.bodyChunks[6].rad, 0.33f);//BodyChunkDisplayRad(2) * this.iVars.fatness;
-                    lastChunkVel = alcedo.waist.tChunks[alcedo.waist.tChunks.Length - 1].vel;//Vector2.Lerp(tail[0].vel, alcedo.bodyChunks[6].vel, 0.33f);
-                }
-                else
-                {
-                    lastChunkPos = Vector2.Lerp(tail[num6].lastPos, tail[num6].pos, timeStacker);
-                    lastRad = tail[num6].StretchedRad;// * this.iVars.fatness * this.iVars.tailFatness;
-                    lastChunkVel = tail[num6].vel;
-                }
-                nextNextChunkPos = Vector2.Lerp(tail[Math.Min(num7 + 1, tail.Length - 1)].lastPos, tail[Math.Min(num7 + 1, tail.Length - 1)].pos, timeStacker);
-                nextChunkPos = Vector2.Lerp(tail[num7].lastPos, tail[num7].pos, timeStacker);
-                nextChunkVel = tail[num7].vel;
-                nextRad = tail[num7].StretchedRad;
-                t = Mathf.InverseLerp(num6 + 1, num7 + 1, num5 * tail.Length);
+                lastChunkPos = Vector2.Lerp(tail[lastIndex].lastPos, tail[lastIndex].pos, timeStacker);
+                lastRad = tail[lastIndex].StretchedRad;
+                lastChunkVel = tail[lastIndex].vel;
+                nextChunkPos = Vector2.Lerp(tail[nextIndex].lastPos, tail[nextIndex].pos, timeStacker);
+                nextRad = tail[nextIndex].StretchedRad;
+                nextChunkVel = tail[nextIndex].vel;
+                nextNextChunkPos = Vector2.Lerp(tail[Math.Min(nextIndex + 1, tail.Length - 1)].lastPos, tail[Math.Min(nextIndex + 1, tail.Length - 1)].pos, timeStacker);
+                t = Mathf.InverseLerp(lastIndex + 1, nextIndex + 1, inBodyRatio * tail.Length);
             }
             //从前向后的方向,指向身体后侧
             Vector2 dir = Vector2.Lerp(nextChunkPos - lastChunkPos, nextNextChunkPos - nextChunkPos, t).normalized;
@@ -1841,11 +1652,12 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             float rad = Mathf.Lerp(lastRad, nextRad, t);
             //中间0，朝右1，朝左-1，Custom.VecToDeg(dir)：dir与向量(0, 1)的夹角
             float depthRotation = Mathf.Sin(Custom.VecToDeg(dir) / 180f * (float)Math.PI);
-            //如果是脖子上的装饰，那么看头和身体的位置来决定透视方向（而不是脖子的位置）
+            //如果是脖子上的装饰，那么看头和身体的位置来改变透视方向（而不完全是脖子的位置）
             if (s < NeckLength / SpineLength)
             {
-                depthRotation = Mathf.Abs(depthRotation);
-                depthRotation *= 2f * Mathf.Sin(Custom.VecToDeg(BodyPosition(1, timeStacker) - BodyPosition(4, timeStacker)) / 180f * (float)Math.PI);
+                float newDepthRotation = Mathf.Abs(depthRotation);
+                newDepthRotation *= 2f * Mathf.Sin(Custom.VecToDeg(BodyPosition(1, timeStacker) - BodyPosition(4, timeStacker)) / 180f * (float)Math.PI);
+                depthRotation = Mathf.Lerp(newDepthRotation, depthRotation, s / (NeckLength / SpineLength));
             }
             depthRotation = Mathf.Pow(Mathf.Abs(depthRotation), Mathf.Lerp(1.2f, 0.3f, Mathf.Pow(Mathf.Max(0f, s), 0.5f))) * Mathf.Sign(depthRotation);
             Vector2 pos = Vector2.Lerp(lastChunkPos, nextChunkPos, t);

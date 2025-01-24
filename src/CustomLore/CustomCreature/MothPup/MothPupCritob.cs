@@ -18,7 +18,7 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
             ShelterDanger = ShelterDanger.Safe;
             CreatureName = "Mothpup";
             Icon = new MothPupIcon();
-            RegisterUnlock(killScore: KillScore.Configurable(2), OutsiderEnums.CreatureTemplateType.MothPupUnlock, parent: MoreSlugcatsEnums.SandboxUnlockID.SlugNPC, data: 0);
+            RegisterUnlock(killScore: KillScore.Configurable(2), OutsiderEnums.CreatureTemplateType.MothPupUnlock, parent: MultiplayerUnlocks.SandboxUnlockID.Slugcat, data: 0);//MoreSlugcatsEnums.SandboxUnlockID.SlugNPC
         }
 
         public override CreatureTemplate CreateTemplate()

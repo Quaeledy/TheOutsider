@@ -19,7 +19,7 @@ namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
 
             RegisterUnlock(OutsiderEnums.AbstractObjectType.AlcedoMaskUnlock, parent: OutsiderEnums.CreatureTemplateType.AlcedoUnlock, data: 70);
         }
-        
+
         public override AbstractPhysicalObject Parse(World world, EntitySaveData saveData, SandboxUnlock? unlock)
         {
             // Centi shield data is just floats separated by ; characters.
@@ -46,7 +46,7 @@ namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
 
             return result;
         }
-        
+
         private static readonly AlcedoMaskProperties properties = new();
 
         public override ItemProperties Properties(PhysicalObject forObject)

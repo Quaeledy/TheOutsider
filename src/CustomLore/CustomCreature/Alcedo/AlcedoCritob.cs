@@ -14,12 +14,12 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
     {
         public AlcedoCritob() : base(OutsiderEnums.CreatureTemplateType.Alcedo)
         {
-            LoadedPerformanceCost = 10f;
-            SandboxPerformanceCost = new(linear: 0.6f, exponential: 0.1f);
-            ShelterDanger = ShelterDanger.Safe;
+            LoadedPerformanceCost = 150f;
+            SandboxPerformanceCost = new(linear: 1.2f, exponential: 0.8f);
+            ShelterDanger = ShelterDanger.Hostile;
             CreatureName = "Alcedo";
             Icon = new AlcedoIcon();
-            RegisterUnlock(killScore: KillScore.Configurable(15), OutsiderEnums.CreatureTemplateType.AlcedoUnlock, parent: MoreSlugcatsEnums.SandboxUnlockID.MirosVulture, data: 0);
+            RegisterUnlock(killScore: KillScore.Configurable(15), OutsiderEnums.CreatureTemplateType.AlcedoUnlock, null, data: 0);
         }
 
         public override CreatureTemplate CreateTemplate()

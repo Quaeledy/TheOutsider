@@ -1,9 +1,8 @@
-﻿using System;
-using System.Globalization;
-using UnityEngine;
-using RWCustom;
-using Random = UnityEngine.Random;
+﻿using RWCustom;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
 {

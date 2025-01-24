@@ -150,7 +150,6 @@ namespace TheOutsider
             public static void RegisterValues()
             {
                 Content.Register(new AlcedoMaskFisob());
-                //AlcedoMask = new AbstractPhysicalObject.AbstractObjectType("AlcedoMask", true);
             }
 
             public static void UnregisterValues()

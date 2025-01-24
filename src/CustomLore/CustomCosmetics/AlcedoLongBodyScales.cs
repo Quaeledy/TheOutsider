@@ -91,7 +91,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                     sLeaser.sprites[num + scalesPositions.Length].x = backPos.outerPos.x - camPos.x;
                     sLeaser.sprites[num + scalesPositions.Length].y = backPos.outerPos.y - camPos.y;
                     sLeaser.sprites[num + scalesPositions.Length].rotation = rotation;
-                    sLeaser.sprites[num + scalesPositions.Length].scaleX = scaleObjects[num - startSprite].width * Mathf.Sign(backPos.depthRotation); 
+                    sLeaser.sprites[num + scalesPositions.Length].scaleX = scaleObjects[num - startSprite].width * Mathf.Sign(backPos.depthRotation);
                     sLeaser.sprites[num + scalesPositions.Length].color = base.CurrentScaleColor(num - startSprite, this.ScalesPos(num - startSprite));
                 }
             }/*

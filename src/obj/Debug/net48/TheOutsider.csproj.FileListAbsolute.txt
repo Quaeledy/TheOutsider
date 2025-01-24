@@ -8,3 +8,15 @@ D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.sourcelink.json
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.dll
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.pdb
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\Fisobs.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsi.21E4EEEE.Up2Date
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\Assembly-CSharp-firstpass.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\BepInEx.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\DressMySlugcat.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\EmgTx.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\HOOKS-Assembly-CSharp.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\PUBLIC-Assembly-CSharp.dll
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\BepInEx.xml
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\DressMySlugcat.pdb
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\DressMySlugcat.dll.config
+D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\bin\Debug\net48\EmgTx.pdb

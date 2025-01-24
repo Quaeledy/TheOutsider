@@ -137,6 +137,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             public static readonly SpritesOverlap Behind = new SpritesOverlap("Behind", true);
             public static readonly SpritesOverlap BehindHead = new SpritesOverlap("BehindHead", true);
             public static readonly SpritesOverlap InFront = new SpritesOverlap("InFront", true);
+            public static readonly SpritesOverlap Discretion = new SpritesOverlap("Discretion", true);
         }
     }
 }

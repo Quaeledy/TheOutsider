@@ -8,31 +8,21 @@
     <ItemGroup>
         <Reference Include="Assembly-CSharp-firstpass">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-          <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
-          <Private>False</Private>
         </Reference>
         <Reference Include="DressMySlugcat">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2948971756\newest\plugins\DressMySlugcat.dll</HintPath>
-          <Private>False</Private>
         </Reference>
         <Reference Include="EmgTx">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2991981689\newest\plugins\EmgTx.dll</HintPath>
-          <Private>False</Private>
         </Reference>
         <Reference Include="Fisobs">
-          <HintPath>..\lib\Fisobs.dll</HintPath>
-          <Private>False</Private>
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2920541687\newest\plugins\Fisobs.dll</HintPath>
         </Reference>
         <Reference Include="HOOKS-Assembly-CSharp">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="Assembly-CSharp">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
-          <Private>False</Private>
         </Reference>
         <Reference Include="Mono.Cecil">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Mono.Cecil.dll</HintPath>
@@ -53,6 +43,9 @@
         <Reference Include="MonoMod.Utils">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.Utils.dll</HintPath>
           <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
         </Reference>
         <Reference Include="SlugBase">
           <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2933196558\newest\plugins\SlugBase.dll</HintPath>
@@ -100,6 +93,7 @@
       <Compile Include="CustomLore\CustomCosmetics\AlcedoBodyScales.cs" />
       <Compile Include="CustomLore\CustomCosmetics\AlcedoLongBodyScales.cs" />
       <Compile Include="CustomLore\CustomCosmetics\AlcedoLongHeadScales.cs" />
+      <Compile Include="CustomLore\CustomCosmetics\AlcedoScaleTemplate.cs" />
       <Compile Include="CustomLore\CustomCosmetics\AlcedoSpineSpikes.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\Alcedo.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoAbstractAI.cs" />
@@ -107,18 +101,17 @@
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoCritob.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoFeather.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoGraphics.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoLimb.cs" />
-      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMask.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoPather.cs" />
-      <Compile Include="CustomLore\CustomCosmetics\AlcedoScaleTemplate.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoIcon.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoLeg.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoLimb.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoPather.cs" />
+      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoProperties.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoScale.cs" />
       <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoTentacle.cs" />
       <Compile Include="CustomLore\CustomCreature\MothPup\MothPupCritob.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoIcon.cs" />
       <Compile Include="CustomLore\CustomCreature\MothPup\MothPupIcon.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoProperties.cs" />
       <Compile Include="CustomLore\CustomCreature\MothPup\MothPupProperties.cs" />
+      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMask.cs" />
       <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskAbstract.cs" />
       <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskFisob.cs" />
       <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskIcon.cs" />

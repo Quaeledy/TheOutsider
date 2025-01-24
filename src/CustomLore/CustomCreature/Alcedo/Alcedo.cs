@@ -1,5 +1,4 @@
 ﻿using MoreSlugcats;
-using Noise;
 using RWCustom;
 using System;
 using System.Collections.Generic;
@@ -163,9 +162,11 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             legs = new AlcedoLeg[2];
             for (int j = 0; j < legs.Length; j++)
             {
-                legs[j] = new AlcedoLeg(this, bodyChunks[7 + j % 2], bodyChunks[7 + (1 - j % 2)], (IsKing ? 9f : 7f) * legLength * 1.5f, j);
+                legs[j] = new AlcedoLeg(this, bodyChunks[7 + j % 2], bodyChunks[7 + (1 - j % 2)], (IsKing ? 9f : 7f) * legLength * 4f, j);
             }
-            waist = new Tentacle(this, bodyChunks[0], Mathf.Max(20f, UpperAndLowerBodySpacing));//长度不能小于20f
+            float waistLength = Mathf.Max(20f, ForeAndHindBodySpacing);//长度不能小于20f
+            float neckLength = 90f * bodySizeFac;
+            waist = new Tentacle(this, bodyChunks[0], waistLength);
             waist.tProps = new Tentacle.TentacleProps(false, true, true, 0.5f, 0f, 0.5f, 1.8f, 0.2f, 1.2f, 10f, 0.25f, 3f, 15, 20, 6, 0);
             waist.tChunks = new Tentacle.TentacleChunk[4];
             for (int k = 0; k < waist.tChunks.Length; k++)
@@ -175,7 +176,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }
             waist.tChunks[waist.tChunks.Length - 1].rad = 1.2f * 11f * bodySizeFac;
             waist.stretchAndSqueeze = 0f;
-            neck = new Tentacle(this, bodyChunks[1], 60f * bodySizeFac); //0.7f * (this.IsKing ? 6f : 5f) * 20f
+            neck = new Tentacle(this, bodyChunks[1], neckLength); //0.7f * (this.IsKing ? 6f : 5f) * 20f
             neck.tProps = new Tentacle.TentacleProps(false, false, true, 0.5f, 0f, 0.5f, 1.8f, 0.2f, 1.2f, 10f, 0.25f, 3f, 15, 20, 6, 0);
             neck.tChunks = new Tentacle.TentacleChunk[4];
             //neck.tChunks = new Tentacle.TentacleChunk[4];
@@ -185,9 +186,9 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 //neck.tChunks[k].collideWithTerrain = false;
             }
             neck.tChunks[0].rad = 8f * bodySizeFac;
-            neck.tChunks[1].rad = 7f * bodySizeFac;
+            neck.tChunks[1].rad = 6.5f * bodySizeFac;
             neck.tChunks[neck.tChunks.Length - 1].rad = 7f * bodySizeFac;
-            neck.stretchAndSqueeze = 0f;
+            //neck.stretchAndSqueeze = 0f;
             lastConnection = new MovementConnection(MovementConnection.MovementType.Standard, new WorldCoordinate(0, 0, 0, 0), new WorldCoordinate(0, 0, 0, 0), 0);
             thrusters = new AlcedoThruster[4];
             jetFuel = 1f;
@@ -422,11 +423,11 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 BodyChunk mainBodyChunk = base.mainBodyChunk;
                 mainBodyChunk.vel.y = mainBodyChunk.vel.y + 20f;
             }
+            return;
             if (grasps[0] != null)
             {
                 Carry();
             }
-            return;
             if (Consious)
             {
                 Act(eu);
@@ -513,6 +514,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     }
                     flag = true;
                 }
+                /** safari模式
                 if (inputWithDiagonals != null)
                 {
                     if (inputWithDiagonals.Value.thrw && (inputWithDiagonals.Value.x != 0 || inputWithDiagonals.Value.y != 0))
@@ -592,6 +594,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                         }
                     }
                 }
+                **/
             }
             if (movementConnection == default || Custom.ManhattanDistance(room.GetWorldCoordinate(mainBodyChunk.pos), AI.pathFinder.GetDestination) < 2)
             {
@@ -1148,10 +1151,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         private void UpdateWaist()
         {
-            waist.tChunks[0].pos = bodyChunks[0].pos;
-            waist.tChunks[0].vel = bodyChunks[0].vel;
-            waist.tChunks[waist.tChunks.Length - 1].pos = bodyChunks[5].pos;
-            waist.tChunks[waist.tChunks.Length - 1].vel = bodyChunks[5].vel;
             waist.Update();
             //base.bodyChunks[5].collideWithTerrain = true;
             //return;
@@ -1166,55 +1165,39 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 this.waist.tChunks[j].vel += this.waist.connectedChunk.vel;*/
             }
             waist.limp = !Consious;
-            float num2 = 0.5f;
             bodyChunks[5].collideWithObjects = true;
+            float num2 = 0.5f;
             //float num2 = (this.waist.backtrackFrom == -1) ? 0.5f : 0f;
-            if (true)//base.grasps[0] == null
+            Vector2 dir = Custom.DirVec(bodyChunkConnections[8].chunk1.pos, bodyChunks[5].pos);
+            Vector2 dir2 = Custom.DirVec(bodyChunks[4].pos, bodyChunks[1].pos);
+            float num32 = Vector2.Distance(bodyChunks[5].pos, bodyChunkConnections[8].chunk1.pos);
+            if (!AirBorne && (hangingInTentacle || hoverStill))
             {
-                waist.tChunks[0].pos = bodyChunks[0].pos;
-                waist.tChunks[0].vel = bodyChunks[0].vel;
-                waist.tChunks[waist.tChunks.Length - 1].pos = bodyChunks[5].pos;
-                waist.tChunks[waist.tChunks.Length - 1].vel = bodyChunks[5].vel;
-                Vector2 dir = Custom.DirVec(bodyChunkConnections[8].chunk1.pos, bodyChunks[5].pos);
-                Vector2 dir2 = Custom.DirVec(bodyChunks[4].pos, bodyChunks[0].pos);
-                float num32 = Vector2.Distance(bodyChunks[5].pos, bodyChunkConnections[8].chunk1.pos);
-                if (!AirBorne && (hangingInTentacle || hoverStill))
-                {
-                    num32 = Mathf.Abs(bodyChunks[5].pos.x - bodyChunkConnections[8].chunk1.pos.x);
-                    dir = new Vector2(dir.x, 0).normalized;
-                    dir2 = new Vector2(dir2.x, 0).normalized;
-                    bodyChunks[5].collideWithObjects = false;
-                }
-                bodyChunks[5].pos -= (bodyChunkConnections[8].distance - num32) * dir * (1f - num2);
-                bodyChunks[5].vel -= (bodyChunkConnections[8].distance - num32) * dir * (1f - num2);
-                bodyChunkConnections[8].chunk1.pos += (bodyChunkConnections[8].distance - num32) * dir * num2;
-                bodyChunkConnections[8].chunk1.vel += (bodyChunkConnections[8].distance - num32) * dir * num2;
-                bodyChunks[5].vel += dir2 * 6f * (1f - num2);
-                bodyChunkConnections[8].chunk1.vel -= dir2 * 6f * num2;/*
-                bodyChunks[5].vel += dir2 * (AirBorne ? 2f : 6f) * (1f - num2);
-                bodyChunkConnections[8].chunk1.vel -= dir2 * (AirBorne ? 2f : 6f) * num2;*/
+                num32 = Mathf.Abs(bodyChunks[5].pos.x - bodyChunkConnections[8].chunk1.pos.x);
+                dir = new Vector2(dir.x, 0).normalized;
+                dir2 = new Vector2(dir2.x, 0).normalized;
+                bodyChunks[5].collideWithObjects = false;
             }
+            bodyChunks[5].vel += dir2 * 6f * (1f - num2);
+            bodyChunkConnections[8].chunk1.vel -= dir2 * 6f * num2;
+
+            Vector2 headToNeck = Custom.DirVec(bodyChunks[5].pos, waist.tChunks[waist.tChunks.Length - 1].pos);
+            float distance = Vector2.Distance(bodyChunks[5].pos, waist.tChunks[waist.tChunks.Length - 1].pos);
+            float idealDist = bodyChunks[5].rad;//6f;
+            bodyChunks[5].pos -= (idealDist - distance) * headToNeck * (1f - num2);
+            bodyChunks[5].vel -= (idealDist - distance) * headToNeck * (1f - num2);
+            waist.tChunks[waist.tChunks.Length - 1].pos += (idealDist - distance) * headToNeck * num2;
+            waist.tChunks[waist.tChunks.Length - 1].vel += (idealDist - distance) * headToNeck * num2;
             if (!Consious)
             {
                 return;
-            }/*
-            Vector2 a2 = Custom.DirVec(base.bodyChunks[5].pos, this.waist.connectedChunk.pos);
-            this.waist.tChunks[this.waist.tChunks.Length - 1].vel += a2 * num2;
-            this.waist.tChunks[this.waist.tChunks.Length - 2].vel -= a2 * 0.5f * num2;
-            //base.bodyChunks[5].vel += a2 * 4f * (1f - num2);
-            
-            if (Custom.DistLess(base.bodyChunks[5].pos, this.waist.connectedChunk.pos, 80f))
-            {
-                for (int k = 0; k < this.waist.tChunks.Length; k++)
-                {
-                    this.waist.tChunks[k].vel -= a2 * Mathf.InverseLerp(80f, 20f, Vector2.Distance(base.bodyChunks[5].pos, this.waist.connectedChunk.pos)) * 8f * num2;
-                }
-            }*/
+            }
         }
 
         private void UpdateNeck()
         {
             neck.Update();
+            //return;
             if (AI.stuckTracker.closeToGoalButNotSeeingItTracker.counter > AI.stuckTracker.closeToGoalButNotSeeingItTracker.counterMin)
             {
                 List<IntVector2> list = null;
@@ -1245,10 +1228,9 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 neck.tChunks[j].vel *= 0.95f;
                 Tentacle.TentacleChunk tentacleChunk = neck.tChunks[j];
-                tentacleChunk.vel.y = tentacleChunk.vel.y + (neck.limp ? 0.7f : 0.1f);
-                //tentacleChunk.vel.y = tentacleChunk.vel.y - (neck.limp ? 0.7f : 0.1f);
-                neck.tChunks[j].vel += Custom.DirVec(bodyChunks[0].pos, bodyChunks[1].pos) * (j == 0 ? 1.2f : 0.8f) * 1f;
-                //neck.tChunks[j].vel += Custom.DirVec(bodyChunks[5].pos, bodyChunks[0].pos) * (j == 0 ? 1.2f : 0.8f) * 0.8f;
+                tentacleChunk.vel.y = tentacleChunk.vel.y + (neck.limp ? 0.1f : 0.7f);
+                neck.tChunks[j].vel += Custom.DirVec(bodyChunks[0].pos, bodyChunks[1].pos) * (j == 0 ? 1.2f : 0.8f) * 0.2f;
+                neck.tChunks[j].vel += Custom.DirVec(bodyChunks[5].pos, bodyChunks[0].pos) * (j == 0 ? 2.5f : 0.8f) * 0.2f;
                 neck.tChunks[j].vel -= neck.connectedChunk.vel;
                 neck.tChunks[j].vel *= (this.AirBorne ? 0.85f : 0.75f);//(this.AirBorne ? 0.2f : 0.75f);
                 neck.tChunks[j].vel += neck.connectedChunk.vel;
@@ -1259,21 +1241,24 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 Vector2 headToNeck = Custom.DirVec(bodyChunks[4].pos, neck.tChunks[neck.tChunks.Length - 1].pos);
                 float distance = Vector2.Distance(bodyChunks[4].pos, neck.tChunks[neck.tChunks.Length - 1].pos);
-                float idealDist = 4f;//6f;
+                float idealDist = bodyChunks[4].rad;//6f;
                 bodyChunks[4].pos -= (idealDist - distance) * headToNeck * (1f - num2);
                 bodyChunks[4].vel -= (idealDist - distance) * headToNeck * (1f - num2);
                 neck.tChunks[neck.tChunks.Length - 1].pos += (idealDist - distance) * headToNeck * num2;
                 neck.tChunks[neck.tChunks.Length - 1].vel += (idealDist - distance) * headToNeck * num2;
+                /*
                 bodyChunks[4].vel += Custom.DirVec(neck.tChunks[neck.tChunks.Length - 1].pos, bodyChunks[4].pos) * (AirBorne ? 5f : 6f) * (1f - num2);
                 neck.tChunks[neck.tChunks.Length - 1].vel -= Custom.DirVec(neck.tChunks[neck.tChunks.Length - 1].pos, bodyChunks[4].pos) * (AirBorne ? 2.5f : 3f) * num2;
                 bodyChunks[4].vel += Custom.DirVec(neck.tChunks[neck.tChunks.Length - 2].pos, bodyChunks[4].pos) * (AirBorne ? 5f : 6f) * (1f - num2);
                 neck.tChunks[neck.tChunks.Length - 2].vel -= Custom.DirVec(neck.tChunks[neck.tChunks.Length - 2].pos, bodyChunks[4].pos) * (AirBorne ? 2.5f : 3f) * num2;
-                
+
                 base.bodyChunks[4].vel += Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 2].pos, base.bodyChunks[4].pos) * (this.AirBorne ? 2f : 6f) * (1f - num2);
                 base.bodyChunks[4].vel += Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 1].pos, base.bodyChunks[4].pos) * (this.AirBorne ? 2f : 6f) * (1f - num2);
-                this.neck.tChunks[this.neck.tChunks.Length - 1].vel -= Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 2].pos, base.bodyChunks[4].pos) * (this.AirBorne ? 1f : 3f) * num2;
+                this.neck.tChunks[this.neck.tChunks.Length - 1].vel -= Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 1].pos, base.bodyChunks[4].pos) * (this.AirBorne ? 1f : 3f) * num2;
                 this.neck.tChunks[this.neck.tChunks.Length - 2].vel -= Custom.DirVec(this.neck.tChunks[this.neck.tChunks.Length - 2].pos, base.bodyChunks[4].pos) * (this.AirBorne ? 1f : 3f) * num2;
+                */
             }
+            return;
             if (!Consious)
             {
                 return;
@@ -1752,7 +1737,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         public int limbGripDelay;
         public bool smoothenLegMovement;
         public float legPairDisplacement;
-        public float bodySizeFac; 
+        public float bodySizeFac;
         public Vector2 limbsAimFor;
 
         private class AlcedoThruster
@@ -1962,7 +1947,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 unrecognizedSaveStrings.Remove("NOMASK");
             }
 
-            public float[] wingHealth; 
+            public float[] wingHealth;
             public float[] limbHealth;
             public bool mask;
         }
