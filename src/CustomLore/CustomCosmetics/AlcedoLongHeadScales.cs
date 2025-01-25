@@ -18,9 +18,12 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             : base(aGraphics, startSprite)
         {
             spritesOverlap = SpritesOverlap.Discretion;
-            count = Random.Range(5, 7);
-            sizeRangeMin = Mathf.Lerp(0.35f, 0.45f, Mathf.Pow(UnityEngine.Random.value, 2f));
-            sizeRangeMax = Mathf.Lerp(sizeRangeMin, 0.6f, UnityEngine.Random.value);
+            count = Mathf.RoundToInt(Mathf.Lerp(2f, 7f, Random.value));
+            sizeRangeMin = Mathf.Lerp(Mathf.Lerp(0.35f, 0.5f, UnityEngine.Random.value),
+                Custom.LerpMap(count, 2, 7, 0.5f, 0.35f),
+                0.75f);
+            Mathf.Lerp(0.35f, 0.45f, Mathf.Pow(UnityEngine.Random.value, 2f));
+            sizeRangeMax = Mathf.Lerp(sizeRangeMin + 0.2f, 0.75f, UnityEngine.Random.value);
             sizeSkewExponent = Mathf.Lerp(0.1f, 0.9f, UnityEngine.Random.value);//Mathf.Lerp(0.1f, 0.9f, UnityEngine.Random.value);
             angleRange = Mathf.Lerp(Mathf.Lerp(10f, 80f, UnityEngine.Random.value),
                 Custom.LerpMap(count, 2, 7, 10f, 80f),
@@ -85,12 +88,18 @@ namespace TheOutsider.CustomLore.CustomCosmetics
         {
             base.InitiateSprites(sLeaser, rCam);
             for (int num = startSprite; num < startSprite + scalesPositions.Length; num++)
+            {
+                sLeaser.sprites[num].anchorX = 0.5f;
                 sLeaser.sprites[num].anchorY = 0.05f;
+                sLeaser.sprites[num + scalesPositions.Length].anchorX = 0.5f;
+                sLeaser.sprites[num + scalesPositions.Length].anchorY = 0.05f;
+            }
         }
 
         public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            float neckToHeadAngle = sLeaser.sprites[aGraphics.HeadSpriteStart].rotation;
             float headRotationFac = aGraphics.headGraphic <= 4 ?
                 Custom.LerpMap(aGraphics.headGraphic, 0, 4, 0f, 1f) :
                 Custom.LerpMap(aGraphics.headGraphic, 5, 8, 0.9f, 0f);
@@ -98,11 +107,14 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                 Custom.LerpMap(aGraphics.headGraphic, 0, 4, 0.8f, 1f) :
                 Custom.LerpMap(aGraphics.headGraphic, 5, 8, 0.9f, 0f);
             float rotationOffset = aGraphics.headGraphic <= 4 ?
-                Custom.LerpMap(aGraphics.headGraphic, 1, 4, 15f, 45f) :
+                Custom.LerpMap(aGraphics.headGraphic, 1, 4, 15f, 40f) :
                 Custom.LerpMap(aGraphics.headGraphic, 5, 7, 90f, 150f);
             Vector2 offset = aGraphics.headGraphic <= 4 ?
-                Vector2.Lerp(new Vector2(0, 5), new Vector2(12, 11), Mathf.InverseLerp(0, 4, aGraphics.headGraphic)) :
-                Vector2.Lerp(new Vector2(5, 11), new Vector2(0, 8), Mathf.InverseLerp(0, 4, aGraphics.headGraphic));
+                Vector2.Lerp(new Vector2(0, 5), new Vector2(-10, 11), Mathf.InverseLerp(0, 4, aGraphics.headGraphic)) :
+                Vector2.Lerp(new Vector2(-4, 11), new Vector2(0, 8), Mathf.InverseLerp(5, 8, aGraphics.headGraphic));
+            Vector2 extraOffset = aGraphics.headGraphic <= 4 ?
+                Vector2.Lerp(new Vector2(-6, -8), new Vector2(1, -8), Mathf.InverseLerp(0, 4, aGraphics.headGraphic)) :
+                Vector2.Lerp(new Vector2(-1, -9), new Vector2(-7, -2), Mathf.InverseLerp(5, 8, aGraphics.headGraphic));
             if (aGraphics.headGraphic == 0)
             {
                 rotationOffset = 0f;
@@ -113,17 +125,28 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             }
             for (int num = startSprite; num < startSprite + scalesPositions.Length; num++)
             {
+                //两侧羽毛额外偏移
+                float dist = num - startSprite - (float)(scalesPositions.Length - 1f) / 2f;
+                extraOffset *= Mathf.Sign(dist);
+                //offset += Vector2.Lerp(Vector2.zero, extraOffset, Mathf.Abs(dist) / ((float)(scalesPositions.Length - 1f) / 2f));
+                //总偏移
+                offset = offset.magnitude * Custom.DegToVec(Custom.VecToDeg(offset) + neckToHeadAngle);
+                sLeaser.sprites[num].x = sLeaser.sprites[aGraphics.HeadSpriteStart].x + offset.x;
+                sLeaser.sprites[num].y = sLeaser.sprites[aGraphics.HeadSpriteStart].y + offset.y;
+                //两侧羽毛额外旋转
+                float extraRotationOffset = 1f;/*
+                if (Mathf.Sign(dist) * sLeaser.sprites[aGraphics.HeadSpriteStart].scaleX < 0)
+                {
+                    extraRotationOffset = aGraphics.headGraphic <= 4 ?
+                    Custom.LerpMap(aGraphics.headGraphic, 0, 4, 1f, -0.9f) :
+                    Custom.LerpMap(aGraphics.headGraphic, 5, 8, -1f, 0f);
+                }*/
+                //总旋转
                 float t = Mathf.InverseLerp(0f, (float)scalesPositions.Length - 1f, (float)(num - startSprite));
-                float sizeFac = Mathf.Lerp(sizeRangeMin, sizeRangeMax, Mathf.Sin(t * (float)Math.PI));
-                float neckToHeadAngle = sLeaser.sprites[aGraphics.HeadSprite].rotation;/*Custom.AimFromOneVectorToAnother(Vector2.Lerp(aGraphics.alcedo.neck.tChunks[aGraphics.alcedo.neck.tChunks.Length - 1].lastPos,
-                                                                                      aGraphics.alcedo.neck.tChunks[aGraphics.alcedo.neck.tChunks.Length - 1].pos, timeStacker),
-                                                                         Vector2.Lerp(aGraphics.alcedo.bodyChunks[4].lastPos, aGraphics.alcedo.bodyChunks[4].pos, timeStacker));*/
-                offset = Custom.DegToVec(Custom.VecToDeg(offset) + neckToHeadAngle);
-                sLeaser.sprites[num].x = sLeaser.sprites[aGraphics.HeadSprite].x + offset.x;
-                sLeaser.sprites[num].y = sLeaser.sprites[aGraphics.HeadSprite].y + offset.y;
-                float idealRotation = sLeaser.sprites[aGraphics.HeadSprite].rotation +
-                                      rotationOffset * (sLeaser.sprites[aGraphics.HeadSprite].scaleX > 0 ? 1f : -1f) +
-                                      Mathf.Lerp(-angleRange, angleRange, t);// * (1f - headRotationFac) * (sLeaser.sprites[aGraphics.HeadSprite].scaleX > 0 ? 1f : -1f)
+                float idealRotation = sLeaser.sprites[aGraphics.HeadSpriteStart].rotation +
+                                      rotationOffset * (sLeaser.sprites[aGraphics.HeadSpriteStart].scaleX > 0 ? 1f : -1f) +
+                                      Mathf.Lerp(-angleRange, angleRange, t) * extraRotationOffset;// * (1f - headRotationFac) * (sLeaser.sprites[aGraphics.HeadSpriteStart].scaleX > 0 ? 1f : -1f)
+                //idealRotation += Mathf.Lerp(0f, extraRotationOffset, Mathf.Abs(dist) / ((float)(scalesPositions.Length - 1f) / 2f));
                 if (idealRotation - sLeaser.sprites[num].rotation > 180f)
                 {
                     idealRotation = idealRotation - 360f;
@@ -133,7 +156,9 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                     idealRotation = idealRotation + 360f;
                 }
                 sLeaser.sprites[num].rotation = idealRotation;// Mathf.Lerp(sLeaser.sprites[num].rotation, idealRotation, 0.5f);
-                sLeaser.sprites[num].scaleX = Mathf.Lerp(sLeaser.sprites[num].scaleX, sizeFac * 0.025f * Mathf.Sign(sLeaser.sprites[aGraphics.HeadSprite].scaleX), 0.2f);
+                //羽毛大小
+                float sizeFac = Mathf.Lerp(sizeRangeMin, sizeRangeMax, Mathf.Sin(t * (float)Math.PI));
+                sLeaser.sprites[num].scaleX = sizeFac * 0.65f * Mathf.Sign(sLeaser.sprites[aGraphics.HeadSpriteStart].scaleX);
                 sLeaser.sprites[num].scaleY = Mathf.Lerp(sLeaser.sprites[num].scaleY, sizeFac * Mathf.Max(0.2f, Mathf.InverseLerp(0f, 0.5f, Mathf.Abs(lengthFac))), 0.2f);
                 if (colored > 0f)
                 {
@@ -142,41 +167,41 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                     sLeaser.sprites[num + scalesPositions.Length].rotation = sLeaser.sprites[num].rotation;
                     sLeaser.sprites[num + scalesPositions.Length].scaleX = sLeaser.sprites[num].scaleX;
                     sLeaser.sprites[num + scalesPositions.Length].scaleY = sLeaser.sprites[num].scaleY;
-                    float dist = Mathf.Abs(num - startSprite - (float)(scalesPositions.Length - 1f) / 2f);
-                    sLeaser.sprites[num + scalesPositions.Length].color = base.CurrentScaleColor(dist, this.ScalesPos(Mathf.RoundToInt(dist)));
+                    sLeaser.sprites[num + scalesPositions.Length].color = base.CurrentScaleColor(Mathf.Abs(dist), 1f);
+                    //sLeaser.sprites[num + scalesPositions.Length].color = base.CurrentScaleColor(dist, this.ScalesPos(Mathf.RoundToInt(dist)));
                 }
             }
-            UpdateSpritesLevel(sLeaser);
         }
 
-        public void UpdateSpritesLevel(RoomCamera.SpriteLeaser sLeaser)
+        public override void UpdateSpritesLevel(RoomCamera.SpriteLeaser sLeaser)
         {
-            FNode head = sLeaser.sprites[aGraphics.HeadSprite];
+            FNode mask = sLeaser.sprites[aGraphics.MaskSpriteStart];
+            FNode neck = sLeaser.sprites[aGraphics.NeckSpriteStart];
             int halfIndex = Mathf.FloorToInt((float)scalesPositions.Length / 2f);
             for (int num = startSprite; num <= halfIndex; num++)
             {
-                if (head.scaleX <= 0)
+                if (mask.scaleX >= 0 && aGraphics.headGraphic >= 1)
                 {
-                    sLeaser.sprites[num].MoveBehindOtherNode(head);
-                    sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(head);
+                    sLeaser.sprites[num].MoveBehindOtherNode(neck);
+                    sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(neck);
                 }
                 else
                 {
-                    sLeaser.sprites[num + scalesPositions.Length].MoveInFrontOfOtherNode(head);
-                    sLeaser.sprites[num].MoveInFrontOfOtherNode(head);
+                    sLeaser.sprites[num].MoveBehindOtherNode(mask);
+                    sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(mask);
                 }
             }
             for (int num = halfIndex; num <= scalesPositions.Length; num++)
             {
-                if (head.scaleX >= 0)
+                if (mask.scaleX <= 0 || aGraphics.headGraphic >= 1)
                 {
-                    sLeaser.sprites[num].MoveBehindOtherNode(head);
-                    sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(head);
+                    sLeaser.sprites[num].MoveBehindOtherNode(neck);
+                    sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(neck);
                 }
                 else
                 {
-                    sLeaser.sprites[num + scalesPositions.Length].MoveInFrontOfOtherNode(head);
-                    sLeaser.sprites[num].MoveInFrontOfOtherNode(head);
+                    sLeaser.sprites[num].MoveBehindOtherNode(mask);
+                    sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(mask);
                 }
             }
         }

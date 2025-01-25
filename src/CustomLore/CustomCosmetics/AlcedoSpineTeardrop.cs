@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace TheOutsider.CustomLore.CustomCosmetics
 {
-    internal class AlcedoSpineSpikes : AlcedoScaleTemplate
+    internal class AlcedoSpineTeardrop : AlcedoScaleTemplate
     {
         public int bumps;
 
@@ -21,12 +21,12 @@ namespace TheOutsider.CustomLore.CustomCosmetics
 
         public float scaleX;
 
-        public AlcedoSpineSpikes(AlcedoGraphics aGraphics, int startSprite)
+        public AlcedoSpineTeardrop(AlcedoGraphics aGraphics, int startSprite)
             : base(aGraphics, startSprite)
         {
             spritesOverlap = SpritesOverlap.Behind;
             //spritesOverlap = SpritesOverlap.BehindHead;
-            float scaleDist = Mathf.Lerp(5f, 8f, Mathf.Pow(UnityEngine.Random.value, 0.7f));
+            float scaleDist = Mathf.Lerp(5f, 10f, Mathf.Pow(UnityEngine.Random.value, 0.7f));
             spineStartLength = 0f; //aGraphics.NeckLength;
             spineSpikesLength = Mathf.Lerp(0.75f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;// * (aGraphics.ForeBodyLength + aGraphics.WaistLength + aGraphics.HindBodyLength + aGraphics.TailLength);
             //spineSpikesLength = Mathf.Lerp(0.2f, 0.95f, UnityEngine.Random.value) * aGraphics.SpineLength;
@@ -119,11 +119,11 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             for (int num = startSprite + bumps - 1; num >= startSprite; num--)
             {
                 sLeaser.sprites[num] = new FSprite("AlcedoScaleA" + graphic);
-                sLeaser.sprites[num].anchorY = 0.05f;
+                sLeaser.sprites[num].anchorY = 0.1f;
                 if (colored > 0f)
                 {
                     sLeaser.sprites[num + bumps] = new FSprite("AlcedoScaleB" + graphic);
-                    sLeaser.sprites[num + bumps].anchorY = 0.05f;
+                    sLeaser.sprites[num + bumps].anchorY = sLeaser.sprites[num].anchorY;
                 }
             }
         }

@@ -197,9 +197,9 @@ namespace TheOutsider.World_Hooks
         {
             orig(self);
 
-            if (self.owner.room != null && self.owner.room.game != null && 
+            if (self.owner.room != null && self.owner.room.game != null &&
                 self.owner.room.game.IsStorySession &&
-                self.owner.room.game.StoryCharacter != null && 
+                self.owner.room.game.StoryCharacter != null &&
                 self.owner.room.game.StoryCharacter == Plugin.SlugName)
             {
                 if (self.owner.room.world.region.name == "DS" && self.owner.room.waterObject != null && !self.owner.room.IsGateRoom())

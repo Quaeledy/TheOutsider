@@ -91,21 +91,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             float num = 0.25f * Mathf.Sin(Mathf.Pow(Mathf.Abs(x - 0.5f), 0.8f) * 5f);
             num *= Mathf.Pow(x + 0.5f, 2.5f) + 0.5f;
             //羽毛分布
-            /*
-            float num = Mathf.Lerp(0.2f, 1f, Custom.SCurve(Mathf.Pow(x, 1.5f), 0.1f));//SCurve: 增函数，越接近1增幅越大，0处约0.5，1处为1
-            if (Mathf.Pow(x, 1.5f) > 0.5f)
-            {
-                num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));//右侧为减函数，越接近1增幅越大，0处约1，1处为0
-                //整体：减函数，越接近1增幅越大，0处约0.5，1处为0
-                //num *= Mathf.Sqrt(1f - Mathf.Pow(Mathf.InverseLerp(0.5f, 1f, Mathf.Pow(x, 1.5f)), 4.5f));
-            }
-            //羽毛长度
-            float num2 = 1f;
-            num2 *= Mathf.Pow(Mathf.Sin(Mathf.Pow(x, 0.5f) * 3.1415927f), 0.7f);
-            if (x < 0.3f)
-            {
-                num2 *= Mathf.Lerp(0.7f, 1f, Custom.SCurve(Mathf.InverseLerp(0f, 0.3f, x), 0.5f));
-            }*/
             num = Mathf.Lerp(num, 1f, 0.5f);
             return Mathf.Lerp(num * 0.5f, num, k);
         }
@@ -233,19 +218,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         public Color CurrentColor()
         {
-            if (kGraphics.alcedo.IsMiros)
-            {
-                Color rgb = HSLColor.Lerp(new HSLColor(kGraphics.ColorB.hue, Mathf.Lerp(kGraphics.ColorB.saturation, 1f, saturationBonus), Mathf.Lerp(kGraphics.ColorB.lightness, 1f, lightnessBonus)),
-                                          kGraphics.ColorA,
-                                          Mathf.Cos(Mathf.Pow(wingPosition, 0.75f) * 3.1415927f)).rgb;
-                rgb.a = Mathf.Max(new float[]
-                {
-                    0.4f,
-                    forcedAlpha,
-                    Mathf.Lerp(0.4f, 0.8f, Mathf.Cos(Mathf.Pow(wingPosition, 1.7f) * 3.1415927f))
-                }) * (extendedFac + wing.flyingMode) * 0.5f * (1f - brokenColor);
-                return rgb;
-            }
             HSLColor colorB = kGraphics.ColorB;
             HSLColor colorA = kGraphics.ColorA;
             if (type == AlcedoFeather.Type.Covert)

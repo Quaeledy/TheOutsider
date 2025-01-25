@@ -118,15 +118,20 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             float l = Mathf.Lerp(this.lightnessBonus[Mathf.FloorToInt(i)], this.lightnessBonus[Mathf.CeilToInt(i)], i - Mathf.FloorToInt(i));
             Color rgb2 = HSLColor.Lerp(new HSLColor(colorB.hue, Mathf.Lerp(colorB.saturation, 1f, s), Mathf.Lerp(colorB.lightness, 1f, l)),
                                        colorA,
-                                       Mathf.Cos(Mathf.Pow(scalePosition, 0.75f) * 3.1415927f)).rgb;
+                                       Mathf.Cos(Mathf.Pow(scalePosition, 1f) * 3.1415927f)).rgb;
             rgb2.a = Mathf.Max(this.forcedAlpha,
-                Mathf.Lerp(0.7f, 0.9f, Mathf.Cos(Mathf.Pow(scalePosition, 1.7f) * 3.1415927f))) * colored;
+                Mathf.Lerp(0.7f, 0.9f, Mathf.Cos(Mathf.Pow(scalePosition, 1f) * 3.1415927f))) * colored;
             return rgb2;
         }
 
         public void MakeColorWave(int delay)
         {
             colorWaves.Add(new AlcedoGraphics.WingColorWave(delay, 1f / Mathf.Lerp(10f, 30f, UnityEngine.Random.value), 1f - UnityEngine.Random.value * UnityEngine.Random.value * UnityEngine.Random.value, 1f - UnityEngine.Random.value * UnityEngine.Random.value * UnityEngine.Random.value, 1f - UnityEngine.Random.value * UnityEngine.Random.value * UnityEngine.Random.value));
+        }
+
+        public virtual void UpdateSpritesLevel(RoomCamera.SpriteLeaser sLeaser)
+        {
+
         }
 
         public class SpritesOverlap : ExtEnum<SpritesOverlap>

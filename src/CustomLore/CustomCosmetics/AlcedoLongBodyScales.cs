@@ -70,8 +70,8 @@ namespace TheOutsider.CustomLore.CustomCosmetics
                 if (colored > 0f)
                 {
                     sLeaser.sprites[num + scalesPositions.Length] = new FSprite("AlcedoScaleB" + graphic);
-                    sLeaser.sprites[num + scalesPositions.Length].scaleY = 1f;//scaleObjects[num - startSprite].length / graphicHeight;
-                    sLeaser.sprites[num + scalesPositions.Length].anchorY = 0.1f;
+                    sLeaser.sprites[num + scalesPositions.Length].scaleY = sLeaser.sprites[num].scaleY;//scaleObjects[num - startSprite].length / graphicHeight;
+                    sLeaser.sprites[num + scalesPositions.Length].anchorY = sLeaser.sprites[num].anchorY;
                 }
             }
         }
