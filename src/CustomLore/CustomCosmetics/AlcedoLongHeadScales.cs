@@ -180,7 +180,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             int halfIndex = Mathf.FloorToInt((float)scalesPositions.Length / 2f);
             for (int num = startSprite; num <= halfIndex; num++)
             {
-                if (mask.scaleX >= 0 && aGraphics.headGraphic >= 1)
+                if (mask.scaleX <= 0 && aGraphics.headGraphic >= 1)
                 {
                     sLeaser.sprites[num].MoveBehindOtherNode(neck);
                     sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(neck);
@@ -193,7 +193,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             }
             for (int num = halfIndex; num <= scalesPositions.Length; num++)
             {
-                if (mask.scaleX <= 0 || aGraphics.headGraphic >= 1)
+                if (mask.scaleX >= 0 || aGraphics.headGraphic >= 1)
                 {
                     sLeaser.sprites[num].MoveBehindOtherNode(neck);
                     sLeaser.sprites[num + scalesPositions.Length].MoveBehindOtherNode(neck);

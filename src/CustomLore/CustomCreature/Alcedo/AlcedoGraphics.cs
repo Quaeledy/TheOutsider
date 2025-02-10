@@ -12,17 +12,11 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         public class WingColorWave
         {
             public int delay;
-
             public float speed;
-
             public float lightness;
-
             public float saturation;
-
             public float forceAlpha;
-
             public float position;
-
             public float lastPosition;
 
             public WingColorWave(int delay, float speed, float lightness, float saturation, float forceAlpha)
@@ -105,6 +99,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         }
         public BodyChunk head => alcedo.bodyChunks[4];
 
+        #region 绘制图形的长度
         public float SpineLength => NeckLength + ForeBodyLength + WaistLength + HindBodyLength + TailLength;
         public float BodyLength => WaistLength;// ForeBodyLength + WaistLength + HindBodyLength;
         public float NeckLength => alcedo.neck.idealLength;
@@ -137,7 +132,8 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 return tailLength;
             }
         }
-
+        #endregion
+        
         #region 贴图序号起始值及长度
         private int TailSpriteStart => 0;
         private int TailSpriteLength => 1;
@@ -745,28 +741,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             headDepthRotationFac = Mathf.InverseLerp(0f, 0.6f, Mathf.Abs(headDepthRotationFac));
             this.headDepthRotation = HeadRotation(0f);//Mathf.Lerp(this.headDepthRotation, this.depthRotation * headDepthRotationFac, 0.5f);
             #endregion
-        }
-
-        public void TuskConnectionPositions(int tusk, float timeStacker, ref Vector2[] resVec)
-        {
-            Vector2 vector = Custom.DirVec(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker),
-                Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker));
-            Vector2 vector2 = Custom.PerpendicularVector(vector);
-            float num = Custom.AimFromOneVectorToAnother(Vector2.Lerp(alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].lastPos, alcedo.neck.tChunks[alcedo.neck.tChunks.Length - 1].pos, timeStacker), Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker)) - Custom.AimFromOneVectorToAnother(Vector2.Lerp(alcedo.bodyChunks[0].lastPos, alcedo.bodyChunks[0].pos, timeStacker), Vector2.Lerp(alcedo.bodyChunks[1].lastPos, alcedo.bodyChunks[1].pos, timeStacker));
-            if (num > 180f)
-            {
-                num -= 360f;
-            }
-            else if (num < -180f)
-            {
-                num += 360f;
-            }
-            Vector2 vector3 = vector2 * (tusk == 0 ? -1f : 1f) * Mathf.Pow(Mathf.Abs(Mathf.Cos((float)Math.PI * num / 180f)), 0.5f) * (Mathf.Abs(num) > 90f ? -1f : 1f);
-            Vector2 vector4 = Vector2.Lerp(alcedo.bodyChunks[4].lastPos, alcedo.bodyChunks[4].pos, timeStacker) + vector * Mathf.Lerp(7f, -13f, alcedo.Snapping || alcedo.grasps[0] != null ? 0f : alcedo.TusksStuck) + vector3 * Mathf.Lerp(4f, 9f, alcedo.TusksStuck);
-            resVec[0] = vector4;
-            resVec[1] = vector;
-            resVec[2] = vector3;
-            resVec[3] = vector4 + vector * 20f - vector3 * (alcedo.grasps[0] != null ? 5f : 0f);
         }
 
         #region 绘图
@@ -1447,22 +1421,37 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }
             int frontWing = Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x >= 0 ? 0 : 1;
             int behindWing = 1 - frontWing;
-            FNode frontPos = alcedo.AirBorne ? sLeaser.sprites[TentacleSprite(behindWing)] : sLeaser.sprites[HindPawColorSprite(frontWing)];
+            FNode frontPos = sLeaser.sprites[BodySprite(2)];// alcedo.AirBorne ? sLeaser.sprites[TentacleSprite(behindWing)] : sLeaser.sprites[HindPawColorSprite(frontWing)];
             FNode behindPos = sLeaser.sprites[TailSpriteStart];
             for (int i = 0; i < alcedo.tentacles.Length; i++)
             {
                 if (i == frontWing && 
-                    Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.tentacles[i].tChunks[0].pos).x * Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x < 0)
+                    Custom.DirVec(alcedo.bodyChunks[0].pos, alcedo.tentacles[i].tChunks[0].pos).x * Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x < 0)
                 {
-                    sLeaser.sprites[ForePawColorSprite(i)].MoveInFrontOfOtherNode(frontPos);
-                    sLeaser.sprites[ForePawSprite(i)].MoveInFrontOfOtherNode(frontPos);
-                    sLeaser.sprites[TentacleSprite(i)].MoveInFrontOfOtherNode(frontPos);
-                    for (int j = featherLayersPerWing - 1; j >= 0; j--)
-                        for (int k = feathersPerLayer - 1; k >= 0; k--)
-                        {
-                            sLeaser.sprites[FeatherColorSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
-                            sLeaser.sprites[FeatherSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
-                        }
+                    if (alcedo.AirBorne)
+                    {
+                        for (int j = 0; j < featherLayersPerWing; j++)
+                            for (int k = 0; k < feathersPerLayer; k++)
+                            {
+                                sLeaser.sprites[FeatherSprite(i, j, k)].MoveBehindOtherNode(frontPos);
+                                sLeaser.sprites[FeatherColorSprite(i, j, k)].MoveBehindOtherNode(frontPos);
+                            }
+                        sLeaser.sprites[TentacleSprite(i)].MoveBehindOtherNode(frontPos);
+                        sLeaser.sprites[ForePawSprite(i)].MoveBehindOtherNode(frontPos);
+                        sLeaser.sprites[ForePawColorSprite(i)].MoveBehindOtherNode(frontPos);
+                    }
+                    else
+                    {
+                        sLeaser.sprites[ForePawColorSprite(i)].MoveInFrontOfOtherNode(frontPos);
+                        sLeaser.sprites[ForePawSprite(i)].MoveInFrontOfOtherNode(frontPos);
+                        sLeaser.sprites[TentacleSprite(i)].MoveInFrontOfOtherNode(frontPos);
+                        for (int j = featherLayersPerWing - 1; j >= 0; j--)
+                            for (int k = feathersPerLayer - 1; k >= 0; k--)
+                            {
+                                sLeaser.sprites[FeatherColorSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
+                                sLeaser.sprites[FeatherSprite(i, j, k)].MoveInFrontOfOtherNode(frontPos);
+                            }
+                    }
                 }
                 else
                 {

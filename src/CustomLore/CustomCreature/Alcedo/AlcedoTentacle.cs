@@ -236,10 +236,6 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                         tChunks[halfWingIndex].pos = floatGrabDest.Value;
                         tChunks[halfWingIndex].vel *= 0f;
                         attachedAtClaw = true;
-                        /*
-                        this.tChunks[this.tChunks.Length - 1].pos = this.floatGrabDest.Value;
-                        this.tChunks[this.tChunks.Length - 1].vel *= 0f;
-                        this.attachedAtClaw = true;*/
                     }
                     flyingMode -= 0.025f;
                     tChunks[halfWingIndex].collideWithTerrain = !attachedAtClaw;
@@ -291,12 +287,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                                 float num = Vector2.Distance(tChunks[m].pos, tChunks[l].pos);
                                 float num2 = 10f;
                                 if (num < num2)
-                                {/*
-                                    if (m != halfWingIndex)
-                                    {
-                                        tChunks[m].pos -= vector * (num2 - num) * 1f;
-                                        tChunks[m].vel -= vector * (num2 - num) * 1f;
-                                    }*/
+                                {
                                     tChunks[m].pos -= vector * (num2 - num) * 0.5f;
                                     tChunks[m].vel -= vector * (num2 - num) * 0.5f;
                                     tChunks[l].pos += vector * (num2 - num) * 0.5f;

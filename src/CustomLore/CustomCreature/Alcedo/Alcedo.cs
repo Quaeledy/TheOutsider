@@ -11,6 +11,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 {
     //TODO:
     //脖子很奇怪，可能有问题
+    //翅膀0的0层0羽毛图层始终在身体前方
     internal class Alcedo : AirBreatherCreature, IFlyingCreature
     {
         public bool IsKing
