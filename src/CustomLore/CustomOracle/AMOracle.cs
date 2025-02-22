@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CustomOracleTx;
+﻿using CustomOracleTx;
 using UnityEngine;
-using Random = UnityEngine.Random;
-using RWCustom;
-using static CustomOracleTx.CustomOracleBehaviour;
-using CustomDreamTx;
-using TheOutsider.CustomLore.CustomDream;
-using TheOutsider.Player_Hooks;
 
 namespace TheOutsider.CustomLore.CustomOracle
 {
@@ -73,5 +62,5 @@ namespace TheOutsider.CustomLore.CustomOracle
         public static readonly Color Rose = new Color(255f / 255f, 67f / 255f, 115f / 255f);
         public static readonly Color Purple = new Color(111f / 255f, 28f / 255f, 213f / 255f);
     }
-    
+
 }

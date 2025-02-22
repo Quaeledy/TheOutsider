@@ -99,7 +99,7 @@ namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
                     if ((grabbedBy[0].grabber as Player).graphicsModule != null &&
                         (grabbedBy[0].grabber as Player).standing &&
                         ((grabbedBy[0].grabber as Player).bodyMode != Player.BodyModeIndex.ClimbingOnBeam || (grabbedBy[0].grabber as Player).animation == Player.AnimationIndex.StandOnBeam) && (grabbedBy[0].grabber as Player).bodyMode != Player.BodyModeIndex.Swimming &&
-                        (grabbedBy[0].graspUsed == 1 || grabbedBy[0].grabber.grasps[1] == null || grabbedBy[0].grabber.grasps[1].grabbed.abstractPhysicalObject.type != OutsiderEnums.AbstractObjectType.AlcedoMask))
+                        (grabbedBy[0].graspUsed == 1 || grabbedBy[0].grabber.grasps[1] == null || grabbedBy[0].grabber.grasps[1].grabbed.abstractPhysicalObject.type != TheOutsiderEnums.AbstractObjectType.AlcedoMask))
                     {
                         to = Mathf.InverseLerp(15f, 10f, Vector2.Distance((grabbedBy[0].grabber.graphicsModule as PlayerGraphics).hands[grabbedBy[0].graspUsed].pos, grabbedBy[0].grabber.mainBodyChunk.pos));
                         if ((grabbedBy[0].grabber as Player).input[0].x != 0 && Mathf.Abs(grabbedBy[0].grabber.bodyChunks[1].lastPos.x - grabbedBy[0].grabber.bodyChunks[1].pos.x) > 2f)

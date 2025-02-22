@@ -6,123 +6,131 @@
     </PropertyGroup>
     
     <ItemGroup>
+      <Compile Remove="CustomLore\CustomCreature\Limb.cs" />
+    </ItemGroup>
+    
+    <ItemGroup>
         <Reference Include="Assembly-CSharp-firstpass">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="BepInEx">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
           <Private>False</Private>
         </Reference>
+        <Reference Include="DevConsole">
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2920528044\newest\plugins\DevConsole.dll</HintPath>
+        </Reference>
         <Reference Include="DressMySlugcat">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2948971756\newest\plugins\DressMySlugcat.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2948971756\newest\plugins\DressMySlugcat.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="EmgTx">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2991981689\newest\plugins\EmgTx.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2991981689\newest\plugins\EmgTx.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="Fisobs">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2920541687\newest\plugins\Fisobs.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2920541687\newest\plugins\Fisobs.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="HOOKS-Assembly-CSharp">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="Mono.Cecil">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Mono.Cecil.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="Mono.Cecil.Rocks">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Mono.Cecil.Rocks.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="MonoMod.Common">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.Common.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="MonoMod.RuntimeDetour">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.RuntimeDetour.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="MonoMod.Utils">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\MonoMod.Utils.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="Assembly-CSharp">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Mono.Cecil">
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\Mono.Cecil.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Mono.Cecil.Rocks">
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\Mono.Cecil.Rocks.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="MonoMod.RuntimeDetour">
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="MonoMod.Utils">
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\MonoMod.Utils.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="SlugBase">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\workshop\content\312520\2933196558\newest\plugins\SlugBase.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2933196558\newest\plugins\SlugBase.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="Unity.Mathematics">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\Unity.Mathematics.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\Unity.Mathematics.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="UnityEngine.AudioModule">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="UnityEngine.InputLegacyModule">
-          <HintPath>..\..\..\..\..\..\Software\Steam\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
           <Private>False</Private>
         </Reference>
     </ItemGroup>
     
     <ItemGroup>
-      <Compile Remove="CustomLore\**" />
-      <Compile Remove="EmgTx\**" />
-      <Compile Remove="MothPup\**" />
-      <Compile Remove="World_Hooks\Creature\**" />
-      <EmbeddedResource Remove="CustomLore\**" />
-      <EmbeddedResource Remove="EmgTx\**" />
-      <EmbeddedResource Remove="MothPup\**" />
-      <EmbeddedResource Remove="World_Hooks\Creature\**" />
-      <None Remove="CustomLore\**" />
-      <None Remove="EmgTx\**" />
-      <None Remove="MothPup\**" />
-      <None Remove="World_Hooks\Creature\**" />
-      <Reference Remove="World_Hooks\Creature\**" />
+      <Reference Update="System">
+        <Private>False</Private>
+      </Reference>
     </ItemGroup>
     
     <ItemGroup>
-      <Compile Include="CustomLore\CustomCosmetics\AlcedoBodyScales.cs" />
-      <Compile Include="CustomLore\CustomCosmetics\AlcedoLongBodyScales.cs" />
-      <Compile Include="CustomLore\CustomCosmetics\AlcedoLongHeadScales.cs" />
-      <Compile Include="CustomLore\CustomCosmetics\AlcedoScaleTemplate.cs" />
-      <Compile Include="CustomLore\CustomCosmetics\AlcedoSpineTeardrop.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\Alcedo.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoAbstractAI.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoAI.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoCritob.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoFeather.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoGraphics.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoIcon.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoLeg.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoLimb.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoPather.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoProperties.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoScale.cs" />
-      <Compile Include="CustomLore\CustomCreature\Alcedo\AlcedoTentacle.cs" />
-      <Compile Include="CustomLore\CustomCreature\MothPup\MothPupCritob.cs" />
-      <Compile Include="CustomLore\CustomCreature\MothPup\MothPupIcon.cs" />
-      <Compile Include="CustomLore\CustomCreature\MothPup\MothPupProperties.cs" />
-      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMask.cs" />
-      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskAbstract.cs" />
-      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskFisob.cs" />
-      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskIcon.cs" />
-      <Compile Include="CustomLore\CustomObject\AlcedoMask\AlcedoMaskProperties.cs" />
+      <Reference Update="System.Data">
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Update="System.Core">
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Update="System.IO.Compression.FileSystem">
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Update="System.Drawing">
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Update="System.Numerics">
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Update="System.Runtime.Serialization">
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Update="System.Xml">
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Update="System.Xml.Linq">
+        <Private>False</Private>
+      </Reference>
     </ItemGroup>
     
 </Project>

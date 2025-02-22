@@ -7,7 +7,13 @@ namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
 {
     sealed class AlcedoMaskFisob : Fisob
     {
-        public AlcedoMaskFisob() : base(OutsiderEnums.AbstractObjectType.AlcedoMask)
+        public static readonly AbstractPhysicalObject.AbstractObjectType AlcedoMask = new("AlcedoMask", false);
+        public static readonly MultiplayerUnlocks.SandboxUnlockID AlcedoMaskUnlock = new("AlcedoMask", false);
+        /*
+        public static readonly AbstractPhysicalObject.AbstractObjectType AlcedoMask = new("AlcedoMask", true);
+        public static readonly MultiplayerUnlocks.SandboxUnlockID AlcedoMaskUnlock = new("AlcedoMask", true);*/
+
+        public AlcedoMaskFisob() : base(TheOutsiderEnums.AbstractObjectType.AlcedoMask)
         {
             // Fisobs auto-loads the `icon_AlcedoMask` embedded resource as a texture.
             // See `AlcedoMasks.csproj` for how you can add embedded resources to your project.
@@ -17,7 +23,7 @@ namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
 
             SandboxPerformanceCost = new(linear: 0.35f, exponential: 0f);
 
-            RegisterUnlock(OutsiderEnums.AbstractObjectType.AlcedoMaskUnlock, parent: OutsiderEnums.CreatureTemplateType.AlcedoUnlock, data: 70);
+            RegisterUnlock(TheOutsiderEnums.AbstractObjectType.AlcedoMaskUnlock, parent: TheOutsiderEnums.CreatureTemplateType.AlcedoUnlock, data: 70);
         }
 
         public override AbstractPhysicalObject Parse(World world, EntitySaveData saveData, SandboxUnlock? unlock)

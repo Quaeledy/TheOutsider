@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using RWCustom;
+﻿using RWCustom;
+using UnityEngine;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Quetzalcoatl
 {
     sealed class QuetzalcoatlGraphics
      : GraphicsModule
@@ -25,7 +25,7 @@ namespace TheOutsider.CustomLore.CustomCreature
         float wingFlap;
         float lastWingFlap;
         RoomPalette roomPalette;
-        ChunkSoundEmitter? soundLoop;
+        ChunkSoundEmitter soundLoop;
 
         readonly TriangleMesh[] m = new TriangleMesh[2]; // mesh sprites 0 and 1
         readonly CustomFSprite[] w = new CustomFSprite[2]; // wing sprites 0 and 1
@@ -167,7 +167,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             base.InitiateSprites(sLeaser, rCam);
         }
 
-        public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer? newContainer)
+        public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContainer)
         {
             newContainer ??= rCam.ReturnFContainer("Midground");
 
@@ -214,7 +214,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             for (int i = 0; i < meshSegs; i++)
             {
                 float iN = Mathf.InverseLerp(1f, meshSegs - 1, i); // i, normalized
-                float num5 = i < 2 ? (0.5f + i) : (Custom.LerpMap(iN, 0.5f, 1f, Mathf.Lerp(3f, 2.5f, iN), 1f, 3f) * num2);
+                float num5 = i < 2 ? 0.5f + i : Custom.LerpMap(iN, 0.5f, 1f, Mathf.Lerp(3f, 2.5f, iN), 1f, 3f) * num2;
                 if (quet.bloat > 0f && i > 1)
                 {
                     num5 = Mathf.Lerp(num5 * (1.2f + 0.65f * Mathf.Sin(Mathf.PI * iN) * quet.bloat * 2f), 1f, (0.5f + 0.5f * squeeze) * Mathf.InverseLerp(1f - squeeze - 0.1f, 1f - squeeze + 0.1f, iN));

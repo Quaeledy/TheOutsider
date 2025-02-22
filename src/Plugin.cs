@@ -20,6 +20,7 @@ using TheOutsider.World_Hooks;
 #pragma warning restore CS0618 // Type or member is obsolete
 
 //暂时隐藏了翠鸟羽毛，拉长了翠鸟身体
+//暂时将翠鸟、翠鸟面具相关注册改成了false
 
 namespace TheOutsider
 {
@@ -35,9 +36,12 @@ namespace TheOutsider
         public void OnEnable()
         {
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
+            //需要注册的变量
+            TheOutsiderEnums.RegisterAllEnumExtensions();
+            TheOutsiderEnums.RegisterAllFisobsContent();
             // Put your custom hooks here!
             On.RainWorld.OnModsInit += new On.RainWorld.hook_OnModsInit(this.RainWorld_OnModsInit);
-            //CreatureTemplateType.RegisterValues();
+            On.RainWorld.PostModsInit += new On.RainWorld.hook_PostModsInit(this.RainWorld_PostModsInit);
         }
 
         public static readonly PlayerColor AntennaeColor = new PlayerColor("Antennae");
@@ -59,9 +63,7 @@ namespace TheOutsider
                 optionsMenuInstance = new OptionsMenu(this);
                 MachineConnector.SetRegisteredOI(MOD_ID, optionsMenuInstance);
 
-                //需要注册的变量
-                OutsiderEnums.RegisterValues();
-
+                //对其它mod的适配
                 if (ModManager.ActiveMods.Any(mod => mod.id == "dressmyslugcat"))
                 {
                     DressMySlugcatHooks.Init();
@@ -83,9 +85,7 @@ namespace TheOutsider
                 MothPup_Hooks.PlayerHooks.Init();
                 MothPup_Hooks.SlugNPCAIHooks.Init();
                 MothPup_Hooks.OtherHooks.Init();
-                /*
-                SlugpupGraphics.Init();
-                SlugpupStuff.Init();*/
+                
                 /*
                 SceneHooks.Init();
                 IntroRollHooks.Init();
@@ -106,6 +106,15 @@ namespace TheOutsider
             }
         }
 
+        private void RainWorld_PostModsInit(On.RainWorld.orig_PostModsInit orig, RainWorld self)
+        {
+            orig.Invoke(self);
+            if (ModManager.ActiveMods.Any(mod => mod.id == "slime-cubed.devconsole"))
+            {
+                DevConsoleHooks.Init();
+            }
+        }
+
         // Load any resources, such as sprites or sounds
         private void LoadResources(RainWorld rainWorld)
         {
@@ -118,7 +127,7 @@ namespace TheOutsider
             Futile.atlasManager.LoadAtlas("atlases/AlcedoScale");
             Futile.atlasManager.LoadAtlas("atlases/OutsiderGuidanceSlugcat");
             Futile.atlasManager.LoadAtlas("atlases/Kill_Slugcat_Outsider");
-            //Futile.atlasManager.LoadAtlas("atlases/icon_Quetzalcoatl");
+            Futile.atlasManager.LoadAtlas("atlases/icon_Quetzalcoatl");
             Futile.atlasManager.LoadAtlas("atlases/icon_MothPup");
             Futile.atlasManager.LoadAtlas("atlases/icon_Alcedo");
             Futile.atlasManager.LoadAtlas("atlases/icon_AlcedoMask");

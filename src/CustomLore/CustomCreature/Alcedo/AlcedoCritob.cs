@@ -12,14 +12,19 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 {
     internal sealed class AlcedoCritob : Critob
     {
-        public AlcedoCritob() : base(OutsiderEnums.CreatureTemplateType.Alcedo)
+        public static readonly CreatureTemplate.Type Alcedo = new("Alcedo", false);
+        public static readonly MultiplayerUnlocks.SandboxUnlockID AlcedoUnlock = new("Alcedo", false);/*
+        public static readonly CreatureTemplate.Type Alcedo = new("Alcedo", true);
+        public static readonly MultiplayerUnlocks.SandboxUnlockID AlcedoUnlock = new("Alcedo", true);*/
+
+        public AlcedoCritob() : base(TheOutsiderEnums.CreatureTemplateType.Alcedo)
         {
             LoadedPerformanceCost = 150f;
             SandboxPerformanceCost = new(linear: 1.2f, exponential: 0.8f);
             ShelterDanger = ShelterDanger.Hostile;
             CreatureName = "Alcedo";
             Icon = new AlcedoIcon();
-            RegisterUnlock(killScore: KillScore.Configurable(15), OutsiderEnums.CreatureTemplateType.AlcedoUnlock, null, data: 0);
+            RegisterUnlock(killScore: KillScore.Configurable(15), TheOutsiderEnums.CreatureTemplateType.AlcedoUnlock, null, data: 0);
         }
 
         public override CreatureTemplate CreateTemplate()
@@ -150,20 +155,20 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         {
             // You can use StaticWorld.EstablishRelationship, but the Relationships class exists to make this process more ergonomic.
             // 您可以使用 StaticWorld.EstablishRelationship，但Relationships类的存在是为了使此过程更符合人体工程学。
-            Relationships self = new(OutsiderEnums.CreatureTemplateType.Alcedo);
-            CreatureTemplate vultureTemplate = StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Vulture);
+            Relationships self = new(TheOutsiderEnums.CreatureTemplateType.Alcedo);
+            //CreatureTemplate vultureTemplate = StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Vulture);
             foreach (var template in StaticWorld.creatureTemplates)
             {
                 if (template.quantified)
-                {/*
+                {
                     self.Ignores(template.type);
-                    self.IgnoredBy(template.type);*/
-                    StaticWorld.EstablishRelationship(template.type, OutsiderEnums.CreatureTemplateType.Alcedo, template.relationships[vultureTemplate.index]);
-                    StaticWorld.EstablishRelationship(OutsiderEnums.CreatureTemplateType.Alcedo, template.type, vultureTemplate.relationships[template.index]);
+                    self.IgnoredBy(template.type);/*
+                    StaticWorld.EstablishRelationship(template.type, TheOutsiderEnums.CreatureTemplateType.Alcedo, template.relationships[vultureTemplate.index]);
+                    StaticWorld.EstablishRelationship(TheOutsiderEnums.CreatureTemplateType.Alcedo, template.type, vultureTemplate.relationships[template.index]);*/
                 }
             }
 
-            self.IsInPack(OutsiderEnums.CreatureTemplateType.Alcedo, 0.5f);
+            self.IsInPack(TheOutsiderEnums.CreatureTemplateType.Alcedo, 0.5f);
 
             //原捕食，现忽略
             self.Ignores(CreatureTemplate.Type.VultureGrub);
@@ -176,7 +181,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             self.FearedBy(CreatureTemplate.Type.GreenLizard, 0f);
             self.FearedBy(CreatureTemplate.Type.RedLizard, 0f);
             self.FearedBy(MoreSlugcatsEnums.CreatureTemplateType.TrainLizard, 0f);
-            self.FearedBy(OutsiderEnums.CreatureTemplateType.Mothpup, 0.9f);
+            self.FearedBy(TheOutsiderEnums.CreatureTemplateType.Mothpup, 0.9f);
 
             //被攻击
             self.AttackedBy(CreatureTemplate.Type.Scavenger, 0.8f);
@@ -196,7 +201,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             self.Eats(MoreSlugcatsEnums.CreatureTemplateType.TrainLizard, 0f);
             self.Eats(MoreSlugcatsEnums.CreatureTemplateType.SpitLizard, 0f);
             self.Eats(MoreSlugcatsEnums.CreatureTemplateType.MotherSpider, 0.7f);
-            self.Eats(OutsiderEnums.CreatureTemplateType.Mothpup, 0.4f);
+            self.Eats(TheOutsiderEnums.CreatureTemplateType.Mothpup, 0.4f);
 
             //被捕食
             self.EatenBy(CreatureTemplate.Type.DaddyLongLegs, 1f);
@@ -305,7 +310,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             // The Mosquitoes example demonstrates this.
             // 如果需要使用forObject参数，请将其传递给ItemProperties类的构造函数。
             // 蚊子的例子说明了这一点。
-            if (crit is Alcedo alcedo && (crit as Alcedo).abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Alcedo)
+            if (crit is Alcedo alcedo && (crit as Alcedo).abstractCreature.creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Alcedo)
             {
                 return new AlcedoProperties(alcedo);
             }

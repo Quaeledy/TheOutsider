@@ -1,19 +1,19 @@
-﻿using Fisobs.Creatures;
-using Fisobs.Properties;
-using System.Collections.Generic;
-using DevInterface;
-using Fisobs.Sandbox;
-using RWCustom;
-using UnityEngine;
-using MoreSlugcats;
-using static PathCost.Legality;
+﻿using DevInterface;
 using Fisobs.Core;
+using Fisobs.Creatures;
+using Fisobs.Properties;
+using Fisobs.Sandbox;
+using MoreSlugcats;
+using RWCustom;
+using System.Collections.Generic;
+using UnityEngine;
+using static PathCost.Legality;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Quetzalcoatl
 {
     sealed class QuetzalcoatlCritob : Critob
     {
-        public static readonly CreatureTemplate.Type Quetzalcoatl = new ("Quetzalcoatl", true);
+        public static readonly CreatureTemplate.Type Quetzalcoatl = new("Quetzalcoatl", true);
         public static readonly MultiplayerUnlocks.SandboxUnlockID QuetzalcoatlUnlock = new("Quetzalcoatl", true);
 
         public QuetzalcoatlCritob() : base(Quetzalcoatl)
@@ -22,7 +22,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             SandboxPerformanceCost = new(linear: 0.6f, exponential: 0.1f);
             ShelterDanger = ShelterDanger.Safe;
             CreatureName = "Quetzalcoatl";
-            base.Icon = new QuetzalcoatlIcon();
+            Icon = new QuetzalcoatlIcon();
             RegisterUnlock(killScore: KillScore.Configurable(50), QuetzalcoatlUnlock, parent: MultiplayerUnlocks.SandboxUnlockID.BigEel, data: 0);
         }
 
@@ -254,7 +254,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             return new Color(32f / 255f, 227f / 255f, 187f / 255f);
         }
 
-        public override ItemProperties? Properties(Creature crit)
+        public override ItemProperties Properties(Creature crit)
         {
             // If you need to use the forObject parameter, pass it to your ItemProperties class's constructor.
             // The Mosquitoes example demonstrates this.

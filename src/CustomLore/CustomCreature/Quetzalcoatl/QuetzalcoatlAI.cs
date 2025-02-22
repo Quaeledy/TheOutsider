@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using static CreatureTemplate.Relationship.Type;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Quetzalcoatl
 {
     sealed class QuetzalcoatlAI : ArtificialIntelligence, IUseARelationshipTracker
     {
@@ -23,7 +23,7 @@ namespace TheOutsider.CustomLore.CustomCreature
 
         public Quetzalcoatl bug;
         public int tiredOfHuntingCounter;
-        public AbstractCreature? tiredOfHuntingCreature;
+        public AbstractCreature tiredOfHuntingCreature;
         private Behavior behavior;
         private int behaviorCounter;
         private WorldCoordinate tempIdlePos;
@@ -60,7 +60,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
         }
 
-        AIModule? IUseARelationshipTracker.ModuleToTrackRelationship(CreatureTemplate.Relationship relationship)
+        AIModule IUseARelationshipTracker.ModuleToTrackRelationship(CreatureTemplate.Relationship relationship)
         {
             if (relationship.type == Eats) return preyTracker;
             if (relationship.type == Afraid) return threatTracker;
@@ -221,7 +221,7 @@ namespace TheOutsider.CustomLore.CustomCreature
             }
         }
 
-        private Tracker.CreatureRepresentation? RandomPackMember()
+        private Tracker.CreatureRepresentation RandomPackMember()
         {
             var others = tracker.creatures.Where(r => r.dynamicRelationship.state.alive && r.dynamicRelationship.currentRelationship.type == Pack).ToList();
             if (others.Any())

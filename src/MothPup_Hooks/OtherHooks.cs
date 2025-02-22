@@ -58,7 +58,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((SlugcatStats.Name slugpup, PlayerNPCState self) =>
                 {
                     SlugcatStats.Name result = slugpup;
-                    if (self.player.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+                    if (self.player.creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         result = Plugin.Mothpup;
                     }
@@ -81,7 +81,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((bool isSlugNPC, FoodMeter self, int i) =>
                 {
                     bool isMothPup = false;
-                    if ((self.hud.owner as Player).abstractCreature.Room.creatures[i].creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+                    if ((self.hud.owner as Player).abstractCreature.Room.creatures[i].creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         isMothPup = true;
                     }
@@ -104,7 +104,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((bool notSlugNPC, ShelterDoor self, int i) =>
                 {
                     bool notMothPup = true;
-                    if (self.room.abstractRoom.creatures[i].creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+                    if (self.room.abstractRoom.creatures[i].creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         notMothPup = false;
                     }
@@ -127,7 +127,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((bool notSlugNPC, GhostCreatureSedater self, int i) =>
                 {
                     bool notMothPup = true;
-                    if (self.room.abstractRoom.creatures[i].creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+                    if (self.room.abstractRoom.creatures[i].creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         notMothPup = false;
                     }
@@ -151,7 +151,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((bool isSlugNPC, RainWorldGame game, int k, int l) =>
                 {
                     bool isMothPup = false;
-                    if (game.world.GetAbstractRoom(game.Players[k].pos).creatures[l].creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+                    if (game.world.GetAbstractRoom(game.Players[k].pos).creatures[l].creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         isMothPup = true;
                     }
@@ -168,7 +168,7 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((SlugcatStats.Name slugpup, RainWorldGame game, int k, int l) =>
                 {
                     SlugcatStats.Name result = slugpup;
-                    if (game.world.GetAbstractRoom(game.Players[k].pos).creatures[l].creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+                    if (game.world.GetAbstractRoom(game.Players[k].pos).creatures[l].creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         result = Plugin.Mothpup;
                     }
@@ -190,13 +190,34 @@ namespace TheOutsider.MothPup_Hooks
                 c.EmitDelegate((bool isSlugNPC, AbstractCreature abstractCreature) =>
                 {
                     bool isMothPup = false;
-                    if (abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+                    if (abstractCreature.creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
                     {
                         isMothPup = true;
                     }
                     return isSlugNPC || isMothPup;
                 });
-            }/*
+            }
+
+            if (c.TryGotoNext(MoveType.After,
+                i => i.MatchCallvirt<RainWorldGame>("GetNewID"),
+                i => i.Match(OpCodes.Newobj),
+                i => i.MatchStloc(13)))
+            {
+                Plugin.Log("World_SpawnPupNPCsIL MatchFind 2!");
+                c.Emit(OpCodes.Ldarg_0); // this, world
+                c.Emit(OpCodes.Ldloc_S, (byte)13); // abstractCreature
+                c.EmitDelegate((World world, AbstractCreature abstractCreature) =>
+                {
+                    if (TheOutsider.PlayerNPCShouldBeMoth(world, abstractCreature.ID))
+                    {
+                        abstractCreature = new AbstractCreature(world, StaticWorld.GetCreatureTemplate(TheOutsiderEnums.CreatureTemplateType.Mothpup), null, 
+                            abstractCreature.pos, abstractCreature.ID);
+                    }
+                    return abstractCreature;
+                });
+                c.Emit(OpCodes.Stloc_S, (byte)13); // abstractCreature
+            }
+            /*
             while (c.TryGotoNext(MoveType.After,
                 i => i.Match(OpCodes.Ldarg_0),
                 i => i.MatchLdsfld<MoreSlugcatsEnums.CreatureTemplateType>(nameof(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC))))
@@ -208,27 +229,28 @@ namespace TheOutsider.MothPup_Hooks
                     CreatureTemplate.Type result = slugpup;
                     if (TheOutsider.PlayerNPCShouldBeMoth(self))
                     {
-                        result = OutsiderEnums.CreatureTemplateType.Mothpup;
+                        result = TheOutsiderEnums.CreatureTemplateType.Mothpup;
                     }
                     return result;
                 });
             }*/
         }
         #endregion
+
         private static void PlayerNPCState_ctor(On.MoreSlugcats.PlayerNPCState.orig_ctor orig, PlayerNPCState self, AbstractCreature abstractCreature, int playerNumber)
         {
             orig(self, abstractCreature, playerNumber);
-            if (abstractCreature.creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+            if (abstractCreature.creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
             {
                 self.Glowing = true;
             }
         }
         private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature self, World world, CreatureTemplate creatureTemplate, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
         {
-            if ((creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && TheOutsider.PlayerNPCShouldBeMoth(world, ID)) ||
-                 creatureTemplate.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+            if (//(creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && TheOutsider.PlayerNPCShouldBeMoth(world, ID)) ||
+                 creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
             {
-                creatureTemplate = StaticWorld.GetCreatureTemplate(OutsiderEnums.CreatureTemplateType.Mothpup);
+                creatureTemplate = StaticWorld.GetCreatureTemplate(TheOutsiderEnums.CreatureTemplateType.Mothpup);
                 self.creatureTemplate = creatureTemplate;
                 self.personality = new AbstractCreature.Personality(ID);
                 self.remainInDenCounter = -1;
@@ -283,7 +305,7 @@ namespace TheOutsider.MothPup_Hooks
         private static bool AImap_TileAccessibleToCreature(On.AImap.orig_TileAccessibleToCreature_IntVector2_CreatureTemplate orig, AImap self, IntVector2 pos, CreatureTemplate crit)
         {
             bool result = orig(self, pos, crit);
-            if (crit.type == OutsiderEnums.CreatureTemplateType.Mothpup)
+            if (crit.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
             {
                 AItile aitile = self.getAItile(pos);
                 if (Plugin.optionsMenuInstance.infiniteFlight.Value)

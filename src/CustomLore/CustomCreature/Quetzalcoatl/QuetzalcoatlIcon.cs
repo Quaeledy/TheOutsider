@@ -1,8 +1,7 @@
 ﻿using Fisobs.Core;
-using RWCustom;
 using UnityEngine;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Quetzalcoatl
 {
     sealed class QuetzalcoatlIcon : Icon
     {
@@ -20,11 +19,11 @@ namespace TheOutsider.CustomLore.CustomCreature
             return (int)(centiShieldAbstract.hue * 1000f);*/
             return 0;
         }
-        
+
         public override Color SpriteColor(int data)
         {
             //return Custom.HSL2RGB((float)data / 1000f, 0.65f, 0.4f);
-            return new Color(32f / 255f, 227f / 255f, 187f /255f);
+            return new Color(32f / 255f, 227f / 255f, 187f / 255f);
         }
 
         public override string SpriteName(int data)

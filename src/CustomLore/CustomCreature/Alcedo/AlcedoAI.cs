@@ -191,7 +191,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     }
                     else
                     {
-                        flag = focusCreature.representedCreature.creatureTemplate.TopAncestor().type == OutsiderEnums.CreatureTemplateType.Alcedo;
+                        flag = focusCreature.representedCreature.creatureTemplate.TopAncestor().type == TheOutsiderEnums.CreatureTemplateType.Alcedo;
                     }
                     if (flag && focusCreature.VisualContact && focusCreature.representedCreature.realizedCreature != null)
                     {
@@ -317,7 +317,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
 
         CreatureTemplate.Relationship IUseARelationshipTracker.UpdateDynamicRelationship(RelationshipTracker.DynamicRelationship dRelation)
         {
-            if (!IsMiros && dRelation.trackerRep.representedCreature.creatureTemplate.TopAncestor().type == OutsiderEnums.CreatureTemplateType.Alcedo && dRelation.trackerRep.representedCreature.state.alive && (alcedo.State as Alcedo.AlcedoState).mask != (dRelation.trackerRep.representedCreature.state as Alcedo.AlcedoState).mask)
+            if (!IsMiros && dRelation.trackerRep.representedCreature.creatureTemplate.TopAncestor().type == TheOutsiderEnums.CreatureTemplateType.Alcedo && dRelation.trackerRep.representedCreature.state.alive && (alcedo.State as Alcedo.AlcedoState).mask != (dRelation.trackerRep.representedCreature.state as Alcedo.AlcedoState).mask)
             {
                 return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Attacks, (alcedo.State as Alcedo.AlcedoState).mask ? 0.8f : 0.1f);
             }

@@ -1,11 +1,10 @@
-﻿using System.Linq;
+﻿using RWCustom;
+using System.Linq;
 using UnityEngine;
-using RWCustom;
-using Fisobs;
 using Random = UnityEngine.Random;
 
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Quetzalcoatl
 {
     sealed class Quetzalcoatl : Creature, IFlyingCreature
     {
@@ -154,14 +153,14 @@ namespace TheOutsider.CustomLore.CustomCreature
             AI.Update();
 
             Vector2 followingPos = bodyChunks[0].pos;
-            if ((room.GetWorldCoordinate(followingPos) == AI.pathFinder.GetDestination) && AI.threatTracker.Utility() < 0.5f)
+            if (room.GetWorldCoordinate(followingPos) == AI.pathFinder.GetDestination && AI.threatTracker.Utility() < 0.5f)
             {
                 GoThroughFloors = false;
                 return;
             }
 
             var pather = AI.pathFinder as StandardPather;
-            var movementConnection = pather!.FollowPath(room.GetWorldCoordinate(followingPos), true) != null ? 
+            var movementConnection = pather!.FollowPath(room.GetWorldCoordinate(followingPos), true) != null ?
                 pather!.FollowPath(room.GetWorldCoordinate(followingPos), true) : pather.FollowPath(room.GetWorldCoordinate(followingPos), true);
             if (movementConnection != null)
             {

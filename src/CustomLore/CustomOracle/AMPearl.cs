@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CustomOracleTx;
+﻿using CustomOracleTx;
 using UnityEngine;
 using Random = UnityEngine.Random;
-using RWCustom;
-using static CustomOracleTx.CustomOracleBehaviour;
-using CustomDreamTx;
-using TheOutsider.CustomLore.CustomDream;
-using TheOutsider.Player_Hooks;
 
 namespace TheOutsider.CustomLore.CustomOracle
 {

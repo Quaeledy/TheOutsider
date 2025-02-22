@@ -1,7 +1,7 @@
 ﻿using Fisobs.Properties;
 using MoreSlugcats;
 
-namespace TheOutsider.CustomLore.CustomCreature
+namespace TheOutsider.CustomLore.CustomCreature.Quetzalcoatl
 {
     sealed class QuetzalcoatlProperties : ItemProperties
     {

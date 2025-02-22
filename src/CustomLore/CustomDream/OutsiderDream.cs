@@ -1,12 +1,6 @@
 ﻿using CustomDreamTx;
-using UnityEngine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using RWCustom;
 using Menu;
+using RWCustom;
 
 namespace TheOutsider.CustomLore.CustomDream
 {

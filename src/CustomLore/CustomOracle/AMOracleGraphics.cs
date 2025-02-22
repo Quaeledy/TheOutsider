@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CustomOracleTx;
+﻿using CustomOracleTx;
+using RWCustom;
 using UnityEngine;
 using Random = UnityEngine.Random;
-using RWCustom;
-using static CustomOracleTx.CustomOracleBehaviour;
-using CustomDreamTx;
-using TheOutsider.CustomLore.CustomDream;
-using TheOutsider.Player_Hooks;
-using System.Diagnostics;
-using TheOutsider.PlayerGraphics_Hooks;
 
 namespace TheOutsider.CustomLore.CustomOracle
 {
@@ -102,7 +91,7 @@ namespace TheOutsider.CustomLore.CustomOracle
 
             //披肩
             cover = new GownCover[2];
-            for(int i = 0; i < 2; i++)
+            for (int i = 0; i < 2; i++)
                 cover[i] = new GownCover(this);
             coverSprite = totalSprites;
             totalSprites += 2;
@@ -168,7 +157,7 @@ namespace TheOutsider.CustomLore.CustomOracle
                     for (int l = 4; l < 7; l++)
                     {
                         Color handColor = Gown_Color(gown, (float)l / 7f);
-                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4]     = handColor;
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = handColor;
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = handColor;
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = handColor;
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 3] = handColor;
@@ -269,7 +258,7 @@ namespace TheOutsider.CustomLore.CustomOracle
 
             sLeaser.sprites[killSprite] = new FSprite("Futile_White", true);
             sLeaser.sprites[killSprite].shader = rCam.game.rainWorld.Shaders["FlatLight"];
-            
+
             for (int i = 0; i < 2; i++)
                 cover[i].InitiateSprites(coverSprite + i, sLeaser, rCam);
             for (int i = 0; i < 2; i++)
@@ -334,7 +323,7 @@ namespace TheOutsider.CustomLore.CustomOracle
         {
             if (f <= 0.1f)
                 return AMOracleColor.Blue;
-            else if(f == 1f)
+            else if (f == 1f)
                 return AMOracleColor.LightBlue;
             else
                 return Color.Lerp(AMOracleColor.LightBlue, AMOracleColor.DarkBlue, f + 0.1f);
@@ -366,9 +355,9 @@ namespace TheOutsider.CustomLore.CustomOracle
 
             public Color Color(int y)
             {
-                if (y < 10) 
+                if (y < 10)
                     return UnityEngine.Color.Lerp(AMOracleColor.Blue, AMOracleColor.DarkBlue, (float)y / 9f);
-                else if(y == 10) 
+                else if (y == 10)
                     return AMOracleColor.LightBlue;
                 else
                     return UnityEngine.Color.Lerp(AMOracleColor.Blue, AMOracleColor.DarkBlue, (float)y / 9f);
@@ -415,7 +404,7 @@ namespace TheOutsider.CustomLore.CustomOracle
                     Vector2 cA = shoulderPos + perpBodyDir * 5f * ((k == 1) ? -1f : 1f);
 
                     Vector2 vector14 = shoulderPos - perpBodyDir * 2f * ((k == 1) ? -1f : 1f);
-                    
+
 
                     for (int m = 0; m < 5; m++)
                     {
@@ -459,8 +448,8 @@ namespace TheOutsider.CustomLore.CustomOracle
                     int floor = (int)Mathf.Floor(y * 6 / (divs - 1));//整数部分
                     float fraction = y * 6 / (divs - 1) - floor;     //小数部分
                     //Vector2.Lerp(this.clothPoints[i, j, 1], this.clothPoints[i, j, 0], timeStacker) - camPos;
-                    Vector2 leftGownInterpolation  = Vector2.Lerp(gown.vertices[(divs - 1) * divs + floor], gown.vertices[(divs - 1) * divs + floor + 1], fraction);
-                    Vector2 rightGownInterpolation = Vector2.Lerp(gown.vertices[ 0 *         divs + floor], gown.vertices[ 0 *         divs + floor + 1], fraction);
+                    Vector2 leftGownInterpolation = Vector2.Lerp(gown.vertices[(divs - 1) * divs + floor], gown.vertices[(divs - 1) * divs + floor + 1], fraction);
+                    Vector2 rightGownInterpolation = Vector2.Lerp(gown.vertices[0 * divs + floor], gown.vertices[0 * divs + floor + 1], fraction);
 
                     //判断披肩是否要加上袍子多于披肩的宽度
                     float gradientAngle = 0.1f;//渐变角度范围（弧度制）
@@ -477,7 +466,7 @@ namespace TheOutsider.CustomLore.CustomOracle
                     //让披肩再往外一点
                     Vector2 expand = perpBodyDir * 7f * y / (divs - 1);
 
-                    cover.MoveVertice(y * divs + 0,         leftSleevePos[y - 1] + leftExpand  + expand);
+                    cover.MoveVertice(y * divs + 0, leftSleevePos[y - 1] + leftExpand + expand);
                     cover.MoveVertice(y * divs + divs - 1, rightSleevePos[y - 1] + rightExpand - expand);
                 }
 
@@ -519,7 +508,7 @@ namespace TheOutsider.CustomLore.CustomOracle
                     {
                         if (i == 0 && x <= half)//玩家视角的右侧
                             cover.MoveVertice(y * divs + x, cover.vertices[y * divs + half + 1]);
-                        else if(i == 1 && x >= half)//玩家视角的左侧
+                        else if (i == 1 && x >= half)//玩家视角的左侧
                             cover.MoveVertice(y * divs + x, cover.vertices[y * divs + half - 1]);
                     }
                 }

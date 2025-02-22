@@ -133,7 +133,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }
         }
         #endregion
-        
+
         #region 贴图序号起始值及长度
         private int TailSpriteStart => 0;
         private int TailSpriteLength => 1;
@@ -1425,7 +1425,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             FNode behindPos = sLeaser.sprites[TailSpriteStart];
             for (int i = 0; i < alcedo.tentacles.Length; i++)
             {
-                if (i == frontWing && 
+                if (i == frontWing &&
                     Custom.DirVec(alcedo.bodyChunks[0].pos, alcedo.tentacles[i].tChunks[0].pos).x * Custom.DirVec(alcedo.bodyChunks[5].pos, alcedo.bodyChunks[0].pos).x < 0)
                 {
                     if (alcedo.AirBorne)
@@ -1511,7 +1511,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     {
                         for (int i = cosmetics[j].startSprite + cosmetics[j].numberOfSprites - 1; i >= cosmetics[j].startSprite; i--)
                         {
-                                sLeaser.sprites[i].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
+                            sLeaser.sprites[i].MoveInFrontOfOtherNode(sLeaser.sprites[TailSpriteStart]);
                         }
                     }
                 }

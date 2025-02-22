@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using Menu;
+﻿using Menu;
 using RWCustom;
-using SlugBase.Features;
-using SlugBase.Assets;
-using UnityEngine.PlayerLoop;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
+using System;
+using System.IO;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace TheOutsider.CustomLore.CustomDream
 {
@@ -30,7 +21,7 @@ namespace TheOutsider.CustomLore.CustomDream
             On.Menu.SlideShowMenuScene.ApplySceneSpecificAlphas += SlideShowMenuScene_ApplySceneSpecificAlphas;*/
         }
 
-        public static ConditionalWeakTable<WeakReference<Player>, PlayerEx> PlayerData = new();
+        public static ConditionalWeakTable<WeakReference<Player>, TheOutsider> PlayerData = new();
 
         public static readonly SlideShow.SlideShowID OutsiderIntro = new SlideShow.SlideShowID("OutsiderIntro", true);
         /*

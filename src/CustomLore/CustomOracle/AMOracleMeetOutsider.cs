@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CustomOracleTx;
-using UnityEngine;
-using Random = UnityEngine.Random;
-using RWCustom;
-using static CustomOracleTx.CustomOracleBehaviour;
-using CustomDreamTx;
+﻿using CustomDreamTx;
 using TheOutsider.CustomLore.CustomDream;
 using TheOutsider.Player_Hooks;
+using static CustomOracleTx.CustomOracleBehaviour;
 
 namespace TheOutsider.CustomLore.CustomOracle
 {
@@ -35,7 +26,7 @@ namespace TheOutsider.CustomLore.CustomOracle
         {
             base.Update();
             if (player == null) return;
-            if (!PlayerHooks.PlayerData.TryGetValue(player, out var module) || !module.isOutsider)
+            if (!PlayerHooks.PlayerData.TryGetValue(player, out var module))
             {
                 return;
             }

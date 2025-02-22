@@ -13,7 +13,7 @@ namespace TheOutsider.CustomLore.CustomObject.AlcedoMask
         public string spriteOverride;
 
         public AbstractAlcedoMask(World world, AlcedoMask realizedObject, WorldCoordinate pos, EntityID ID, int colorSeed, bool king)
-            : base(world, OutsiderEnums.AbstractObjectType.AlcedoMask, realizedObject, pos, ID)
+            : base(world, TheOutsiderEnums.AbstractObjectType.AlcedoMask, realizedObject, pos, ID)
         {
             this.colorSeed = colorSeed;
             this.king = king;
