@@ -24,10 +24,11 @@ namespace TheOutsider.World_Hooks
                 for (int k = 0; k < 2; k++)
                 {
                     if (c.TryGotoNext(MoveType.After,
-                   (i) => i.MatchLdfld<StoryGameSession>("saveStateNumber"),
-                   (i) => i.MatchLdsfld<MoreSlugcatsEnums.SlugcatStatsName>("Saint"),
+                   (i) => i.MatchLdfld<StoryGameSession>(nameof(StoryGameSession.saveStateNumber)),
+                   (i) => i.MatchLdsfld<MoreSlugcatsEnums.SlugcatStatsName>(nameof(MoreSlugcatsEnums.SlugcatStatsName.Saint)),
                    (i) => i.Match(OpCodes.Call)))
                     {
+                        Plugin.Log("World_SpawnGhostIL MatchFind 1!");
                         c.Emit(OpCodes.Ldarg_0);
                         c.EmitDelegate<Func<bool, World, bool>>((shouldReturn, self) =>
                         {
@@ -41,10 +42,11 @@ namespace TheOutsider.World_Hooks
                 }
                 //使第一个雨循环不会生成回响
                 if (c.TryGotoNext(MoveType.After,
-                   (i) => i.MatchLdsfld<SlugcatStats.Name>("Red"),
+                   (i) => i.MatchLdsfld<SlugcatStats.Name>(nameof(SlugcatStats.Name.Red)),
                    (i) => i.Match(OpCodes.Call),
                    (i) => i.Match(OpCodes.Call)))
                 {
+                    Plugin.Log("World_SpawnGhostIL MatchFind 2!");
                     c.Emit(OpCodes.Ldarg_0);
                     c.EmitDelegate<Func<bool, World, bool>>((shouldSpawnGhost, self) =>
                     {

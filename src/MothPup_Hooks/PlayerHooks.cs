@@ -2,6 +2,7 @@
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MoreSlugcats;
+using System;
 using System.Reflection;
 using UnityEngine;
 using Custom = RWCustom.Custom;
@@ -22,6 +23,7 @@ namespace TheOutsider.MothPup_Hooks
             IL.Player.ThrowObject += Player_ThrowObjectIL;
             IL.Player.FoodInRoom_Room_bool += Player_FoodInRoomIL;
             IL.Player.SetMalnourished += Player_SetMalnourishedIL;
+            IL.Player.AddFood += Player_AddFoodIL;
 
             On.Player.NPCStats.ctor += Player_NPCStats_ctor;
             On.Player.ctor += Player_ctor;
@@ -148,7 +150,29 @@ namespace TheOutsider.MothPup_Hooks
                 });
             }
         }
+
+        private static void Player_AddFoodIL(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+
+            if (c.TryGotoNext(MoveType.After,
+                i => i.Match(OpCodes.Ldarg_0),
+                i => i.MatchCall<Player>("get_playerState"),
+                i => i.Match(OpCodes.Isinst),
+                i => i.Match(OpCodes.Ldc_I4_0)))
+            {
+                Plugin.Log("Player_AddFoodIL MatchFind!");
+                c.Emit(OpCodes.Ldarg_0); // self
+                c.EmitDelegate<Func<int, Player, bool>>((malnourished, self) =>
+                {
+                    if (self.isSlugpup)
+                        self.SetMalnourished(false);
+                    return self.slugcatStats.malnourished;
+                });
+            }
+        }
         #endregion
+
         private static void Player_NPCStats_ctor(On.Player.NPCStats.orig_ctor orig, Player.NPCStats self, Player player)
         {
             orig(self, player);

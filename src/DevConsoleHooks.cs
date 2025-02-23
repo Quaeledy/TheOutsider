@@ -65,14 +65,19 @@ namespace TheOutsider
                         Room realizedRoom = room.realizedRoom;
                         if (realizedRoom != null)
                         {
-                            bool flag = (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.TentaclePlant || (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.PoleMimic || (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)MoreSlugcatsEnums.CreatureTemplateType.StowawayBug;
+                            bool flag = (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.TentaclePlant || 
+                                        (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.PoleMimic || 
+                                        (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)MoreSlugcatsEnums.CreatureTemplateType.StowawayBug;
                             float num = float.PositiveInfinity;
                             for (int j = 0; j < room.nodes.Length; j++)
                             {
                                 AbstractRoomNode.Type type2 = room.nodes[j].type;
                                 WorldCoordinate val3 = realizedRoom.LocalCoordinateOfNode(j);
                                 val3.abstractNode = j;
-                                if ((j < creatureTemplate.mappedNodeTypes.Length && creatureTemplate.mappedNodeTypes[j]) || (flag && (ExtEnum<CreatureTemplate.Type>)(object)type2 == (ExtEnum<CreatureTemplate.Type>)(object)AbstractRoomNode.Type.Den) || ((ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.GarbageWorm && (ExtEnum<CreatureTemplate.Type>)(object)type2 == (ExtEnum<CreatureTemplate.Type>)(object)AbstractRoomNode.Type.GarbageHoles))
+                                if ((j < creatureTemplate.mappedNodeTypes.Length && creatureTemplate.mappedNodeTypes[j]) || 
+                                    (flag && (ExtEnum<CreatureTemplate.Type>)(object)type2 == (ExtEnum<CreatureTemplate.Type>)(object)AbstractRoomNode.Type.Den) || 
+                                    ((ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.GarbageWorm && 
+                                     (ExtEnum<CreatureTemplate.Type>)(object)type2 == (ExtEnum<CreatureTemplate.Type>)(object)AbstractRoomNode.Type.GarbageHoles))
                                 {
                                     IntVector2 tile = pos.Tile;
                                     float num2 = tile.FloatDist(val3.Tile);

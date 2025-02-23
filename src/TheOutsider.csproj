@@ -6,6 +6,12 @@
     </PropertyGroup>
     
     <ItemGroup>
+      <Compile Remove="CustomLore\CustomCreature\Quetzalcoatl\**" />
+      <EmbeddedResource Remove="CustomLore\CustomCreature\Quetzalcoatl\**" />
+      <None Remove="CustomLore\CustomCreature\Quetzalcoatl\**" />
+    </ItemGroup>
+    
+    <ItemGroup>
       <Compile Remove="CustomLore\CustomCreature\Limb.cs" />
     </ItemGroup>
     

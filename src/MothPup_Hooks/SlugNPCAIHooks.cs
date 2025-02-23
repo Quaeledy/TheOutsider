@@ -1,9 +1,13 @@
 ﻿using MoreSlugcats;
 using RWCustom;
+using System.Collections.Generic;
+using System;
 using System.Linq;
 using TheOutsider.Player_Hooks;
 using UnityEngine;
+using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 using Custom = RWCustom.Custom;
+using Random = UnityEngine.Random;
 
 namespace TheOutsider.MothPup_Hooks
 {
@@ -42,85 +46,126 @@ namespace TheOutsider.MothPup_Hooks
             orig(self);
             if (Player_Hooks.PlayerHooks.PlayerData.TryGetValue(self.cat, out var player) && player.isMothNPC && self.cat.room != null)
             {
-                //pupVariables.pathingVisualizer?.VisualizeConnections();
-                /*MovementConnection movementConnection = (self.pathFinder as StandardPather).FollowPath(self.creature.pos, true);
-                if (self.grabTarget == null && self.abstractAI.destination.room == self.abstractAI.parent.Room.index &&
-                    (new Vector2((float)self.abstractAI.destination.x, (float)self.abstractAI.destination.y) - new Vector2((float)self.abstractAI.parent.pos.x, (float)self.abstractAI.parent.pos.y)).magnitude < 1.5f)
+                Player.InputPackage inputPackage = new Player.InputPackage(false, Options.ControlSetup.Preset.None, self.cat.input[0].x, self.cat.input[0].y, self.cat.input[0].jmp, self.cat.input[0].thrw, self.cat.input[0].pckp, self.cat.input[0].mp, self.cat.input[0].crouchToggle);
+                MovementConnection movementConnection = (self.pathFinder as StandardPather).FollowPath(self.creature.pos, true);
+                if (self.grabTarget == null && self.abstractAI.destination.room == self.abstractAI.parent.Room.index && (new Vector2((float)self.abstractAI.destination.x, (float)self.abstractAI.destination.y) - new Vector2((float)self.abstractAI.parent.pos.x, (float)self.abstractAI.parent.pos.y)).magnitude < 1.5f)
                 {
                     movementConnection = default(MovementConnection);
-                }*/
-                Player.InputPackage inputPackage = new Player.InputPackage(false, Options.ControlSetup.Preset.None, self.cat.input[0].x, self.cat.input[0].y, self.cat.input[0].jmp, self.cat.input[0].thrw, self.cat.input[0].pckp, self.cat.input[0].mp, self.cat.input[0].crouchToggle);
-                if (self.abstractAI.parent.pos.y < self.abstractAI.destination.y)
-                {
-                    if (!self.jumping && !player.isFlying)
-                    {
-                        if (self.cat.animation != Player.AnimationIndex.HangFromBeam && self.cat.bodyMode != Player.BodyModeIndex.ClimbingOnBeam &&
-                            self.cat.animation != Player.AnimationIndex.GetUpOnBeam && self.cat.animation != Player.AnimationIndex.GetUpToBeamTip &&
-                            (self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 1)).AnyBeam ||
-                             self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 2)).AnyBeam ||
-                             self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 3)).AnyBeam ||
-                             self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 4)).AnyBeam ||
-                             Plugin.optionsMenuInstance.infiniteFlight.Value ||
-                             self.behaviorType == SlugNPCAI.BehaviorType.Fleeing))
-                        {
-                            inputPackage.jmp = true;/*
-                            if (Plugin.optionsMenuInstance.infiniteFlight.Value || self.behaviorType == SlugNPCAI.BehaviorType.Fleeing)
-                                self.cat.wantToJump = 5;*/
-                        }
-                    }
-                    if (self.jumping && (!player.isFlying || self.behaviorType == SlugNPCAI.BehaviorType.Fleeing || Plugin.optionsMenuInstance.infiniteFlight.Value))
-                    {
-                        if (self.forceJump == 3)
-                        {
-                            inputPackage.jmp = true;
-                            inputPackage.x = self.jumpDir;
-                            self.cat.wantToJump = 5;
-                        }
-                    }
-                    //inputPackage.y = 1;
                 }
-                if (self.abstractAI.parent.pos.y <= self.abstractAI.destination.y)
-                {
-                    if ((self.jumping || player.isFlying) && !self.OnAnyBeam() &&
-                        self.cat.room.GetTile(self.cat.abstractCreature.pos.Tile).AnyBeam)
+                if (!((self.HasEdible() & !self.IsFull) &&
+                    (self.behaviorType == SlugNPCAI.BehaviorType.Following ||
+                     self.behaviorType == SlugNPCAI.BehaviorType.Idle ||
+                     (self.behaviorType == SlugNPCAI.BehaviorType.Attacking && self.AttackingPrey()))))
+                {/*
+                    if (self.jumping)
                     {
-                        inputPackage.y = 1;
-                    }
-                }
-                if (player.isFlying)
-                {
-                    if (self.abstractAI.parent.pos.x != self.abstractAI.destination.x)
-                        inputPackage.x = (self.abstractAI.parent.pos.x < self.abstractAI.destination.x) ? 1 : -1;
-                    else
-                        inputPackage.x = 0;
-
-                    if ((self.abstractAI.parent.pos.y < self.abstractAI.destination.y ||
-                        Mathf.Abs(self.abstractAI.parent.pos.x - self.abstractAI.destination.x) >= 4) &&
-                        player.flutterTimeAdd > player.upFlightTime && Plugin.optionsMenuInstance.infiniteFlight.Value)
-                    {
+                        inputPackage.y = (self.catchPoles ? 1 : 0);
+                        inputPackage.x = self.jumpDir;
                         inputPackage.jmp = true;
-                        self.cat.wantToJump = 5;
-                        if (Mathf.Abs(self.abstractAI.parent.pos.x - self.abstractAI.destination.x) >= 4)
-                            inputPackage.x = (self.abstractAI.parent.pos.x < self.abstractAI.destination.x) ? 1 : -1;
-                        else
-                            inputPackage.y = 1;
-                    }
-                }
-                /*
-                if (self.cat.gourmandExhausted)
-                {
-                    if (!self.OnAnyBeam())
-                    {
-                        inputPackage.jmp = false;
-                    }
-                    if (inputPackage.x == 0 && inputPackage.y == 0 && !inputPackage.pckp && self.FunStuff)
-                    {
-                        if (Random.value < Mathf.Lerp(0f, 0.3f, Mathf.InverseLerp(0.1f, 0f, self.creature.personality.energy)))
+                        if ((self.cat.bodyMode != Player.BodyModeIndex.Default || self.OnHorizontalBeam()) && self.forceJump == 0)
                         {
-                            self.cat.standing = false;
+                            self.jumping = false;
                         }
                     }
-                }*/
+                    else */
+                    if (movementConnection != default(MovementConnection))
+                    {
+                        WorldCoordinate startCoord = movementConnection.startCoord;
+                        WorldCoordinate destinationCoord = movementConnection.destinationCoord;
+                        /*
+                        List<MovementConnection> upcoming = self.GetUpcoming();
+                        if (upcoming != null)
+                        {
+                            for (int i = 0; i < upcoming.Count; i++)
+                            {*/
+                        //目的地在上方时起跳
+                        if (self.abstractAI.parent.pos.y < destinationCoord.y)
+                        {
+                            //起跳
+                            if (!self.jumping && !player.isFlying)
+                            {
+                                if (self.cat.animation != Player.AnimationIndex.HangFromBeam && self.cat.bodyMode != Player.BodyModeIndex.ClimbingOnBeam &&
+                                    self.cat.animation != Player.AnimationIndex.GetUpOnBeam && self.cat.animation != Player.AnimationIndex.GetUpToBeamTip &&
+                                    (self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 1)).AnyBeam ||
+                                     self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 2)).AnyBeam ||
+                                     self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 3)).AnyBeam ||
+                                     self.cat.room.GetTile(self.abstractAI.parent.pos.Tile + new IntVector2(0, 4)).AnyBeam ||
+                                     Plugin.optionsMenuInstance.infiniteFlight.Value ||
+                                     self.behaviorType == SlugNPCAI.BehaviorType.Fleeing))
+                                {
+                                    inputPackage.jmp = true;
+                                    /*
+                                    if (Plugin.optionsMenuInstance.infiniteFlight.Value || self.behaviorType == SlugNPCAI.BehaviorType.Fleeing)
+                                        self.cat.wantToJump = 5;*/
+                                }
+                            }
+                            //飞行
+                            if (self.jumping && (!player.isFlying || self.behaviorType == SlugNPCAI.BehaviorType.Fleeing || Plugin.optionsMenuInstance.infiniteFlight.Value))
+                            {
+                                if (self.forceJump <= 3 && self.forceJump > 0)
+                                {
+                                    inputPackage.jmp = true;
+                                    inputPackage.x = self.jumpDir;
+                                    self.cat.wantToJump = 5;
+                                }
+                            }
+                            //inputPackage.y = 1;
+                        }
+                        //未抓住杆子时抓杆子
+                        if (self.abstractAI.parent.pos.y <= destinationCoord.y)
+                        {
+                            if ((self.jumping || player.isFlying) && !self.OnAnyBeam() &&
+                                self.cat.room.GetTile(self.cat.abstractCreature.pos.Tile).AnyBeam)
+                            {
+                                inputPackage.y = 1;
+                            }
+                        }
+                        if (player.isFlying)
+                        {
+                            //移动的左右方向
+                            if (self.abstractAI.parent.pos.x != destinationCoord.x)
+                                inputPackage.x = (self.abstractAI.parent.pos.x < destinationCoord.x) ? 1 : -1;
+                            else
+                                inputPackage.x = 0;
+                            if ((self.abstractAI.parent.pos.y < destinationCoord.y ||
+                                Mathf.Abs(self.abstractAI.parent.pos.x - destinationCoord.x) >= 4) &&
+                                player.flutterTimeAdd > player.upFlightTime &&
+                                (self.behaviorType == SlugNPCAI.BehaviorType.Fleeing || Plugin.optionsMenuInstance.infiniteFlight.Value))
+                            {
+                                inputPackage.jmp = true;
+                                self.cat.wantToJump = 5;
+                                if (Mathf.Abs(self.abstractAI.parent.pos.x - destinationCoord.x) >= 4)
+                                    inputPackage.x = (self.abstractAI.parent.pos.x < destinationCoord.x) ? 1 : -1;
+                                else
+                                    inputPackage.y = 1;
+                            }
+                        }
+                        /*
+                        if (self.cat.gourmandExhausted)
+                        {
+                            if (!self.OnAnyBeam())
+                            {
+                                inputPackage.jmp = false;
+                            }
+                            if (inputPackage.x == 0 && inputPackage.y == 0 && !inputPackage.pckp && self.FunStuff)
+                            {
+                                if (Random.value < Mathf.Lerp(0f, 0.3f, Mathf.InverseLerp(0.1f, 0f, self.creature.personality.energy)))
+                                {
+                                    self.cat.standing = false;
+                                }
+                            }
+                        }*/
+                        if (!self.jumping && !player.isFlying && inputPackage.jmp)
+                        {
+                            //移动的左右方向
+                            if (self.abstractAI.parent.pos.x != destinationCoord.x)
+                                inputPackage.x = (self.abstractAI.parent.pos.x < destinationCoord.x) ? 1 : -1;
+                            else
+                                inputPackage.x = 0;
+                            self.Jump(inputPackage.x, self.catchPoles, ref inputPackage);
+                        }
+                    }
+                }
                 self.cat.input[0] = inputPackage;
             }
         }
@@ -156,7 +201,6 @@ namespace TheOutsider.MothPup_Hooks
                                                   Custom.DistLess(self.cat.bodyChunks[1].pos, (realizedCreature as Spider).centipede.FirstSpider.mainBodyChunk.pos, 200f));
                                 if (isCreatureDislikeFlare && inFlareRange && canFlare && wantFlare)
                                 {
-                                    //self.cat.standing = true;
                                     inputPackage.jmp = true;
                                     inputPackage.pckp = true;
                                     self.cat.wantToJump = 5;
@@ -167,69 +211,6 @@ namespace TheOutsider.MothPup_Hooks
                     }
                 }
                 self.cat.input[0] = inputPackage;
-                /*
-                if (self.nap)
-                {
-                    if (Mathf.Clamp01(0.06f / self.creature.personality.energy) > Random.Range(0.35f, 1f) || self.cat.emoteSleepCounter > 1.4f)
-                    {
-                        self.cat.emoteSleepCounter += Mathf.Clamp(0.0008f / self.creature.personality.energy, 0.0008f, 0.05f);
-                        if (self.cat.emoteSleepCounter > 1.4f)
-                        {
-                            if (self.cat.graphicsModule != null)
-                            {
-                                (self.cat.graphicsModule as PlayerGraphics).blink = 5;
-                            }
-                            self.cat.sleepCurlUp = Mathf.SmoothStep(self.cat.sleepCurlUp, 1f, self.cat.emoteSleepCounter - 1.4f);
-                        }
-                        else
-                        {
-                            self.cat.sleepCurlUp = Mathf.Max(0f, self.cat.sleepCurlUp - 0.1f);
-                        }
-                    }
-                }
-                else
-                {
-                    self.cat.emoteSleepCounter = 0f;
-                }
-                if (pupVariables.wantsToRegurgitate)
-                {
-                    self.cat.PupRegurgitate();
-                }
-                if (pupVariables.wantsToSwallowObject && self.cat.grasps[0]?.grabbed != null)
-                {
-                    self.cat.PupSwallowObject(0);
-                }
-                if (pupVariables.giftedItem != null)
-                {
-                    bool giftedTracked = false;
-                    foreach(var rep in self.itemTracker.items)
-                    {
-                        if (rep.representedItem != pupVariables.giftedItem) continue;
-                        giftedTracked = true;
-                    }
-                    if (pupVariables.giftedItem.realizedObject == null || !giftedTracked)
-                    {
-                        pupVariables.giftedItem = null;
-                    }
-                }
-                if (self.behaviorType == SlugNPCAI.BehaviorType.OnHead || self.behaviorType == SlugNPCAI.BehaviorType.BeingHeld)
-                {
-                    if (self.cat.grasps[0]?.grabbed != null)
-                    {
-                        if (self.cat.Grabability(self.cat.grasps[0].grabbed) > Player.ObjectGrabability.TwoHands)
-                        {
-                            self.cat.ReleaseGrasp(0);
-                        }
-                    }
-                }
-                */
-                //pupVariables.pathingVisualizer?.Update();
-                //if (pupVariables.labelManager != null)
-                //{
-                //    pupVariables.labelManager.UpdateLabel("grabTarget", $"grabTarget: {(self.grabTarget != null ? self.grabTarget is Creature ? (self.grabTarget as Creature).abstractCreature.creatureTemplate.type : self.grabTarget.abstractPhysicalObject.type : "NULL")}", self.grabTarget != null);
-                //    pupVariables.labelManager.UpdateLabel("giftedItem", $"giftedItem: {(pupVariables.giftedItem != null ? pupVariables.giftedItem is AbstractCreature ? (pupVariables.giftedItem as AbstractCreature).creatureTemplate.type : pupVariables.giftedItem.type : "NULL")}", pupVariables.giftedItem != null);
-                //    pupVariables.labelManager.Update(self.cat.mainBodyChunk.pos + new Vector2(35f, 30f));
-                //}
             }
         }
         private static void SlugNPCAI_DecideBehavior(On.MoreSlugcats.SlugNPCAI.orig_DecideBehavior orig, SlugNPCAI self)

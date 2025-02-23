@@ -42,6 +42,7 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
                 //Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
+                    Air = new (4.5f, Allowed),
                     OffScreen = new(1f, Allowed),
                     Floor = new(1f, Allowed),
                     Corridor = new(1f, Allowed),
@@ -53,6 +54,7 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
                     OpenDiagonal = new(3f, Allowed),
                     ReachOverGap = new(3f, Allowed),
                     ReachUp = new(2f, Allowed),
+                    DoubleReachUp = new(2f, Allowed),
                     ReachDown = new(2f, Allowed),
                     SemiDiagonalReach = new(2f, Allowed),
                     DropToFloor = new(10f, Allowed),
@@ -61,7 +63,7 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
                     ShortCut = new(2.5f, Allowed),
                     BetweenRooms = new(4f, Allowed),
                     Slope = new(1.5f, Allowed),
-                    NPCTransportation = new(20f, Allowed),
+                    NPCTransportation = new(20f, Allowed)
                 },
                 DamageResistances = new()
                 {

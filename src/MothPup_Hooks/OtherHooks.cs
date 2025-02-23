@@ -27,6 +27,7 @@ namespace TheOutsider.MothPup_Hooks
             On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;
 
+            On.MoreSlugcats.PlayerNPCState.CycleTick += PlayerNPCState_CycleTick;
             On.MoreSlugcats.PlayerNPCState.ctor += PlayerNPCState_ctor;
             On.AbstractCreature.ctor += AbstractCreature_ctor;
             //On.AImap.TileAccessibleToCreature_IntVector2_CreatureTemplate += AImap_TileAccessibleToCreature;
@@ -237,6 +238,15 @@ namespace TheOutsider.MothPup_Hooks
         }
         #endregion
 
+        private static void PlayerNPCState_CycleTick(On.MoreSlugcats.PlayerNPCState.orig_CycleTick orig, PlayerNPCState self)
+        {
+            Plugin.Log($"Before: self.player.creatureTemplate.type: {self.player.creatureTemplate.type},  self.Malnourished: {self.Malnourished}");
+            orig(self);
+            Plugin.Log($"After: self.player.creatureTemplate.type: {self.player.creatureTemplate.type},  self.Malnourished: {self.Malnourished}");
+            if (self.player.creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
+            {
+            }
+        }
         private static void PlayerNPCState_ctor(On.MoreSlugcats.PlayerNPCState.orig_ctor orig, PlayerNPCState self, AbstractCreature abstractCreature, int playerNumber)
         {
             orig(self, abstractCreature, playerNumber);
