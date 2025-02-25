@@ -57,7 +57,8 @@ namespace TheOutsider
                         return tagsAC(type, args);
                     }
                     return args.Skip(((ExtEnum<CreatureTemplate.Type>)(object)StaticWorld.GetCreatureTemplate(t).TopAncestor().type == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.LizardTemplate) ? 1 : 0).All((string s) => tags.Contains(s, StringComparer.OrdinalIgnoreCase)) ? tagsAC(type, args) : null;
-                }, delegate (AbstractPhysicalObject.AbstractObjectType type, string[] args, EntityID id, AbstractRoom room, WorldCoordinate pos)
+                }, 
+                delegate (AbstractPhysicalObject.AbstractObjectType type, string[] args, EntityID id, AbstractRoom room, WorldCoordinate pos)
                 {
                     CreatureTemplate creatureTemplate = StaticWorld.GetCreatureTemplate(t);
                     if (!pos.NodeDefined || !creatureTemplate.mappedNodeTypes[pos.abstractNode])
