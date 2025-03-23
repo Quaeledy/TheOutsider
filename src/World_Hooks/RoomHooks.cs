@@ -255,7 +255,7 @@ namespace TheOutsider.World_Hooks
         {
             orig(self, eu);
 
-            if (!ModManager.MSC || self.room.world.game.session.characterStats.name.value != Plugin.SlugName.value)
+            if (!ModManager.MSC || self.abstractCreature.world.game.session.characterStats.name.value != Plugin.SlugName.value)
             {
                 return;
             }

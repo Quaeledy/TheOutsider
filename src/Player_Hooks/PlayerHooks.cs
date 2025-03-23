@@ -7,15 +7,21 @@ namespace TheOutsider.Player_Hooks
         public static ConditionalWeakTable<Player, TheOutsider> PlayerData = new();
         public static void Init()
         {
+            //IL.Player.MovementUpdate += ClimbWall.Player_MovementUpdateIL;
+
             On.Player.ctor += Player_ctor;
+            On.Player.NewRoom += Player_NewRoom;
             On.Player.MovementUpdate += Flight.Player_MovementUpdate;
             On.Player.UpdateMSC += Flight.Player_Fly;
             On.Player.UpdateMSC += Flare.Player_Flare;
             On.Player.Jump += JumpHooks.Player_Jump;
-            On.SporeCloud.Update += SporeCloudHooks.SporeCloud_Update;
+            On.Player.WallJump += JumpHooks.Player_WallJump;
             On.Player.UpdateMSC += SporeCloudHooks.Player_Update;
-            On.Player.NewRoom += Player_NewRoom;
+            On.Player.Update += ClimbWall.Player_Update;
+            On.Player.checkInput += ClimbWall.Player_checkInput;
+            //On.Player.MovementUpdate += ClimbWall.Player_MovementUpdate;
             On.Player.DeathByBiteMultiplier += Player_DeathByBiteMultiplier;
+            On.SporeCloud.Update += SporeCloudHooks.SporeCloud_Update;
         }
 
         #region Player

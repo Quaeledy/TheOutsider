@@ -34,5 +34,19 @@
                 }*/
             }
         }
+
+        public static void Player_WallJump(On.Player.orig_WallJump orig, Player self, int direction)
+        {
+            orig(self, direction);
+
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
+            {
+                bool flag = self.input[0].x != 0 && self.bodyChunks[0].ContactPoint.x == self.input[0].x && self.IsTileSolid(0, self.input[0].x, 0) && !self.IsTileSolid(0, self.input[0].x, 1);
+                if (!(self.IsTileSolid(1, 0, -1) || self.IsTileSolid(0, 0, -1) || self.bodyChunks[1].submersion > 0.1f || flag))
+                    self.jumpBoost = 4f;
+
+                self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.wingSpeed * 0.5f;
+            }
+        }
     }
 }

@@ -99,30 +99,43 @@ namespace TheOutsider.Player_Hooks
         //调整姿势
         public static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
         {
-            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && player.isFlying)
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
-                self.bodyMode = Player.BodyModeIndex.Default;
-                self.animation = Player.AnimationIndex.None;
-
-                orig(self, eu);
-
-                if (!player.CanSustainFlight(self, player))
+                if (player.isFlying)
                 {
-                    player.StopFlight();
-                }
-                else
-                {
-                    if (self.input[0].x != 0)
+                    self.bodyMode = Player.BodyModeIndex.Default;
+                    self.animation = Player.AnimationIndex.None;
+
+                    orig(self, eu);
+
+                    if (!player.CanSustainFlight(self, player))
                     {
-                        self.bodyMode = Player.BodyModeIndex.Default;
-                        self.animation = Player.AnimationIndex.LedgeCrawl;
+                        player.StopFlight();
                     }
                     else
                     {
-                        self.bodyMode = Player.BodyModeIndex.Default;
-                        self.animation = Player.AnimationIndex.None;
+                        if (self.input[0].x != 0)
+                        {
+                            self.bodyMode = Player.BodyModeIndex.Default;
+                            self.animation = Player.AnimationIndex.LedgeCrawl;
+                        }
+                        else
+                        {
+                            self.bodyMode = Player.BodyModeIndex.Default;
+                            self.animation = Player.AnimationIndex.None;
+                        }
                     }
-                }
+                }/*
+                //自动抓墙
+                else if (self.bodyMode == Player.BodyModeIndex.WallClimb && self.input[0].x == 0 && !self.input[0].jmp)
+                {
+                    Player.InputPackage inputPackage = new Player.InputPackage(false, Options.ControlSetup.Preset.None,
+                        self.input[0].x, self.input[0].y,
+                        self.input[0].jmp, self.input[0].thrw, self.input[0].pckp,
+                        self.input[0].mp, self.input[0].crouchToggle);
+                    inputPackage.x = self.bodyChunks[0].ContactPoint.x;
+                    self.input[0] = inputPackage;
+                }*/
             }
 
             orig(self, eu);
