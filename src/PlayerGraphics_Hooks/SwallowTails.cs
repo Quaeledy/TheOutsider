@@ -341,9 +341,6 @@ namespace TheOutsider.PlayerGraphics_Hooks
             if (!playerRef.TryGetTarget(out PlayerGraphics self) || !outsiderRef.TryGetTarget(out TheOutsider outsider))
                 return;
 
-            for (int i = 0; i < 9; i++)//记得删除！！
-                sLeaser.sprites[i].isVisible = false;//记得删除！！
-
             Vector2 bodyPos = sLeaser.sprites[0].GetPosition();
             Vector2 hipsPos = sLeaser.sprites[1].GetPosition();
 

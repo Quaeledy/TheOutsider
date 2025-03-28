@@ -711,21 +711,21 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 }
             }
             //侧身
-            else if (!outsider.isFlying && bodyRotation < -0.12f)
+            else if (!outsider.isFlying && self.player.bodyMode != Player.BodyModeIndex.WallClimb && bodyRotation < -0.12f)
             {
                 sLeaser.sprites[WingSprite(0, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
                 sLeaser.sprites[WingSprite(0, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[WingSprite(0, 1)]);
                 sLeaser.sprites[WingSprite(0, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[WingSprite(0, 0)]);
                 sLeaser.sprites[WingSprite(0, 2)].isVisible = true;
             }
-            else if (!outsider.isFlying && bodyRotation > 0.12f)
+            else if (!outsider.isFlying && self.player.bodyMode != Player.BodyModeIndex.WallClimb && bodyRotation > 0.12f)
             {
                 sLeaser.sprites[WingSprite(1, 1)].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
                 sLeaser.sprites[WingSprite(1, 0)].MoveInFrontOfOtherNode(sLeaser.sprites[WingSprite(1, 1)]);
                 sLeaser.sprites[WingSprite(1, 2)].MoveInFrontOfOtherNode(sLeaser.sprites[WingSprite(1, 0)]);
                 sLeaser.sprites[WingSprite(1, 2)].isVisible = true;
             }
-            //平飞、正立
+            //平飞、正立、爬墙
             else
             {
                 for (int i = 0; i < 2; i++)
