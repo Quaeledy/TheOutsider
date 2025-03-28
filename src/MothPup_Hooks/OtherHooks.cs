@@ -14,7 +14,7 @@ namespace TheOutsider.MothPup_Hooks
         private static BindingFlags methodFlags = BindingFlags.Static | BindingFlags.NonPublic;
         public delegate int orig_StoryGameSession_get_slugPupMaxCount(StoryGameSession self);
 
-        public static void Init()
+        public static void InitIL()
         {
             IL.MoreSlugcats.PlayerNPCState.CycleTick += PlayerNPCState_CycleTickIL;
             IL.HUD.FoodMeter.TrySpawnPupBars += FoodMeter_TrySpawnPupBarsIL;
@@ -22,7 +22,10 @@ namespace TheOutsider.MothPup_Hooks
             IL.GhostCreatureSedater.Update += GhostCreatureSedater_UpdateIL;
             IL.SaveState.SessionEnded += SaveState_SessionEndedIL;
             IL.World.SpawnPupNPCs += World_SpawnPupNPCsIL;
+        }
 
+        public static void Init()
+        {
             On.SlugcatStats.ctor += SlugcatStats_ctor;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;

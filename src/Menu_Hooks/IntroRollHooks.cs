@@ -7,7 +7,7 @@ namespace TheOutsider.Menu_Hooks
 {
     public class IntroRollHooks
     {
-        public static void Init()
+        public static void InitIL()
         {
             IL.Menu.IntroRoll.ctor += IntroRoll_ctorIL;
             //On.Menu.IntroRoll.ctor += IntroRoll_ctor;

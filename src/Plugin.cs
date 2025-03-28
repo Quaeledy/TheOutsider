@@ -9,6 +9,7 @@ using TheOutsider.CustomLore.CustomOracle;
 using TheOutsider.CustomLore.CustomDream;*/
 using TheOutsider.HUD_Hooks;
 using TheOutsider.Menu_Hooks;
+using TheOutsider.MothPup_Hooks;
 using TheOutsider.Oracle_Hooks;
 using TheOutsider.Player_Hooks;
 using TheOutsider.PlayerGraphics_Hooks;
@@ -59,6 +60,11 @@ namespace TheOutsider
 
             try
             {
+                OtherHooks.InitIL();
+                WorldHooks.InitIL();
+                MothPup_Hooks.PlayerHooks.InitIL();
+                Player_Hooks.PlayerHooks.InitIL();
+
                 //Remix配置菜单
                 optionsMenuInstance = new OptionsMenu(this);
                 MachineConnector.SetRegisteredOI(MOD_ID, optionsMenuInstance);

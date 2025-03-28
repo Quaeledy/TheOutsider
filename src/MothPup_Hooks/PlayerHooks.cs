@@ -16,7 +16,7 @@ namespace TheOutsider.MothPup_Hooks
         private static BindingFlags methodFlags = BindingFlags.Static | BindingFlags.NonPublic;
         public delegate bool orig_Player_isSlugpup(Player self);
 
-        public static void Init()
+        public static void InitIL()
         {
             IL.Player.NPCStats.ctor += Player_NPCStats_ctorIL;
             IL.Player.ObjectEaten += Player_ObjectEatenIL;
@@ -24,7 +24,10 @@ namespace TheOutsider.MothPup_Hooks
             IL.Player.FoodInRoom_Room_bool += Player_FoodInRoomIL;
             IL.Player.SetMalnourished += Player_SetMalnourishedIL;
             IL.Player.AddFood += Player_AddFoodIL;
+        }
 
+        public static void Init()
+        {
             On.Player.NPCStats.ctor += Player_NPCStats_ctor;
             On.Player.ctor += Player_ctor;
             On.Player.AllowGrabbingBatflys += Player_AllowGrabbingBatflys;

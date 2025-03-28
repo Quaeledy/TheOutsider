@@ -9,9 +9,12 @@ namespace TheOutsider.World_Hooks
 {
     public class WorldHooks
     {
-        public static void Init()
+        public static void InitIL()
         {
             IL.World.SpawnGhost += World_SpawnGhostIL;
+        }
+        public static void Init()
+        {
             On.World.CheckForRegionGhost += World_CheckForRegionGhost;
         }
 
