@@ -14,6 +14,8 @@ namespace TheOutsider.PlayerGraphics_Hooks
         private int swallowtailSpriteLength;
         private int tailN;
         private readonly float swallowTailSpacing = 6f;
+        private float nowSwallowTailSpacing;
+        private float moveDeg;
         private readonly float MaxLength = 15f;
         private readonly float swallowTailWidth = 0.4f;
         private float tailTimeAdd;
@@ -172,7 +174,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
             float moveDeg = self.player.animation == Player.AnimationIndex.StandOnBeam ? 60f : 22.5f;
             var moveScale = Mathf.Clamp(Custom.AimFromOneVectorToAnother(Vector2.zero, (hipsPos - drawPos1).normalized), -moveDeg, moveDeg);
             //实际凤尾偏移
-            var nowSwallowTailSpacing = swallowTailSpacing * Custom.LerpMap(Mathf.Abs(moveScale), 0, 10, 1f, 0.3f);
+            nowSwallowTailSpacing = swallowTailSpacing * Custom.LerpMap(Mathf.Abs(moveScale), 0, 10, 1f, 0.3f);
 
             for (int i = 0; i < swallowtail.GetLength(0); i++)
             {
@@ -184,7 +186,6 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 Vector2 vector2 = rootPos;
                 Vector2 pos = rootPos;
                 float num9 = 28f;*/
-
                 swallowtail[i, 0].connectedPoint = new Vector2?(rootPos);
                 Vector2 lastNormalized = dir;
                 for (int k = 0; k < swallowtail.GetLength(1); k++)
@@ -250,6 +251,9 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         if (!outsider.isFlying)
                             swallowtail[i, k].vel += 6f * (1 - t) * Custom.DirVec(normalized, lastNormalized) * Mathf.InverseLerp(0.1f, 2f, bodyVel.magnitude);
                         //lastNormalized = normalized;
+
+                        swallowtail[i, k].vel *= Custom.LerpMap(swallowtail[i, k].vel.magnitude, 1f, 10f, 1f, 0.5f, Mathf.Lerp(1.4f, 0.4f, t));
+                        swallowtail[i, k].vel += Custom.RNV() * 0.2f;
                     }
                     //触须根部位置
                     else
@@ -336,6 +340,10 @@ namespace TheOutsider.PlayerGraphics_Hooks
         {
             if (!playerRef.TryGetTarget(out PlayerGraphics self) || !outsiderRef.TryGetTarget(out TheOutsider outsider))
                 return;
+
+            for (int i = 0; i < 9; i++)//记得删除！！
+                sLeaser.sprites[i].isVisible = false;//记得删除！！
+
             Vector2 bodyPos = sLeaser.sprites[0].GetPosition();
             Vector2 hipsPos = sLeaser.sprites[1].GetPosition();
 
@@ -353,23 +361,21 @@ namespace TheOutsider.PlayerGraphics_Hooks
 
             int startSprite = swallowtailSprite;
 
-            //通过身体角度判断移动
-            var moveDeg = Mathf.Clamp(Custom.AimFromOneVectorToAnother(Vector2.zero, (hipsPos - bodyPos).normalized), -22.5f, 22.5f);
-
-            //实际偏移
-            var nowSwallowTailSpacing = swallowTailSpacing * Custom.LerpMap(Mathf.Abs(moveDeg), 0, 10, 1f, 0.3f);
-
             //实际显示
             for (int k = 0; k < swallowtail.GetLength(0); k++)
             {
                 var dir = Custom.DirVec(self.drawPositions[0, 0], self.drawPositions[1, 0]).normalized;
-                var rootPos = Vector2.Lerp(self.owner.bodyChunks[1].pos, self.owner.bodyChunks[0].pos, 0.35f) + (k == 0 ? -1 : 1) * Custom.PerpendicularVector(dir).normalized * nowSwallowTailSpacing + dir * -0.2f;
+                var rootPos = Vector2.Lerp(self.owner.bodyChunks[1].pos, self.owner.bodyChunks[0].pos, 0.35f) +
+                    (k == 0 ? -1 : 1) * Custom.PerpendicularVector(dir).normalized * nowSwallowTailSpacing + dir; //dir * -0.2f;
 
                 var lastDir = Custom.DirVec(self.drawPositions[0, 1], self.drawPositions[1, 1]).normalized;
-                Vector2 vector2 = Vector2.Lerp(Vector2.Lerp(self.owner.bodyChunks[1].lastPos, self.owner.bodyChunks[0].lastPos, 0.35f) + (k == 0 ? -1 : 1) * Custom.PerpendicularVector(lastDir).normalized * nowSwallowTailSpacing + lastDir * 5f, rootPos, timeStacker);
-                Vector2 vector4 = (vector2 * 3f + rootPos) / 4f;
+                Vector2 lastRootPos = Vector2.Lerp(self.owner.bodyChunks[1].lastPos, self.owner.bodyChunks[0].lastPos, 0.35f) +
+                    (k == 0 ? -1 : 1) * Custom.PerpendicularVector(lastDir).normalized * nowSwallowTailSpacing + lastDir;// lastDir * 5f;
+                Vector2 nowRootPos = Vector2.Lerp(lastRootPos, rootPos, timeStacker);
+                //Vector2 lastSegPos = (nowRootPos * 3f + rootPos) / 4f;
+                Vector2 lastSegPos = nowRootPos;
 
-                float d2 = 6f;
+                float lastDist = 6f;
 
                 bool OutLength = false;
 
@@ -377,22 +383,22 @@ namespace TheOutsider.PlayerGraphics_Hooks
 
                 for (int i = 0; i < swallowtail.GetLength(1); i++)
                 {
-                    Vector2 vector5 = Vector2.Lerp(swallowtail[k, i].lastPos, swallowtail[k, i].pos, timeStacker);
-                    Vector2 normalized = (vector5 - vector4).normalized;
+                    Vector2 segPos = Vector2.Lerp(swallowtail[k, i].lastPos, swallowtail[k, i].pos, timeStacker);
+                    Vector2 normalized = (segPos - lastSegPos).normalized;
                     Vector2 widthDir = Custom.PerpendicularVector(normalized);
-                    float d3 = Vector2.Distance(vector5, vector4) / 5f;
+                    float dist = Vector2.Distance(segPos, lastSegPos) / 5f;
 
                     if (i == 0)
                     {
-                        d3 = 0f;
+                        dist = 0f;
                     }
 
                     if (i != 0 && !Custom.DistLess(swallowTail.vertices[i * 4], swallowTail.vertices[i * 4 - 4], 100))
                         OutLength = true;
 
                     //设置坐标
-                    swallowTail.MoveVertice(i * 4 + 0, vector4 - widthDir * d2 * swallowTailWidth + normalized * d3 - camPos);
-                    swallowTail.MoveVertice(i * 4 + 1, vector4 + widthDir * d2 * swallowTailWidth + normalized * d3 - camPos);
+                    swallowTail.MoveVertice(i * 4 + 0, lastSegPos - widthDir * lastDist * swallowTailWidth + normalized * dist - camPos);
+                    swallowTail.MoveVertice(i * 4 + 1, lastSegPos + widthDir * lastDist * swallowTailWidth + normalized * dist - camPos);
                     /*
                     if (i > 0)
                     {
@@ -401,15 +407,15 @@ namespace TheOutsider.PlayerGraphics_Hooks
                     }*/
                     if (i < swallowtail.GetLength(1) - 1)
                     {
-                        swallowTail.MoveVertice(i * 4 + 2, vector5 - widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * d3 - camPos);//swallowTail.MoveVertice(i * 4 + 2, vector5 - widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * d3 - camPos);
-                        swallowTail.MoveVertice(i * 4 + 3, vector5 + widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * d3 - camPos);//swallowTail.MoveVertice(i * 4 + 3, vector5 + widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * d3 - camPos); 
+                        swallowTail.MoveVertice(i * 4 + 2, segPos - widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);//swallowTail.MoveVertice(i * 4 + 2, segPos - widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);
+                        swallowTail.MoveVertice(i * 4 + 3, segPos + widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);//swallowTail.MoveVertice(i * 4 + 3, segPos + widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos); 
                     }
                     else
                     {
-                        swallowTail.MoveVertice(i * 4 + 2, vector5 - camPos);
+                        swallowTail.MoveVertice(i * 4 + 2, segPos - camPos);
                     }
-                    d2 = swallowtail[k, i].StretchedRad;//swallowtail[k, i].StretchedRad;
-                    vector4 = vector5;
+                    lastDist = swallowtail[k, i].StretchedRad;//swallowtail[k, i].StretchedRad;
+                    lastSegPos = segPos;
                     /*
                     //防止穿模
                     if (i < self.tail.Length)

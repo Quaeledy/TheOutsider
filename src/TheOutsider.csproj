@@ -26,6 +26,7 @@
         </Reference>
         <Reference Include="DevConsole">
           <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2920528044\newest\plugins\DevConsole.dll</HintPath>
+          <Private>False</Private>
         </Reference>
         <Reference Include="DressMySlugcat">
           <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2948971756\newest\plugins\DressMySlugcat.dll</HintPath>

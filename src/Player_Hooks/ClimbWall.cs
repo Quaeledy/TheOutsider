@@ -44,11 +44,14 @@ namespace TheOutsider.Player_Hooks
         //自动抓墙
         public static void Player_checkInput(On.Player.orig_checkInput orig, Player self)
         {
-            orig(self);
-            if (self.bodyChunks[0].ContactPoint.x != 0 && self.bodyMode == Player.BodyModeIndex.WallClimb &&
-                !self.input[0].jmp && self.input[0].x == 0)
+            orig(self); 
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
-                self.input[0].x = self.bodyChunks[0].ContactPoint.x;
+                if (self.bodyChunks[0].ContactPoint.x != 0 && self.bodyMode == Player.BodyModeIndex.WallClimb &&
+                !self.input[0].jmp && self.input[0].x == 0)
+                {
+                    self.input[0].x = self.bodyChunks[0].ContactPoint.x;
+                }
             }
         }
 

@@ -10,13 +10,11 @@ D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider
 D:\收藏\雨世界\Mod制作\代码\TheOutsider\src\obj\Debug\net48\TheOutsider.pdb
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\bin\Debug\net48\TheOutsider.dll
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\bin\Debug\net48\TheOutsider.pdb
-D:\Collection\Rain World\Mod\Code\TheOutsider\src\bin\Debug\net48\DevConsole.dll
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.csproj.AssemblyReference.cache
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.GeneratedMSBuildEditorConfig.editorconfig
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.AssemblyInfoInputs.cache
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.AssemblyInfo.cs
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.csproj.CoreCompileInputs.cache
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.sourcelink.json
-D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsi.21E4EEEE.Up2Date
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.dll
 D:\Collection\Rain World\Mod\Code\TheOutsider\src\obj\Debug\net48\TheOutsider.pdb
