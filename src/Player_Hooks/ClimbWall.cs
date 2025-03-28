@@ -112,12 +112,12 @@ namespace TheOutsider.Player_Hooks
         public static bool SlugcatHand_EngageInMovement(On.SlugcatHand.orig_EngageInMovement orig, SlugcatHand self)
         {
             bool isWallClimb = self.owner != null && (self.owner.owner as Player).bodyMode == Player.BodyModeIndex.WallClimb;
-            if (isWallClimb)
+            if (PlayerHooks.PlayerData.TryGetValue(self.owner.owner as Player, out var player) && isWallClimb)
                 (self.owner.owner as Player).bodyMode = Player.BodyModeIndex.Default;
 
             bool result = orig(self);
 
-            if (PlayerHooks.PlayerData.TryGetValue(self.owner.owner as Player, out var player) && isWallClimb)
+            if (PlayerHooks.PlayerData.TryGetValue(self.owner.owner as Player, out player) && isWallClimb)
             {
                 (self.owner.owner as Player).bodyMode = Player.BodyModeIndex.WallClimb;
 
