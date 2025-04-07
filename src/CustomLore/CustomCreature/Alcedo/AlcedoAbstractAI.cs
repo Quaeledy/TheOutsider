@@ -16,7 +16,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         {
             get
             {
-                return ModManager.MSC && parent.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.MirosVulture;
+                return ModManager.MSC && parent.creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.MirosVulture;
             }
         }
 

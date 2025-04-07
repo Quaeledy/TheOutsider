@@ -23,7 +23,7 @@
                     self.animation != Player.AnimationIndex.VineGrab &&
                     self.animation != Player.AnimationIndex.ZeroGPoleGrab)
                 {
-                    self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.wingSpeed * 0.5f;
+                    self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.flightSpeed * 0.5f;
                     //self.bodyChunks[1].vel.y = self.bodyChunks[1].vel.y - 1f * (1f - 1f * Mathf.Cos(upJumpTime * 2 * 3.14159f / 7f));
                     //upJumpTime++;
                 }
@@ -45,7 +45,7 @@
                 if (!(self.IsTileSolid(1, 0, -1) || self.IsTileSolid(0, 0, -1) || self.bodyChunks[1].submersion > 0.1f || flag))
                     self.jumpBoost = 4f;
 
-                self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.wingSpeed * 0.5f;
+                self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.flightSpeed * 0.5f;
             }
         }
     }

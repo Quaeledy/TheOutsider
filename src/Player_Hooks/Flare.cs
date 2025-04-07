@@ -8,12 +8,12 @@ namespace TheOutsider.Player_Hooks
     public class Flare
     {
         //爆发闪光
-        public static void Player_Flare(On.Player.orig_UpdateMSC orig, Player self)
+        public static void Player_Flare(On.Player.orig_Update orig, Player self, bool eu)
         {
-            orig(self);
+            orig(self, eu);
 
             //检测是不是蛾猫
-            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && !Plugin.optionsMenuInstance.neverFlare.Value)
+            if (PlayerHooks.PlayerData.TryGetValue(self, out var player) && !Plugin.optionsMenuInstance.neverFlare.Value && self.room != null)
             {
                 //消耗饱食度爆发闪光
                 if (FlareKeyCode(self) && player.burning == 0f && self.FoodInStomach > 0)
@@ -118,7 +118,8 @@ namespace TheOutsider.Player_Hooks
             }
             if (Plugin.optionsMenuInstance.flareKeyCode.Value == KeyCode.None || self.isNPC)
             {
-                return self.wantToJump > 0 && self.input[0].pckp && AIwantFlare;
+                return (!self.input[1].jmp || !self.input[1].pckp) && 
+                    self.input[0].jmp && self.input[0].pckp && AIwantFlare;
             }
             else
             {

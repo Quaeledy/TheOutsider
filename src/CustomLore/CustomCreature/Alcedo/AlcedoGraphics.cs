@@ -500,7 +500,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 {
                     UpdateTailSegment(num12, stiffness);
                 }/*
-                if ((this.alcedo.Template.type == CreatureTemplate.Type.Salamander || (ModManager.MSC && this.alcedo.Template.type == MoreSlugcatsEnums.CreatureTemplateType.EelLizard)) && !this.alcedo.salamanderLurk)
+                if ((this.alcedo.Template.type == CreatureTemplate.Type.Salamander || (ModManager.MSC && this.alcedo.Template.type == DLCSharedEnums.CreatureTemplateType.EelLizard)) && !this.alcedo.salamanderLurk)
                 {
                     Vector2 a2 = Custom.PerpendicularVector(Custom.DirVec(this.alcedo.bodyChunks[2].pos, this.alcedo.bodyChunks[0].pos));
                     this.alcedo.bodyChunks[0].pos += a2 * Mathf.Sin(this.breath * 3.1415927f * 2f * 3f) * 3.5f * this.alcedo.swim;
@@ -674,7 +674,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             {
                 if (this.alcedo.Consious && this.alcedo.swim > 0.5f)
                 {
-                    if (this.alcedo.Template.type == CreatureTemplate.Type.Salamander || (ModManager.MSC && this.alcedo.Template.type == MoreSlugcatsEnums.CreatureTemplateType.EelLizard))
+                    if (this.alcedo.Template.type == CreatureTemplate.Type.Salamander || (ModManager.MSC && this.alcedo.Template.type == DLCSharedEnums.CreatureTemplateType.EelLizard))
                     {/*
                         if (!this.alcedo.salamanderLurk)
                         {
@@ -1391,7 +1391,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             }/*
             if (this.alcedo.Consious && this.alcedo.swim > 0.5f)
             {
-                if (!(this.alcedo.Template.type == CreatureTemplate.Type.Salamander) && (!ModManager.MSC || !(this.alcedo.Template.type == MoreSlugcatsEnums.CreatureTemplateType.EelLizard)))
+                if (!(this.alcedo.Template.type == CreatureTemplate.Type.Salamander) && (!ModManager.MSC || !(this.alcedo.Template.type == DLCSharedEnums.CreatureTemplateType.EelLizard)))
                 {
                     this.tail[i].vel *= 1f - 0.5f * Mathf.InverseLerp(0.5f, 1f, this.alcedo.swim);
                     this.tail[i].vel += (Custom.DirVec(base.owner.bodyChunks[1].pos, base.owner.bodyChunks[5].pos) + Custom.PerpendicularVector((this.tail[i].pos - vector).normalized) * Mathf.Sin((this.breath * 5f - (float)i / (float)this.tail.Length) * 0.3f * 3.1415927f)) * Mathf.InverseLerp(0.5f, 1f, this.alcedo.swim) * Mathf.Pow(0.85f, (float)i) * 7f;

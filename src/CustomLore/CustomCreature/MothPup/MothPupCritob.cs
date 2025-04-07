@@ -21,7 +21,7 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
             ShelterDanger = ShelterDanger.Safe;
             CreatureName = "Mothpup";
             Icon = new MothPupIcon();
-            RegisterUnlock(killScore: KillScore.Configurable(2), TheOutsiderEnums.CreatureTemplateType.MothPupUnlock, parent: MultiplayerUnlocks.SandboxUnlockID.Slugcat, data: 0);//MoreSlugcatsEnums.SandboxUnlockID.SlugNPC
+            RegisterUnlock(killScore: KillScore.Configurable(2), TheOutsiderEnums.CreatureTemplateType.MothPupUnlock, parent: MultiplayerUnlocks.SandboxUnlockID.Slugcat, data: 0);//DLCSharedEnums.SandboxUnlockID.SlugNPC
         }
 
         public override CreatureTemplate CreateTemplate()
@@ -38,8 +38,8 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
                 InstantDeathDamage = 1,
                 Pathing = Plugin.optionsMenuInstance.infiniteFlight.Value ?
                           PreBakedPathing.Ancestral(CreatureTemplate.Type.CicadaB) :
-                          PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
-                //Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
+                          PreBakedPathing.Ancestral(DLCSharedEnums.CreatureTemplateType.ScavengerElite),
+                //Pathing = PreBakedPathing.Ancestral(DLCSharedEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
                     Air = new (4.5f, Allowed),
@@ -166,7 +166,7 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
             self.EatenBy(CreatureTemplate.Type.DaddyLongLegs, 1f);
             self.EatenBy(CreatureTemplate.Type.MirosBird, 0.6f);
             self.EatenBy(CreatureTemplate.Type.BigSpider, 0.4f);
-            self.EatenBy(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 1f);
+            self.EatenBy(DLCSharedEnums.CreatureTemplateType.MirosVulture, 1f);
             self.EatenBy(MoreSlugcatsEnums.CreatureTemplateType.FireBug, 0.5f);
 
             //害怕
@@ -183,7 +183,7 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
             self.Fears(CreatureTemplate.Type.SpitterSpider, 0.8f);
             self.Fears(CreatureTemplate.Type.DropBug, 0.5f);
             self.Fears(CreatureTemplate.Type.RedCentipede, 1f);
-            self.Fears(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 1f);
+            self.Fears(DLCSharedEnums.CreatureTemplateType.MirosVulture, 1f);
 
             //独立社会关系
             self.HasDynamicRelationship(CreatureTemplate.Type.CicadaA, 1f);

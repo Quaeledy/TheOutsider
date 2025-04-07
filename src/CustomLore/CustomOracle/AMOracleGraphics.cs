@@ -50,7 +50,8 @@ namespace TheOutsider.CustomLore.CustomOracle
             totalSprites += halo.totalSprites;
 
             //袍子
-            gown = new Gown(this);
+            gowns = new OracleGraphics.Gown[1];
+            gowns[0] = new Gown(this, 0);
             robeSprite = totalSprites;
             totalSprites++;
 
@@ -144,11 +145,11 @@ namespace TheOutsider.CustomLore.CustomOracle
 
 
                 sLeaser.sprites[HandSprite(k, 0)].color = color;
-                if (gown != null)
+                if (gowns != null)
                 {
                     for (int l = 0; l < 4; l++)
                     {
-                        Color handColor = Gown_Color(gown, (float)l / 7f);
+                        Color handColor = Gown_Color(gowns[0], (float)l / 7f);
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = handColor;
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = AMOracleColor.Blue;
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = handColor;
@@ -156,7 +157,7 @@ namespace TheOutsider.CustomLore.CustomOracle
                     }
                     for (int l = 4; l < 7; l++)
                     {
-                        Color handColor = Gown_Color(gown, (float)l / 7f);
+                        Color handColor = Gown_Color(gowns[0], (float)l / 7f);
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = handColor;
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = handColor;
                         (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = handColor;
@@ -201,9 +202,10 @@ namespace TheOutsider.CustomLore.CustomOracle
                 armJointGraphics[j].InitiateSprites(sLeaser, rCam);
             }
 
-            if (gown != null)
+            if (gowns != null)
             {
-                gown.InitiateSprite(robeSprite, sLeaser, rCam);
+                for (int j = 0; j < this.gowns.Length; j++)
+                    gowns[j].InitiateSprite(robeSprite, sLeaser, rCam);
             }
 
             if (halo != null)
@@ -380,13 +382,13 @@ namespace TheOutsider.CustomLore.CustomOracle
             {
                 for (int x = 0; x < divs; x++)
                 {
-                    collarPos[x] = owner.gown.clothPoints[x, 0, 0];
+                    collarPos[x] = owner.gowns[0].clothPoints[x, 0, 0];
                 }
 
                 for (int y = 0; y < divs; y++)
                 {
-                    Vector2 delta = owner.gown.clothPoints[5, y, 0] - owner.gown.clothPoints[5, 0, 0];
-                    midColPos[y] = owner.gown.clothPoints[5, 0, 0] + delta / 2f;
+                    Vector2 delta = owner.gowns[0].clothPoints[5, y, 0] - owner.gowns[0].clothPoints[5, 0, 0];
+                    midColPos[y] = owner.gowns[0].clothPoints[5, 0, 0] + delta / 2f;
                 }
             }
 

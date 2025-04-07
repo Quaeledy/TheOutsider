@@ -68,7 +68,7 @@ namespace TheOutsider
                         {
                             bool flag = (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.TentaclePlant || 
                                         (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)CreatureTemplate.Type.PoleMimic || 
-                                        (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)MoreSlugcatsEnums.CreatureTemplateType.StowawayBug;
+                                        (ExtEnum<CreatureTemplate.Type>)(object)t == (ExtEnum<CreatureTemplate.Type>)(object)DLCSharedEnums.CreatureTemplateType.StowawayBug;
                             float num = float.PositiveInfinity;
                             for (int j = 0; j < room.nodes.Length; j++)
                             {

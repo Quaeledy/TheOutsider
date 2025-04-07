@@ -145,12 +145,11 @@ namespace TheOutsider.World_Hooks
                     {
                         self.waterObject.Destroy();
                         self.waterObject.fWaterLevel = float.MinValue;
-                        for (int i = 0; i < self.waterObject.surface.GetLength(0); i++)
+                        for (int i = 0; i < self.waterObject.surfaces.GetLength(0); i++)
                         {
-                            for (int j = 0; j < 2; j++)
-                            {
-                                self.waterObject.surface[i, j] = new Water.SurfacePoint(new Vector2(0, 0));
-                            }
+                            for (int j = 0; j < self.waterObject.surfaces[i].points.GetLength(0); j++)
+                                for (int k = 0; k < self.waterObject.surfaces[i].points.GetLength(1); k++)
+                                    self.waterObject.surfaces[i].points[j, k] = new Water.SurfacePoint(new Vector2(0, 0));
                         }
                     }
                 }

@@ -45,7 +45,7 @@ namespace TheOutsider
         #endregion
         #region 飞行相关
         public float flutterTimeAdd;
-        public readonly float wingSpeed;
+        public readonly float flightSpeed;
         public readonly float upFlightTime;
         public int preventGrabs;
         public bool isFlying;
@@ -118,11 +118,11 @@ namespace TheOutsider
             flyingBuzzSound.Pitch = 1f;
             flyingBuzzSound.Volume = 1f;
             */
-            wingSpeed = 10;
-            upFlightTime = 30;
+            this.flightSpeed = isMothNPC ? 8 : 10;
+            this.upFlightTime = 30;
 
-            burningRange = isMothNPC ? 300f : 600f;
-            burningRangeWithVisualContact = isMothNPC ? 800f : 1600f;
+            this.burningRange = isMothNPC ? 300f : 600f;
+            this.burningRangeWithVisualContact = isMothNPC ? 800f : 1600f;
         }
 
         #region 颜色相关

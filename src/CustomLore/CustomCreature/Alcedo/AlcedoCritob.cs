@@ -40,7 +40,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                 HasAI = true,
                 InstantDeathDamage = 7,
                 Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.Vulture),
-                //Pathing = PreBakedPathing.Ancestral(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite),
+                //Pathing = PreBakedPathing.Ancestral(DLCSharedEnums.CreatureTemplateType.ScavengerElite),
                 TileResistances = new()
                 {
                     Air = new PathCost(1f, Allowed),
@@ -199,8 +199,8 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             self.Eats(CreatureTemplate.Type.BigSpider, 1f);
             self.Eats(CreatureTemplate.Type.SpitterSpider, 0.9f);
             self.Eats(MoreSlugcatsEnums.CreatureTemplateType.TrainLizard, 0f);
-            self.Eats(MoreSlugcatsEnums.CreatureTemplateType.SpitLizard, 0f);
-            self.Eats(MoreSlugcatsEnums.CreatureTemplateType.MotherSpider, 0.7f);
+            self.Eats(DLCSharedEnums.CreatureTemplateType.SpitLizard, 0f);
+            self.Eats(DLCSharedEnums.CreatureTemplateType.MotherSpider, 0.7f);
             self.Eats(TheOutsiderEnums.CreatureTemplateType.Mothpup, 0.4f);
 
             //被捕食
@@ -208,7 +208,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             //self.EatenBy(CreatureTemplate.Type.Vulture, 0.1f);
             self.EatenBy(CreatureTemplate.Type.KingVulture, 0.1f);
             self.EatenBy(CreatureTemplate.Type.MirosBird, 0.3f);
-            self.EatenBy(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 0.3f);
+            self.EatenBy(DLCSharedEnums.CreatureTemplateType.MirosVulture, 0.3f);
 
             //害怕
             self.Fears(CreatureTemplate.Type.Vulture, 0.1f);
@@ -219,7 +219,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
             self.Fears(CreatureTemplate.Type.RedCentipede, 0.2f);
             self.Fears(CreatureTemplate.Type.RedLizard, 0.2f);
             self.Fears(CreatureTemplate.Type.MirosBird, 0.2f);
-            self.Fears(MoreSlugcatsEnums.CreatureTemplateType.MirosVulture, 0.8f);
+            self.Fears(DLCSharedEnums.CreatureTemplateType.MirosVulture, 0.8f);
         }
 
         public override ArtificialIntelligence CreateRealizedAI(AbstractCreature acrit)

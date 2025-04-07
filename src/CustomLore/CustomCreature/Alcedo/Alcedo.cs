@@ -25,7 +25,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         {
             get
             {
-                return ModManager.MSC && Template.type == MoreSlugcatsEnums.CreatureTemplateType.MirosVulture;
+                return ModManager.MSC && Template.type == DLCSharedEnums.CreatureTemplateType.MirosVulture;
             }
         }
         public float jetFuel
@@ -1913,7 +1913,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         {
             public AlcedoState(AbstractCreature creature) : base(creature)
             {
-                bool flag = ModManager.MSC && creature.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.MirosVulture;
+                bool flag = ModManager.MSC && creature.creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.MirosVulture;
                 wingHealth = new float[flag ? 4 : 2];
                 for (int i = 0; i < wingHealth.Length; i++)
                 {

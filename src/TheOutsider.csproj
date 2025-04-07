@@ -7,8 +7,14 @@
     
     <ItemGroup>
       <Compile Remove="CustomLore\CustomCreature\Quetzalcoatl\**" />
+      <Compile Remove="CustomLore\CustomDream\**" />
+      <Compile Remove="CustomLore\CustomOracle\**" />
       <EmbeddedResource Remove="CustomLore\CustomCreature\Quetzalcoatl\**" />
+      <EmbeddedResource Remove="CustomLore\CustomDream\**" />
+      <EmbeddedResource Remove="CustomLore\CustomOracle\**" />
       <None Remove="CustomLore\CustomCreature\Quetzalcoatl\**" />
+      <None Remove="CustomLore\CustomDream\**" />
+      <None Remove="CustomLore\CustomOracle\**" />
     </ItemGroup>
     
     <ItemGroup>
@@ -32,20 +38,12 @@
           <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2948971756\newest\plugins\DressMySlugcat.dll</HintPath>
           <Private>False</Private>
         </Reference>
-        <Reference Include="EmgTx">
-          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2991981689\newest\plugins\EmgTx.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
         <Reference Include="Fisobs">
           <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\workshop\content\312520\2920541687\newest\plugins\Fisobs.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="HOOKS-Assembly-CSharp">
           <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
-          <Private>False</Private>
-        </Reference>
-        <Reference Include="Assembly-CSharp">
-          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="Mono.Cecil">
@@ -62,6 +60,10 @@
         </Reference>
         <Reference Include="MonoMod.Utils">
           <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\core\MonoMod.Utils.dll</HintPath>
+          <Private>False</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+          <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
           <Private>False</Private>
         </Reference>
         <Reference Include="SlugBase">

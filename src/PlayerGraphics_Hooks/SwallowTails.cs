@@ -13,7 +13,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
         private int swallowtailSprite;
         private int swallowtailSpriteLength;
         private int tailN;
-        private readonly float swallowTailSpacing = 6f;
+        private readonly float swallowTailSpacing = 5f;
         private float nowSwallowTailSpacing;
         private float moveDeg;
         private readonly float MaxLength = 15f;
@@ -191,9 +191,9 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 for (int k = 0; k < swallowtail.GetLength(1); k++)
                 {
                     //超出长度限位
-                    if (!Custom.DistLess(swallowtail[i, k].pos, rootPos, MaxLength))
+                    if (k > 1 && !Custom.DistLess(swallowtail[i, k - 1].pos, swallowtail[i, k].pos, MaxLength))
                     {
-                        swallowtail[i, k].pos = rootPos + Custom.DirVec(rootPos, swallowtail[i, k].pos) * MaxLength;// * (1 + t);if (k > 1)
+                        swallowtail[i, k].pos = rootPos + Custom.DirVec(swallowtail[i, k - 1].pos, swallowtail[i, k].pos) * MaxLength;// * (1 + t);if (k > 1)
                         swallowtail[i, k].vel *= 0.5f;
                     }
 

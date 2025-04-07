@@ -48,7 +48,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
         {
             get
             {
-                return ModManager.MSC && creature.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.MirosVulture;
+                return ModManager.MSC && creature.creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.MirosVulture;
             }
         }
         public float disencouraged
@@ -187,7 +187,7 @@ namespace TheOutsider.CustomLore.CustomCreature.Alcedo
                     bool flag;
                     if (IsMiros)
                     {
-                        flag = focusCreature.representedCreature.creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.MirosVulture;
+                        flag = focusCreature.representedCreature.creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.MirosVulture;
                     }
                     else
                     {

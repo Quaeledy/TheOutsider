@@ -30,7 +30,6 @@ namespace TheOutsider.MothPup_Hooks
             On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             On.SlugcatStats.SlugcatFoodMeter += SlugcatStats_SlugcatFoodMeter;
 
-            On.MoreSlugcats.PlayerNPCState.CycleTick += PlayerNPCState_CycleTick;
             On.MoreSlugcats.PlayerNPCState.ctor += PlayerNPCState_ctor;
             On.AbstractCreature.ctor += AbstractCreature_ctor;
             //On.AImap.TileAccessibleToCreature_IntVector2_CreatureTemplate += AImap_TileAccessibleToCreature;
@@ -127,7 +126,7 @@ namespace TheOutsider.MothPup_Hooks
             {
                 Plugin.Log("GhostCreatureSedater_UpdateIL MatchFind!");
                 c.Emit(OpCodes.Ldarg_0); // self
-                c.Emit(OpCodes.Ldloc_0); // i
+                c.Emit(OpCodes.Ldloc_2); // i
                 c.EmitDelegate((bool notSlugNPC, GhostCreatureSedater self, int i) =>
                 {
                     bool notMothPup = true;
@@ -224,7 +223,7 @@ namespace TheOutsider.MothPup_Hooks
             /*
             while (c.TryGotoNext(MoveType.After,
                 i => i.Match(OpCodes.Ldarg_0),
-                i => i.MatchLdsfld<MoreSlugcatsEnums.CreatureTemplateType>(nameof(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC))))
+                i => i.MatchLdsfld<DLCSharedEnums.CreatureTemplateType>(nameof(DLCSharedEnums.CreatureTemplateType.SlugNPC))))
             {
                 Plugin.Log("World_SpawnPupNPCsIL MatchFind 2!");
                 c.Emit(OpCodes.Ldarg_0); // world
@@ -241,15 +240,6 @@ namespace TheOutsider.MothPup_Hooks
         }
         #endregion
 
-        private static void PlayerNPCState_CycleTick(On.MoreSlugcats.PlayerNPCState.orig_CycleTick orig, PlayerNPCState self)
-        {
-            Plugin.Log($"Before: self.player.creatureTemplate.type: {self.player.creatureTemplate.type},  self.Malnourished: {self.Malnourished}");
-            orig(self);
-            Plugin.Log($"After: self.player.creatureTemplate.type: {self.player.creatureTemplate.type},  self.Malnourished: {self.Malnourished}");
-            if (self.player.creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
-            {
-            }
-        }
         private static void PlayerNPCState_ctor(On.MoreSlugcats.PlayerNPCState.orig_ctor orig, PlayerNPCState self, AbstractCreature abstractCreature, int playerNumber)
         {
             orig(self, abstractCreature, playerNumber);
@@ -260,7 +250,7 @@ namespace TheOutsider.MothPup_Hooks
         }
         private static void AbstractCreature_ctor(On.AbstractCreature.orig_ctor orig, AbstractCreature self, World world, CreatureTemplate creatureTemplate, Creature realizedCreature, WorldCoordinate pos, EntityID ID)
         {
-            if (//(creatureTemplate.type == MoreSlugcatsEnums.CreatureTemplateType.SlugNPC && TheOutsider.PlayerNPCShouldBeMoth(world, ID)) ||
+            if (//(creatureTemplate.type == DLCSharedEnums.CreatureTemplateType.SlugNPC && TheOutsider.PlayerNPCShouldBeMoth(world, ID)) ||
                  creatureTemplate.type == TheOutsiderEnums.CreatureTemplateType.Mothpup)
             {
                 creatureTemplate = StaticWorld.GetCreatureTemplate(TheOutsiderEnums.CreatureTemplateType.Mothpup);
@@ -329,7 +319,7 @@ namespace TheOutsider.MothPup_Hooks
                 else
                 {
                     result = result ||
-                             StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite).AccessibilityResistance(aitile.acc).Allowed;
+                             StaticWorld.GetCreatureTemplate(DLCSharedEnums.CreatureTemplateType.ScavengerElite).AccessibilityResistance(aitile.acc).Allowed;
                 }
             }
             return result;

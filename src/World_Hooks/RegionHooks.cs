@@ -9,7 +9,7 @@ namespace TheOutsider.World_Hooks
             /*On.ModManager.ModMerger.WriteMergedFile += ModMerger_WriteMergedFile;
             On.ModManager.ModMerger.ExecutePendingMerge += ModMerger_ExecutePendingMerge;*/
             On.SlugcatStats.getSlugcatStoryRegions += SlugcatStats_getSlugcatStoryRegions;
-            On.Region.GetProperRegionAcronym += Region_GetProperRegionAcronym;
+            On.Region.GetProperRegionAcronym_Name_string += Region_GetProperRegionAcronym_Name_string;
         }
         /*
         private void ModMerger_WriteMergedFile(On.ModManager.ModMerger.orig_WriteMergedFile orig, ModManager.Mod sourceMod, string sourcePath, string[] mergeLines)
@@ -255,7 +255,7 @@ namespace TheOutsider.World_Hooks
             return result;
         }
 
-        public static string Region_GetProperRegionAcronym(On.Region.orig_GetProperRegionAcronym orig, SlugcatStats.Name character, string baseAcronym)
+        public static string Region_GetProperRegionAcronym_Name_string(On.Region.orig_GetProperRegionAcronym_Name_string orig, SlugcatStats.Name character, string baseAcronym)
         {
             if (character.value != Plugin.SlugName.value)
             {

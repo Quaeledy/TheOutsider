@@ -95,7 +95,7 @@ namespace TheOutsider.CustomLore.CustomCosmetics
             {
                 colored = 1;
             }
-            if (ModManager.MSC && aGraphics.alcedo.Template.type == MoreSlugcatsEnums.CreatureTemplateType.TrainAlcedo)
+            if (ModManager.MSC && aGraphics.alcedo.Template.type == DLCSharedEnums.CreatureTemplateType.TrainAlcedo)
             {
                 colored = 1;
                 sizeRangeMin = 1f;

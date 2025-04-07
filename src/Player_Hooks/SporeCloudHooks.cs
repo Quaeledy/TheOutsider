@@ -40,9 +40,9 @@ namespace TheOutsider.Player_Hooks
         }
 
 
-        public static void Player_Update(On.Player.orig_UpdateMSC orig, Player self)
+        public static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
-            orig(self);
+            orig(self, eu);
 
             if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
