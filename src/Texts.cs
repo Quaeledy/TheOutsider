@@ -96,7 +96,7 @@ namespace TheOutsider
     {
         public IntroText3(Room room) : base(room, new Message[]
             {
-                Message.NewMessage("You have a wider range of vegetarian diet, including those explosive red grasses.", 120, 180)
+                Message.NewMessage("You have a wider range of vegetarian diet, including those Firebushes, Bubble Weeds, Batnips and so on.", 120, 180)
             })
 
         {

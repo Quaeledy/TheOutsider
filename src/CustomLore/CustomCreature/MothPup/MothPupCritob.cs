@@ -5,6 +5,7 @@ using Fisobs.Sandbox;
 using MoreSlugcats;
 using System.Collections.Generic;
 using UnityEngine;
+using Watcher;
 using static PathCost.Legality;
 
 namespace TheOutsider.CustomLore.CustomCreature.MothPup
@@ -191,6 +192,14 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
             self.HasDynamicRelationship(CreatureTemplate.Type.JetFish, 1f);
             self.HasDynamicRelationship(CreatureTemplate.Type.Scavenger, 1f);
             self.HasDynamicRelationship(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, 1f);
+
+            if (ModManager.Watcher)
+            {
+                self.Ignores(WatcherEnums.CreatureTemplateType.BigMoth);
+                self.IgnoredBy(WatcherEnums.CreatureTemplateType.BigMoth);
+                self.Ignores(WatcherEnums.CreatureTemplateType.SmallMoth);
+                self.IgnoredBy(WatcherEnums.CreatureTemplateType.SmallMoth);
+            }
         }
 
         public override ArtificialIntelligence CreateRealizedAI(AbstractCreature acrit)

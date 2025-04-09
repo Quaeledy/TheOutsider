@@ -173,6 +173,15 @@ namespace TheOutsider.Player_Hooks
                 self.bodyChunks[0].vel.y -= 1f;
                 self.bodyChunks[1].vel.y += 1f;
             }
+            if (player.flightTime > player.upFlightTime / 2f)
+            {
+                float scale = Mathf.Abs(Mathf.Cos(Custom.AimFromOneVectorToAnother(self.bodyChunks[0].pos, self.bodyChunks[1].pos) / 180f * Mathf.PI));
+                float fac = Custom.LerpMap(scale, 1f, 0f, 
+                    Custom.LerpMap((float)player.flightTime / (float)player.upFlightTime, 1f / 2f, 1f, 0.975f, 0.925f),
+                    Custom.LerpMap((float)player.flightTime / (float)player.upFlightTime, 1f / 1.5f, 1f, 0.99f, 0.975f));
+                for (int i = 0; i < self.bodyChunks.Length; i++)
+                    self.bodyChunks[i].vel.x *= fac;
+            }
             /*
             if (player.flightTime >= 1.5f * player.upFlightTime)//self.input[0].x > 0 && 
             {
@@ -236,9 +245,9 @@ namespace TheOutsider.Player_Hooks
         {
             //Plugin.Log($"player.flightTime: {player.flightTime}, player.ax: {player.ax}, player.ay:  {player.ay}");
             
-            float sa = 3f / 60f;//3f;
-            float sv = 0.2f / 60f;//0.2f;
-            float sf = 0.0012f / 60f;//0.0012f
+            float sa = 3f / 80f;//3f;
+            float sv = 0.2f / 80f;//0.2f;
+            float sf = 0.0012f / 40f;//0.0012f
             float ss = 0.5f;//1f
             /*
             float sa = 3f;
@@ -339,7 +348,8 @@ namespace TheOutsider.Player_Hooks
                             player.ax += 1.2f * sv * self.input[0].x;
                             self.bodyChunks[0].vel.x *= 1.1f;
                             self.bodyChunks[1].vel.x *= 0.9f;
-                            self.bodyChunks[1].vel.y += 1.25f * self.room.gravity;
+                            self.bodyChunks[0].vel.y -= 1f * self.room.gravity;
+                            self.bodyChunks[1].vel.y += 1f * self.room.gravity;
                         }
 
                         if (player.ay < 0f && self.input[1].y < 0 && self.input[0].y >= 0)//拍翅动画
@@ -376,12 +386,12 @@ namespace TheOutsider.Player_Hooks
                         //注意，self.bodyChunks[0].vel.y是负数，因此下面都进行了变号
                         if (self.input[0].x > 0)
                         {
-                            player.ax -= sv * self.bodyChunks[0].vel.y * 0.5f;
+                            player.ax -= sv * self.bodyChunks[0].vel.y * 0.25f;
                             player.ay += sv * ss;
                         }
                         else if (self.input[0].x < 0)
                         {
-                            player.ax += sv * self.bodyChunks[0].vel.y * 0.5f;
+                            player.ax += sv * self.bodyChunks[0].vel.y * 0.25f;
                             player.ay += sv * ss;
                         }
                     }

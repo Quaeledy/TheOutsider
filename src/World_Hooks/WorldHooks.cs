@@ -4,6 +4,9 @@ using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
 using System;
+using System.Linq;
+using TheOutsider.Player_Hooks;
+using Watcher;
 
 namespace TheOutsider.World_Hooks
 {
@@ -16,6 +19,9 @@ namespace TheOutsider.World_Hooks
         public static void Init()
         {
             On.World.CheckForRegionGhost += World_CheckForRegionGhost;
+            //On.StaticWorld.InitStaticWorldRelationshipsWatcher += StaticWorld_InitStaticWorldRelationshipsWatcher;
+            if (ModManager.Watcher)
+                On.Watcher.BigMothAI.IUseARelationshipTracker_UpdateDynamicRelationship += BigMothAI_IUseARelationshipTracker_UpdateDynamicRelationship;
         }
 
         private static void World_SpawnGhostIL(ILContext il)
@@ -81,5 +87,72 @@ namespace TheOutsider.World_Hooks
             }
             return result;
         }
+
+        #region 生物关系
+        public static CreatureTemplate.Relationship BigMothAI_IUseARelationshipTracker_UpdateDynamicRelationship(On.Watcher.BigMothAI.orig_IUseARelationshipTracker_UpdateDynamicRelationship orig, BigMothAI self, RelationshipTracker.DynamicRelationship dRelation)
+        {
+            CreatureTemplate.Relationship result = orig(self, dRelation);
+            if (dRelation.trackerRep != null && dRelation.trackerRep.representedCreature != null && dRelation.trackerRep.representedCreature.realizedCreature != null &&
+                dRelation.trackerRep.representedCreature.realizedCreature is Player player && PlayerHooks.PlayerData.TryGetValue(player, out var playerEX))
+            {
+                BigMothAI.BigMothTrackState bigMothTrackState = dRelation.state as BigMothAI.BigMothTrackState;
+                CreatureTemplate.Relationship relationship = self.StaticRelationship(dRelation.trackerRep.representedCreature);
+                if (relationship.type == CreatureTemplate.Relationship.Type.Afraid || relationship.type == CreatureTemplate.Relationship.Type.Uncomfortable)
+                {
+                    if (!dRelation.state.alive)
+                    {
+                        relationship.intensity = 0f;
+                    }
+                    else
+                    {
+                        float tempLike = self.creature.state.socialMemory.GetLike(dRelation.trackerRep.representedCreature.ID);// GetTempLike -> GetLike
+                        if (!self.bug.Small)
+                        {
+                            if (tempLike > -0.15f)// 0.15f
+                            {
+                                relationship.type = CreatureTemplate.Relationship.Type.Ignores;
+                            }/*
+                            else if (tempLike < -0.9f)
+                            {
+                                relationship.type = CreatureTemplate.Relationship.Type.Eats;
+                            }*/
+                            else if (tempLike < -0.5f)// -0.15f
+                            {
+                                relationship.type = CreatureTemplate.Relationship.Type.Attacks;
+                            }
+                        }
+                    }
+                }
+                else if (relationship.type == CreatureTemplate.Relationship.Type.Antagonizes)
+                {// GetTempLike -> GetLike
+                    if ((double)self.creature.state.socialMemory.GetLike(dRelation.trackerRep.representedCreature.ID) > -0.15f)// -0.2f
+                    {
+                        relationship.type = CreatureTemplate.Relationship.Type.Ignores;
+                    }
+                    else if ((double)self.creature.state.socialMemory.GetLike(dRelation.trackerRep.representedCreature.ID) < -0.65f)// -0.2f
+                    {
+                        relationship.type = CreatureTemplate.Relationship.Type.Afraid;
+                    }
+                    else if (self.bug.room.abstractRoom.AttractionForCreature(self.bug.Template.type) == AbstractRoom.CreatureRoomAttraction.Forbidden)
+                    {
+                        return new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Ignores, 0f);
+                    }
+                }
+                else if (relationship.type == CreatureTemplate.Relationship.Type.Uncomfortable)
+                {
+                    if (bigMothTrackState.vultureMasked && self.creature.state.socialMemory.GetLike(dRelation.trackerRep.representedCreature.ID) < -0.15f)
+                    {
+                        relationship.type = CreatureTemplate.Relationship.Type.Eats;
+                    }
+                    else if (bigMothTrackState.thrownTimer > 0)
+                    {
+                        relationship.type = CreatureTemplate.Relationship.Type.Ignores;
+                        relationship.intensity = 0f;
+                    }
+                }
+            }
+            return result;
+        }
+        #endregion
     }
 }

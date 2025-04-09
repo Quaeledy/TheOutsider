@@ -233,22 +233,44 @@ namespace TheOutsider.HUD_Hooks
                 return;
 
             //飞行教程
-            if (!introText1 && room.roomSettings.name == "SB_TOPSIDE")
+            if (!introText1 && room.abstractRoom.name == "SB_TOPSIDE")
             {
                 room.AddObject(new IntroText1(room));
                 introText1 = true;
             }
             //闪光教程
-            else if (!introText2 && (room.roomSettings.name == "SB_H03" || room.roomSettings.name == "LF_C03"))
+            else if (!introText2 && room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.Darkness) != null && room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.Darkness) > 0.35f)
             {
                 room.AddObject(new IntroText2(room));
                 introText2 = true;
             }
             //食素教程
-            else if (!introText3 && room.roomSettings.name == "SB_H03")
+            else if (!introText3)
             {
-                room.AddObject(new IntroText3(room));
-                introText3 = true;
+                bool hasFood = false;
+                for (int i = 0; i < room.physicalObjects.Length; i++)
+                {
+                    for (int j = 0; j < room.physicalObjects[i].Count; j++)
+                    {
+                        foreach (var data in CustomEdible.edibleDatas[Plugin.SlugName].edibleDatas)
+                        {
+                            if (data.edibleType == room.physicalObjects[i][j].abstractPhysicalObject.type)
+                            {
+                                hasFood = true;
+                                break;
+                            }
+                        }
+                        if (hasFood)
+                            break;
+                    }
+                    if (hasFood)
+                        break;
+                }
+                if (hasFood)
+                {
+                    room.AddObject(new IntroText3(room));
+                    introText3 = true;
+                }
             }
         }
 
