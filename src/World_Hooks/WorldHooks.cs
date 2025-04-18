@@ -20,7 +20,7 @@ namespace TheOutsider.World_Hooks
         {
             On.World.CheckForRegionGhost += World_CheckForRegionGhost;
             //On.StaticWorld.InitStaticWorldRelationshipsWatcher += StaticWorld_InitStaticWorldRelationshipsWatcher;
-            if (ModManager.Watcher)
+            if (ModManager.ActiveMods.Any(mod => mod.id == "watcher"))//ModManager.Watcher
                 On.Watcher.BigMothAI.IUseARelationshipTracker_UpdateDynamicRelationship += BigMothAI_IUseARelationshipTracker_UpdateDynamicRelationship;
         }
 

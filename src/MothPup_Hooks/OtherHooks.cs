@@ -5,6 +5,7 @@ using MonoMod.RuntimeDetour;
 using MoreSlugcats;
 using RWCustom;
 using System.Reflection;
+using System;
 
 namespace TheOutsider.MothPup_Hooks
 {
@@ -32,11 +33,61 @@ namespace TheOutsider.MothPup_Hooks
 
             On.MoreSlugcats.PlayerNPCState.ctor += PlayerNPCState_ctor;
             On.AbstractCreature.ctor += AbstractCreature_ctor;
+            On.AImap.IsConnectionAllowedForCreature += AImap_IsConnectionAllowedForCreature;
             //On.AImap.TileAccessibleToCreature_IntVector2_CreatureTemplate += AImap_TileAccessibleToCreature;
             //On.SaveState.AbstractCreatureFromString += SaveState_AbstractCreatureFromString;
 
             Hook hook = new Hook(typeof(StoryGameSession).GetProperty(nameof(StoryGameSession.slugPupMaxCount), OtherHooks.propFlags).GetGetMethod(), typeof(OtherHooks).GetMethod(nameof(StoryGameSession_get_slugPupMaxCount), OtherHooks.methodFlags));
         }
+
+        private static bool AImap_IsConnectionAllowedForCreature(On.AImap.orig_IsConnectionAllowedForCreature orig, AImap self, MovementConnection connection, CreatureTemplate crit)
+        {
+            bool result;
+            if (self.IsConnectionForceAllowedForCreature(connection, crit, out result))
+            {
+                return result;
+            }
+            if (!self.WorldCoordinateAccessibleToCreature(connection.startCoord, crit) || !self.WorldCoordinateAccessibleToCreature(connection.destinationCoord, crit) || !crit.ConnectionResistance(connection.type).Allowed)
+            {
+                return false;
+            }
+            if (connection.type == MovementConnection.MovementType.DropToClimb || connection.type == MovementConnection.MovementType.DropToFloor || connection.type == MovementConnection.MovementType.ReachDown || connection.type == MovementConnection.MovementType.ReachOverGap || connection.type == MovementConnection.MovementType.ReachUp)
+            {
+                if (connection.type == MovementConnection.MovementType.ReachUp && self.getAItile(connection.StartTile).acc == AItile.Accessibility.Floor && self.getAItile(connection.DestTile).acc == AItile.Accessibility.Floor)
+                {
+                    return !self.TileAccessibleToCreature(connection.StartTile + new IntVector2(0, 1), crit) && (self.TileAccessibleToCreature(connection.StartTile + new IntVector2(0, -1), crit) || self.getAItile(connection.StartTile + new IntVector2(0, -1)).acc == AItile.Accessibility.Solid);
+                }
+                IntVector2 b = IntVector2.ClampAtOne(new IntVector2(connection.destinationCoord.x - connection.startCoord.x, connection.destinationCoord.y - connection.startCoord.y));
+                return !self.TileAccessibleToCreature(connection.StartTile + b, crit);
+            }
+            else
+            {
+                if (connection.type == MovementConnection.MovementType.SemiDiagonalReach)
+                {
+                    IntVector2 b2 = IntVector2.ClampAtOne(new IntVector2(connection.destinationCoord.x - connection.startCoord.x, connection.destinationCoord.y - connection.startCoord.y));
+                    if (Math.Abs(connection.destinationCoord.x - connection.startCoord.x) > Math.Abs(connection.destinationCoord.y - connection.startCoord.y))
+                    {
+                        b2.y = 0;
+                    }
+                    else
+                    {
+                        b2.x = 0;
+                    }
+                    return !self.TileAccessibleToCreature(connection.StartTile + b2, crit);
+                }
+                if (connection.type == MovementConnection.MovementType.DoubleReachUp)
+                {
+                    return self.getAItile(connection.StartTile).acc <= 
+                        (AItile.Accessibility)crit.doubleReachUpConnectionParams[0] && 
+                        self.getAItile(connection.StartTile + new IntVector2(0, 1)).acc <= (AItile.Accessibility)crit.doubleReachUpConnectionParams[1] && 
+                        self.getAItile(connection.StartTile + new IntVector2(0, 2)).acc <= (AItile.Accessibility)crit.doubleReachUpConnectionParams[1] && 
+                        self.getAItile(connection.StartTile + new IntVector2(0, 3)).acc <= (AItile.Accessibility)crit.doubleReachUpConnectionParams[2] && 
+                        !self.TileAccessibleToCreature(connection.StartTile + new IntVector2(0, 1), crit) && !self.TileAccessibleToCreature(connection.StartTile + new IntVector2(0, 2), crit);
+                }
+                return connection.type != MovementConnection.MovementType.OpenDiagonal || (!self.TileAccessibleToCreature(new IntVector2(connection.startCoord.x, connection.destinationCoord.y), crit) && !self.TileAccessibleToCreature(new IntVector2(connection.destinationCoord.x, connection.startCoord.y), crit));
+            }
+        }
+
         private static int StoryGameSession_get_slugPupMaxCount(OtherHooks.orig_StoryGameSession_get_slugPupMaxCount orig, StoryGameSession self)
         {
             int result = orig(self);

@@ -287,6 +287,12 @@ namespace TheOutsider
             self.wantToJump = 0;
             flightTime = 0;
             isFlying = true;
+
+            Vector2 inputHG = new Vector2(0f, self.input[0].y == 0 ? 1f : self.input[0].y).normalized;
+            Vector2 inputLG = new Vector2(self.input[0].x, self.input[0].y).normalized;
+            Vector2 input = Vector2.Lerp(inputLG, inputHG, self.room.gravity);
+            Vector2 vel = (self.bodyChunks[0].vel.normalized + input).normalized * 4f;
+            self.bodyChunks[0].vel = vel;
         }
 
         public bool CanSustainFlight(Player self, TheOutsider player)
@@ -304,7 +310,8 @@ namespace TheOutsider
                 && self.animation != Player.AnimationIndex.AntlerClimb
                 && self.animation != Player.AnimationIndex.VineGrab
                 && self.animation != Player.AnimationIndex.ZeroGPoleGrab
-                && self.animation != Player.AnimationIndex.HangUnderVerticalBeam;
+                && self.animation != Player.AnimationIndex.HangUnderVerticalBeam
+                && !(self.grasps != null && self.grasps[0] != null && self.grasps[0].grabbed is Pomegranate);
         }
         #endregion
         /*

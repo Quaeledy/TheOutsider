@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Watcher;
 using static PathCost.Legality;
+using System.Linq;
 
 namespace TheOutsider.CustomLore.CustomCreature.MothPup
 {
@@ -125,6 +126,8 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
             t.communityInfluence = 0.5f;
             t.canFly = false;*/
 
+            t.SetDoubleReachUpConnectionParams(AItile.Accessibility.Climb, AItile.Accessibility.Air, AItile.Accessibility.Climb);
+
             return t;
         }
 
@@ -192,8 +195,8 @@ namespace TheOutsider.CustomLore.CustomCreature.MothPup
             self.HasDynamicRelationship(CreatureTemplate.Type.JetFish, 1f);
             self.HasDynamicRelationship(CreatureTemplate.Type.Scavenger, 1f);
             self.HasDynamicRelationship(MoreSlugcatsEnums.CreatureTemplateType.SlugNPC, 1f);
-
-            if (ModManager.Watcher)
+            
+            if (ModManager.ActiveMods.Any(mod => mod.id == "watcher"))//ModManager.Watcher
             {
                 self.Ignores(WatcherEnums.CreatureTemplateType.BigMoth);
                 self.IgnoredBy(WatcherEnums.CreatureTemplateType.BigMoth);

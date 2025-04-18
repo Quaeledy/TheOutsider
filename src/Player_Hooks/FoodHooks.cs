@@ -1,8 +1,11 @@
 ﻿using MoreSlugcats;
+using SlugBase.Features;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-//using TheOutsider.EmgTx;
+using UnityEngine;
+using Random = UnityEngine.Random;
+using RWCustom;
 
 namespace TheOutsider.Player_Hooks
 {
@@ -37,15 +40,14 @@ namespace TheOutsider.Player_Hooks
             {
                 Debug.LogException(e);
             }
-            /*
-            On.Player.SwallowObject += Player_SwallowObject;
-            On.Player.GrabUpdate += Player_GrabUpdate;
-            On.Player.GrabUpdate += Player_GrabUpdate_Rotund;
-            On.PlayerGraphics.Update += PlayerGraphics_Update_Swallow;
-            
-            //On.SlugcatHand.Update += SlugcatHand_Update;
-            */
+            //食用腐化蓝果眩晕概率和眩晕时间都减少，获取食物点增加
+            On.Player.ObjectEaten += Player_ObjectEaten;
+            //食用腐化爆米花眩晕概率和眩晕时间都减少，获取食物点增加
+            On.Player.Update += Player_Update;
+            //无需把石榴摔到地上，直接就能啃食
+            On.Pomegranate.Update += Pomegranate_Update; ;
         }
+
         private static void PhysicalObject_ctor(On.PhysicalObject.orig_ctor orig, PhysicalObject self, AbstractPhysicalObject abstractPhysicalObject)
         {
             orig(self, abstractPhysicalObject);
@@ -55,272 +57,151 @@ namespace TheOutsider.Player_Hooks
                 PhysicalObjectData.Add(self, new PhysicalObjectEx(self));
         }
 
-        /*
-        public static void Player_SwallowObject(On.Player.orig_SwallowObject orig, Player self, int grasp)
+        //食用腐化蓝果眩晕概率和眩晕时间都减少，获取食物点增加
+        private static void Player_ObjectEaten(On.Player.orig_ObjectEaten orig, Player self, IPlayerEdible edible)
         {
-            //如果是蛾猫
+            int stun = -1;
             if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
-                if (grasp < 0 || (self as Creature).grasps[grasp] == null)
+                stun = self.stun;
+            }
+
+            orig(self, edible);
+
+            if (PlayerHooks.PlayerData.TryGetValue(self, out player) && edible is DangleFruit && (edible as DangleFruit).AbstrConsumable.rotted)
+            {
+                if (stun != -1)
+                    self.stun = stun;
+                float value = Random.value;
+                if (value < 0.15f)//0.3f
                 {
+                    self.Stun(80);//120
+                    self.warpExhausionTime = Mathf.Max(280, self.warpExhausionTime);
                     return;
                 }
-                AbstractPhysicalObject abstractPhysicalObject = (self as Creature).grasps[grasp].grabbed.abstractPhysicalObject;
-                if (abstractPhysicalObject is AbstractSpear)
+                if (value < 0.35f)//0.65f
                 {
-                    (abstractPhysicalObject as AbstractSpear).stuckInWallCycles = 0;
+                    self.Stun(40);//60
                 }
-                //给下面的条件判断定义一下是不是素食
-                bool isFood = (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlareBomb || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlyLure || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.BubbleGrass || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.Mushroom || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.WaterNut || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.PuffBall);
-                //check if rotund world is enabled (our mass increases if we are full)
-                bool rotund = self.TotalMass > (0.7f * self.slugcatStats.bodyWeightFac);
-
-                if (isFood && (self.FoodInStomach < self.MaxFoodInStomach || self.IsJollyPlayer || rotund))
-                {
-                    if (ModManager.MMF && self.room.game.session is StoryGameSession)
-                    {
-                        (self.room.game.session as StoryGameSession).RemovePersistentTracker(abstractPhysicalObject);
-                    }
-                    self.ReleaseGrasp(grasp);
-                    abstractPhysicalObject.realizedObject.RemoveFromRoom();
-                    abstractPhysicalObject.Abstractize((self as Creature).abstractCreature.pos);
-                    abstractPhysicalObject.Room.RemoveEntity(abstractPhysicalObject);
-                    //吃闪光果、鞭炮草
-                    if (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlareBomb || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant)
-                    {
-                        self.AddFood(1);
-                        self.AddQuarterFood();
-                        self.AddQuarterFood();
-                        if (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant)
-                        {
-                            self.Hypothermia = Mathf.Min(0, self.Hypothermia - 0.3f);
-                        }
-                    }
-                    //吃蝙蝠草、气泡草、未泡开的泡水果
-                    if (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlyLure || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.BubbleGrass || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.WaterNut)
-                    {
-                        self.AddFood(1);
-                    }
-                    //吃子弹菇
-                    if (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.Mushroom)
-                    {
-                        self.AddQuarterFood();
-                    }
-                    //吃烟雾果
-                    if (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.PuffBall)
-                    {
-                        self.Die();
-                    }
-                }
-            }
-
-            orig(self, grasp);
-        }
-
-        public static void Player_GrabUpdate(On.Player.orig_GrabUpdate orig, Player self, bool eu)
-        {
-            orig(self, eu);
-
-            if (PlayerHooks.PlayerData.TryGetValue(self, out var player)
-            {
-                return;
-            }
-            //如果是蛾猫
-            //给下面的条件判断定义一下是不是素食
-            bool[] isFood = new bool[2];
-            for (int i = 0; i < 2; i++)
-            {
-                if ((self as Creature).grasps[i] != null)
-                {
-                    AbstractPhysicalObject abstractPhysicalObject = (self as Creature).grasps[i].grabbed.abstractPhysicalObject;
-                    isFood[i] = (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlareBomb || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlyLure || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.BubbleGrass || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.Mushroom || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.WaterNut || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.PuffBall);
-                }
-            }
-            //check if rotund world is enabled (our mass increases if we are full)
-            bool rotund = self.TotalMass > (0.7f * self.slugcatStats.bodyWeightFac);
-
-            bool flag = ((self.input[0].x == 0 && self.input[0].y == 0 && !self.input[0].jmp && !self.input[0].thrw) || (ModManager.MMF && self.input[0].x == 0 && self.input[0].y == 1 && !self.input[0].jmp && !self.input[0].thrw && (self.bodyMode != Player.BodyModeIndex.ClimbingOnBeam || self.animation == Player.AnimationIndex.BeamTip || self.animation == Player.AnimationIndex.StandOnBeam))) && ((self as Creature).mainBodyChunk.submersion < 0.5f || self.isRivulet);
-            bool flag3 = false;
-
-            int num4 = -1;
-            int num5 = -1;
-            int num6 = -1;
-
-            self.craftingObject = false;
-
-            if (flag)
-            {
-                int num7 = -1;
-                int num8 = 0;
-                while (num5 < 0 && num8 < 2)
-                {
-                    if ((self as Creature).grasps[num8] != null && (self as Creature).grasps[num8].grabbed is IPlayerEdible && ((self as Creature).grasps[num8].grabbed as IPlayerEdible).Edible)
-                    {
-                        num5 = num8;
-                    }
-                    num8++;
-                }
-                if ((num5 == -1 || (self.FoodInStomach >= self.MaxFoodInStomach && !((self as Creature).grasps[num5].grabbed is KarmaFlower) && !((self as Creature).grasps[num5].grabbed is Mushroom))) && (self.CanPutSpearToBack || self.CanPutSlugToBack))
-                {
-                    int num9 = 0;
-                    while (num7 < 0 && num4 < 0 && num6 < 0 && num9 < 2)
-                    {
-                        if ((self as Creature).grasps[num9] != null)
-                        {
-                            if ((self.CanPutSlugToBack && (self as Creature).grasps[num9].grabbed is Player && !((self as Creature).grasps[num9].grabbed as Player).dead) || self.CanIPutDeadSlugOnBack((self as Creature).grasps[num9].grabbed as Player))
-                            {
-                                num6 = num9;
-                            }
-                            else if (self.CanPutSpearToBack && (self as Creature).grasps[num9].grabbed is Spear)
-                            {
-                                num4 = num9;
-                            }
-                            else if (self.CanBeSwallowed((self as Creature).grasps[num9].grabbed))
-                            {
-                                num7 = num9;
-                            }
-                        }
-                        num9++;
-                    }
-                }
-                if (self.input[0].pckp)
-                {
-                    if (ModManager.MSC && self.FreeHand() == -1 && self.GraspsCanBeCrafted())
-                    {
-                        self.craftingObject = true;
-                        flag3 = true;
-                        num5 = -1;
-                    }
-                    if (num6 > -1 || self.CanRetrieveSlugFromBack)
-                    {
-                        self.slugOnBack.increment = true;
-                    }
-                    else if (num4 > -1 || self.CanRetrieveSpearFromBack)
-                    {
-                        self.spearOnBack.increment = true;
-                    }
-                    else if (num7 > -1)
-                    {
-                        flag3 = true;
-                    }
-                }
-                if (num5 > -1 && self.wantToPickUp < 1 && (self.input[0].pckp || self.eatCounter <= 15) && (self as Creature).Consious && Custom.DistLess((self as Creature).mainBodyChunk.pos, (self as Creature).mainBodyChunk.lastPos, 3.6f))
-                {
-                    if (self.FoodInStomach < self.MaxFoodInStomach || (self as Creature).grasps[num5].grabbed is KarmaFlower || (self as Creature).grasps[num5].grabbed is Mushroom)
-                    {
-                        flag3 = false;
-                    }
-                }
-            }
-            if (ModManager.MMF && (self as Creature).mainBodyChunk.submersion >= 0.5f)
-            {
-                flag3 = false;
-            }
-            if (flag3)
-            {
-                if (!ModManager.MMF || self.input[0].y == 0)
-                {
-                    self.swallowAndRegurgitateCounter++;
-
-                    if ((isFood[0] || isFood[1]) && (self.FoodInStomach < self.MaxFoodInStomach || rotund) && self.swallowAndRegurgitateCounter > 90)
-                    {
-                        for (int num13 = 0; num13 < 2; num13++)
-                        {
-                            if (isFood[num13] && (self as Creature).grasps[num13] != null && self.CanBeSwallowed((self as Creature).grasps[num13].grabbed))
-                            {
-                                (self as Creature).bodyChunks[0].pos += Custom.DirVec((self as Creature).grasps[num13].grabbed.firstChunk.pos, (self as Creature).bodyChunks[0].pos) * 2f;
-                                self.SwallowObject(num13);
-                                if (self.spearOnBack != null)
-                                {
-                                    self.spearOnBack.interactionLocked = true;
-                                }
-                                if ((ModManager.MSC || ModManager.CoopAvailable) && self.slugOnBack != null)
-                                {
-                                    self.slugOnBack.interactionLocked = true;
-                                }
-                                self.swallowAndRegurgitateCounter = 0;
-                                ((self as Creature).graphicsModule as PlayerGraphics).swallowing = 20;
-                                break;
-                            }
-                        }
-                    }
-                }
+                self.AddQuarterFood();
             }
         }
 
-        public static void Player_GrabUpdate_Rotund(On.Player.orig_GrabUpdate orig, Player self, bool eu)
+        //食用腐化爆米花眩晕概率和眩晕时间都减少，获取食物点增加
+        private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             if (PlayerHooks.PlayerData.TryGetValue(self, out var player))
             {
-                //给下面的条件判断定义一下是不是素食
-                bool[] isFood = new bool[2];
-                for (int i = 0; i < 2; i++)
+                if (self.eatExternalFoodSourceCounter > 0)
                 {
-                    if (self.grasps[i] != null)
+                    //self.eatExternalFoodSourceCounter--;
+                    if (self.eatExternalFoodSourceCounter < 2)//1
                     {
-                        AbstractPhysicalObject abstractPhysicalObject = self.grasps[i].grabbed.abstractPhysicalObject;
-                        isFood[i] = (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlareBomb || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlyLure || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.BubbleGrass || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.Mushroom || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.WaterNut || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.PuffBall);
-                    }
-                }
-
-                //check if rotund world is enabled (our mass increases if we are full)
-                bool rotund = self.TotalMass > (0.7f * self.slugcatStats.bodyWeightFac);
-
-                //If our food is full and we are trying to swallow something
-                if (self.FoodInStomach >= self.MaxFoodInStomach && self.swallowAndRegurgitateCounter > 88 && !rotund)
-                {
-                    //check each hand to see if it is food
-                    for (int i = 0; i < 2; i++)
-                    {
-                        if (isFood[i])
+                        if (self.externalFoodSourceRotten)
                         {
-                            //reverse the swallow progress so it never fully completes
-                            self.swallowAndRegurgitateCounter--;
+                            self.AddQuarterFood();
+                            self.AddQuarterFood();
+                            float value = Random.value;
+                            if (value < 0.1f)//0.2f
+                            {
+                                self.Stun(80);//120
+                                self.warpExhausionTime = Mathf.Max(280, self.warpExhausionTime);
+                            }
+                            else if (value < 0.25f)//0.5f
+                            {
+                                self.Stun(40);//60
+                            }
                         }
+                        else
+                        {
+                            self.AddFood(1);
+                        }
+                        self.dontEatExternalFoodSourceCounter = 45;
+                        self.handOnExternalFoodSource = null;
+                        self.room.PlaySound(SoundID.Slugcat_Bite_Fly, self.mainBodyChunk);
+                        self.externalFoodSourceRotten = false;
                     }
                 }
-            }
 
+            }
             orig(self, eu);
         }
 
-        public static void PlayerGraphics_Update_Swallow(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
+        //无需把石榴摔到地上，直接就能啃食
+        private static void Pomegranate_Update(On.Pomegranate.orig_Update orig, Pomegranate self, bool eu)
         {
-            if (PlayerHooks.PlayerData.TryGetValue(self.player, out var player)
+            orig(self, eu);
+            if (self.grabbedBy != null && self.grabbedBy.Count > 0)//self.currentlyEdible
             {
-                orig(self);
-            }
-            else
-            {
-                //给下面的条件判断定义一下是不是额外素食
-                bool[] isFood = new bool[2];
-                for (int i = 0; i < 2; i++)
+                int l = 0;
+                while (l < (ModManager.MSC ? self.room.abstractRoom.creatures.Count : self.room.game.Players.Count))
                 {
-                    if ((self.player as Creature).grasps[i] != null)
+                    Player player;
+                    if (ModManager.MSC)
                     {
-                        AbstractPhysicalObject abstractPhysicalObject = (self.player as Creature).grasps[i].grabbed.abstractPhysicalObject;
-                        isFood[i] = (abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlareBomb || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FirecrackerPlant || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.FlyLure || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.BubbleGrass || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.Mushroom || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.WaterNut || abstractPhysicalObject.type == AbstractPhysicalObject.AbstractObjectType.PuffBall);
+                        Creature realizedCreature = self.room.abstractRoom.creatures[l].realizedCreature;
+                        if (realizedCreature != null && realizedCreature is Player && realizedCreature.Consious)
+                        {
+                            player = (realizedCreature as Player);
+                            goto IL_7C6;
+                        }
+                    }
+                    else if (self.room.game.Players[l].realizedCreature != null && self.room.game.Players[l].realizedCreature.Consious)
+                    {
+                        player = (self.room.game.Players[l].realizedCreature as Player);
+                        goto IL_7C6;
+                    }
+                    IL_AF9:
+                    l++;
+                    continue;
+                    IL_7C6:
+                    if (PlayerHooks.PlayerData.TryGetValue(player, out var playerEX))
+                    {
+                        if (player.room != self.room || player.handOnExternalFoodSource != null || 
+                            player.eatExternalFoodSourceCounter >= 1 || player.dontEatExternalFoodSourceCounter >= 1 || 
+                            player.FoodInStomach >= player.MaxFoodInStomach || 
+                            player.wantToPickUp <= 0// && !player.input[0].pckp && player.touchedNoInputCounter <= 5 &&
+                            )// || player.FreeHand() <= -1
+                        {
+                            goto IL_AF9;
+                        }
+                        Vector2 pos = player.mainBodyChunk.pos;
+                        if (!Custom.DistLess(pos, self.firstChunk.pos, 35f))
+                        {
+                            goto IL_AF9;
+                        }
+                        player.handOnExternalFoodSource = new Vector2?(self.firstChunk.pos + Custom.DirVec(pos, self.firstChunk.pos) * 5f);
+                        player.eatExternalFoodSourceCounter = 15;
+                        if (Random.value < 0.75f)
+                        {
+                            self.room.AddObject(new Pomegranate.PomegranateSeed(self.firstChunk.pos + Custom.RNV() * Random.Range(0f, 10f), Custom.RNV() * 4f + new Vector2(0f, 3f), self.baseColor));
+                        }
+                        for (int m = 0; m < Random.Range(4, 8); m++)//for (int m = 0; m < Random.Range(1, 3); m++)
+                        {
+                            self.room.AddObject(new WaterDrip(self.firstChunk.pos + Custom.RNV() * Random.Range(0f, 10f), Custom.RNV() * Random.Range(0f, 2f), false));
+                        }
+                        for (int n = 2; n < self.smashedBits.GetLength(0); n++)
+                        {
+                            self.smashedBits[n, 2] += new Vector2(Random.Range(-2f, 2f), Random.Range(-2f, 2f));
+                        }
+                        if (Random.value < 0.5f)
+                        {
+                            self.room.PlaySound(SoundID.Slime_Mold_Terrain_Impact, self.firstChunk.pos, 0.5f, 1f);
+                        }
+                        if (self.room.game.IsStorySession && player.abstractCreature.creatureTemplate.type == CreatureTemplate.Type.Slugcat && self.room.game.GetStorySession.playerSessionRecords != null)
+                        {
+                            self.room.game.GetStorySession.playerSessionRecords[(player.abstractCreature.state as PlayerState).playerNumber].AddEat(self);
+                        }
+                        if (player.graphicsModule != null)
+                        {
+                            (player.graphicsModule as PlayerGraphics).LookAtPoint(self.firstChunk.pos, 100f);
+                            goto IL_AF9;
+                        }
+                        goto IL_AF9;
                     }
                 }
-                //check if rotund world is enabled (our mass increases if we are full)
-                bool rotund = self.player.TotalMass > (0.7f * self.player.slugcatStats.bodyWeightFac);
-
-                //用很傻的办法绕过原版的吐东西检测
-                AbstractPhysicalObject objectInStomach = self.player.objectInStomach;
-
-                if ((isFood[0] || isFood[1]) && (self.player.FoodInStomach < self.player.MaxFoodInStomach || rotund))
-                {
-                    self.player.objectInStomach = null;
-                }
-
-                orig(self);
-
-                if ((isFood[0] || isFood[1]) && (self.player.FoodInStomach < self.player.MaxFoodInStomach || rotund))
-                {
-                    self.player.objectInStomach = objectInStomach;
-                }
             }
-        }*/
+        }
     }
 
     public class PhysicalObjectEx

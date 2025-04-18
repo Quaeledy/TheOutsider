@@ -33,7 +33,7 @@ namespace TheOutsider
                 {
                     continue;
                 }
-                RegisterSpawner(t, new SimpleSpawnerInfo(delegate (AbstractPhysicalObject.AbstractObjectType type, string[] args)
+                DevConsole.ObjectSpawner.RegisterSpawner(t, new SimpleSpawnerInfo(delegate (AbstractPhysicalObject.AbstractObjectType type, string[] args)
                 {
                     if (args.Length == 0)
                     {

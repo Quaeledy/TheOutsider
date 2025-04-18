@@ -166,14 +166,21 @@ namespace TheOutsider.Player_Hooks
             for (int i = 0; i < self.bodyChunks.Length; i++)
             {
                 self.bodyChunks[i].vel.x = Mathf.Clamp(self.bodyChunks[i].vel.x, -3f * player.flightSpeed, 3f * player.flightSpeed);
-                self.bodyChunks[i].vel.y = Mathf.Clamp(self.bodyChunks[i].vel.y, -3f * player.flightSpeed, 3f * player.flightSpeed);
+                if (self.input[0].y >= 0)
+                {
+                    if (self.bodyChunks[i].vel.y < -3f * player.flightSpeed * 0.45f)
+                        player.flutterTimeAdd = 0;
+                    self.bodyChunks[i].vel.y = Mathf.Clamp(self.bodyChunks[i].vel.y, -3f * player.flightSpeed * 0.35f, 3f * player.flightSpeed);
+                }
+                else
+                    self.bodyChunks[i].vel.y = Mathf.Clamp(self.bodyChunks[i].vel.y, -3f * player.flightSpeed, 3f * player.flightSpeed);
             }
             if (self.input[0].x != 0)
             {
                 self.bodyChunks[0].vel.y -= 1f;
                 self.bodyChunks[1].vel.y += 1f;
             }
-            if (player.flightTime > player.upFlightTime / 2f)
+            if (player.flightTime > player.upFlightTime)
             {
                 float scale = Mathf.Abs(Mathf.Cos(Custom.AimFromOneVectorToAnother(self.bodyChunks[0].pos, self.bodyChunks[1].pos) / 180f * Mathf.PI));
                 float fac = Custom.LerpMap(scale, 1f, 0f, 
@@ -182,69 +189,12 @@ namespace TheOutsider.Player_Hooks
                 for (int i = 0; i < self.bodyChunks.Length; i++)
                     self.bodyChunks[i].vel.x *= fac;
             }
-            /*
-            if (player.flightTime >= 1.5f * player.upFlightTime)//self.input[0].x > 0 && 
-            {
-                self.bodyChunks[0].vel.x = self.bodyChunks[0].vel.x + player.flightSpeed * ax / player.upFlightTime;
-                /self.bodyChunks[1].vel.x = self.bodyChunks[1].vel.x - 1.5f * (1f - 1f * Mathf.Cos(player.flightTime * 2 * 3.14159f / 7f));
-            }
-            else// if (self.input[0].x > 0)
-            {
-                self.bodyChunks[0].vel.x = self.bodyChunks[0].vel.x + player.flightSpeed * ax / player.upFlightTime;
-                //self.bodyChunks[1].vel.x = self.bodyChunks[1].vel.x - 1f;
-            }
-            else if (self.input[0].x < 0 && player.flightTime >= 1.5f * player.upFlightTime)
-            {
-                self.bodyChunks[0].vel.x = self.bodyChunks[0].vel.x - player.flightSpeed;
-                //self.bodyChunks[1].vel.x = self.bodyChunks[1].vel.x + 1.5f * (1f - 1f * Mathf.Cos(player.flightTime * 2 * 3.14159f / 7f));
-            }
-            else if (self.input[0].x < 0)
-            {
-                self.bodyChunks[0].vel.x = self.bodyChunks[0].vel.x - player.flightSpeed;
-                //self.bodyChunks[1].vel.x = self.bodyChunks[1].vel.x + 1f;
-            }
-            //低重力环境的飞行
-            if (self.room.gravity <= 0.5)
-            {
-                if (self.input[0].y > 0)
-                {
-                    self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.flightSpeed * ay / player.upFlightTime;
-                    //self.bodyChunks[1].vel.y = self.bodyChunks[1].vel.y - 1f;
-                }
-                else if (self.input[0].y < 0)
-                {
-                    self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y - player.flightSpeed;
-                    //self.bodyChunks[1].vel.y = self.bodyChunks[1].vel.y + 1f;
-                }
-
-                if (player.flightTime > player.upFlightTime)
-                {
-                    player.flightTime = 0;
-                }
-            }
-            //飞起来一段时间内持续上升
-            else if (player.flightTime <= player.upFlightTime)
-            {
-                self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y + player.flightSpeed * 0.75f;
-                //self.bodyChunks[1].vel.y = self.bodyChunks[1].vel.y - 1f * (1f - 1f * Mathf.Cos(player.flightTime * 2 * 3.14159f / 7f));
-            }
-            //无论怎样，你还可以俯冲
-            else if (self.input[0].y < 0)
-            {
-                self.bodyChunks[0].vel.y = self.bodyChunks[0].vel.y - player.flightSpeed;
-                //self.bodyChunks[1].vel.y = self.bodyChunks[1].vel.y + 1f;
-            }
-            else
-            {
-                self.bodyChunks[1].vel.y = self.bodyChunks[1].vel.y + 0.3f;
-            }*/
         }
 
         //飞行加速度
         private static void FlightAcceleration(Player self, TheOutsider player)
         {
-            //Plugin.Log($"player.flightTime: {player.flightTime}, player.ax: {player.ax}, player.ay:  {player.ay}");
-            
+            Plugin.Log($"player.flightTime: {player.flightTime}, player.ax: {player.ax}, player.ay:  {player.ay}");
             float sa = 3f / 80f;//3f;
             float sv = 0.2f / 80f;//0.2f;
             float sf = 0.0012f / 40f;//0.0012f
@@ -258,154 +208,179 @@ namespace TheOutsider.Player_Hooks
             if (player.isFlying)
             {
                 float t = Mathf.Max((float)(player.upFlightTime / 1.5f - player.flightTime) / ((float)player.upFlightTime / 1.5f), 0f);
+                float lowGravityFac = 1f - self.room.gravity;
 
-                //低重力
-                if (self.room.gravity <= 0.5f)
+                #region 低重力
+                float axLowG = player.ax;
+                float ayLowG = player.ay;
+                float vxLowG = self.bodyChunks[0].vel.x;
+                float vyLowG = self.bodyChunks[0].vel.y;
+                // x 方向
+                if (self.input[0].x > 0)
                 {
-                    if (self.input[0].x > 0)
-                    {
-                        self.bodyChunks[0].vel.x += 0.25f;
-                        player.ax = Mathf.Max(0f, player.ax + sa * t + sv);
-                    }
-                    else if (self.input[0].x < 0)
-                    {
-                        self.bodyChunks[0].vel.x -= 0.25f;
-                        player.ax = Mathf.Min(0f, player.ax - sa * t - sv);
-                    }
-                    else
-                    {
-                        self.bodyChunks[0].vel.x *= 0.9f;
-                        player.ax *= 0.9f;
-                    }
-                    if (self.input[0].y > 0)
-                    {
-                        self.bodyChunks[0].vel.y += 0.25f;
-                        player.ay = Mathf.Max(0f, player.ay + sa * t + sv);
-                    }
-                    else if (self.input[0].y < 0)
-                    {
-                        self.bodyChunks[0].vel.y -= 0.25f;
-                        player.ay = Mathf.Min(0f, player.ay - sa * t - sv);
-                    }
-                    else
-                    {
-                        self.bodyChunks[0].vel.y *= 0.9f;
-                        player.ay *= 0.9f;
-                    }
+                    vxLowG += 0.65f;
+                    axLowG = Mathf.Max(0f, axLowG + (sa * t + sv));
                 }
-                //正常重力
+                else if (self.input[0].x < 0)
+                {
+                    vxLowG -= 0.65f;
+                    axLowG = Mathf.Min(0f, axLowG - (sa * t + sv));
+                }
                 else
                 {
-                    if (player.flightTime == 0)
+                    vxLowG *= 0.95f;
+                    axLowG *= 0.95f;
+                }
+
+                if (self.input[0].x * self.bodyChunks[0].vel.x < 0)
+                {
+                    vxLowG *= 0.9f;
+                    axLowG *= 0.9f;
+                }
+                // y 方向
+                if (self.input[0].y > 0)
+                {
+                    vyLowG += 0.65f;
+                    ayLowG = Mathf.Max(0f, ayLowG + (sa * t + sv));
+                }
+                else if (self.input[0].y < 0)
+                {
+                    vyLowG -= 0.65f;
+                    ayLowG = Mathf.Min(0f, ayLowG - (sa * t + sv));
+                }
+                else
+                {
+                    vyLowG *= 0.95f;
+                    ayLowG *= 0.95f;
+                }
+
+                if (self.input[0].y * self.bodyChunks[0].vel.y < 0)
+                {
+                    vyLowG *= 0.9f;
+                    ayLowG *= 0.9f;
+                }
+                #endregion
+                //正常重力
+                float axHighG = player.ax;
+                float ayHighG = player.ay;
+                float vxHighG = self.bodyChunks[0].vel.x;
+                float vyHighG = self.bodyChunks[0].vel.y;
+                if (player.flightTime == 0)
+                {
+                    axHighG /= 2f;
+                    ayHighG /= 2f;
+                }
+
+                //x方向加速度
+                if (self.input[0].x > 0)
+                {
+                    axHighG = axHighG + (sa * t + sv - sf * Mathf.Pow(vxHighG, 2f));
+                }
+                else if (self.input[0].x < 0)
+                {
+                    axHighG = axHighG - (sa * t + sv - sf * Mathf.Pow(vxHighG, 2f));
+                }
+                else
+                {
+                    if (axHighG > 0.05f)
                     {
-                        player.ax /= 2f;
-                        player.ay /= 2f;
+                        axHighG = Mathf.Max(axHighG - sv, 0f);
+                    }
+                    else if (axHighG < -0.05f)
+                    {
+                        axHighG = Mathf.Min(axHighG + sv, 0f);
+                    }
+                }
+                if (self.input[0].x * vxHighG < 0 && self.input[0].x * self.input[1].x <= 0)//拍翅动画
+                    player.flutterTimeAdd = 0f;
+
+                //y方向加速度
+                if (player.flightTime == 1 && self.input[0].y >= 0)
+                {
+                    ayHighG += 0.5f;
+                }
+                if (player.flightTime <= player.upFlightTime / 1.5f)
+                {
+                    ayHighG += (self.input[0].x == 0 ? 2f : 1.5f) * (self.input[0].y >= 0 ? 1f : -1f) * ss * t * 0.925f;
+                    if (self.input[0].x != 0 && player.flightTime <= player.upFlightTime / 4f)
+                        vyHighG += 0.5f;
+                }
+                else
+                {/*
+                        ayHighG *= 0.85f;
+                        ayHighG = Mathf.Max(ayHighG - (self.input[0].x == 0 ? 1f : 0.5f) * (self.input[0].y >= 0 ? 0.75f : 1f) * ss,
+                                              self.input[0].y >= 0 ? 0f : -5f);*/
+
+                    ayHighG = self.input[0].y >= 0 ? 0f : -1f;
+                    if (self.input[0].y >= 0)
+                        vyHighG += (self.input[0].x == 0 ? 1.45f : 1.75f) * self.room.gravity;
+                    else if (self.input[0].x != 0)
+                    {
+                        axHighG += 1.2f * sv * self.input[0].x;
+                        vxHighG *= 1.1f;
+                        vyHighG -= 1f * self.room.gravity;
+                        self.bodyChunks[1].vel.x *= Mathf.Lerp(0.9f, 1f, lowGravityFac);
+                        self.bodyChunks[1].vel.y += Mathf.Lerp(0.9f, 1f, lowGravityFac);
                     }
 
-                    //x方向加速度
+                    if (ayHighG < 0f && self.input[1].y < 0 && self.input[0].y >= 0)//拍翅动画
+                    {
+                        player.flutterTimeAdd = 0f;
+                    }
+                }
+
+                #region 额外修正
+                //修正(空翻)
+                if (self.input[0].y > 0 && self.input[0].x == 0)
+                {
+                    if (self.input[1].x != 0 && player.flightTime <= 2f * player.upFlightTime)//拍翅动画
+                    {
+                        player.flutterTimeAdd = 0f;
+                    }
+
+                    if (axHighG > 0)
+                    {
+                        axHighG = Mathf.Max(axHighG - 2f * ss, 0f);
+                    }
+                    else if (axHighG < 0)
+                    {
+                        axHighG = Mathf.Min(axHighG + 2f * ss, 0f);
+                    }
+                    ayHighG += 2f * ss * Mathf.Max(0f, 20f * Mathf.Abs(axHighG), Mathf.Abs(vxHighG) - 1f) * 0.05f;
+                    vxHighG = Mathf.Sign(vxHighG) * Mathf.Max(Mathf.Abs(vxHighG) - 1f * ss, 0f);
+                }
+
+                //俯冲
+                if (vyHighG < 0 &&
+                    player.flightTime >= player.upFlightTime / 2f)
+                {
+                    //注意，vyHighG是负数，因此下面都进行了变号
                     if (self.input[0].x > 0)
                     {
-                        player.ax = player.ax + sa * t + sv - sf * Mathf.Pow(self.bodyChunks[0].vel.x, 2f);
+                        axHighG -= sv * vyHighG * 0.25f;
+                        ayHighG += sv * ss;
                     }
                     else if (self.input[0].x < 0)
                     {
-                        player.ax = player.ax - sa * t - sv + sf * Mathf.Pow(self.bodyChunks[0].vel.x, 2f);
-                    }
-                    else
-                    {
-                        if (player.ax > 0.05f)
-                        {
-                            player.ax = Mathf.Max(player.ax - sv, 0f);
-                        }
-                        else if (player.ax < -0.05f)
-                        {
-                            player.ax = Mathf.Min(player.ax + sv, 0f);
-                        }
-                    }
-                    if (self.input[0].x * self.bodyChunks[0].vel.x < 0 && self.input[0].x * self.input[1].x <= 0)//拍翅动画
-                        player.flutterTimeAdd = 0f;
-
-                    //y方向加速度
-                    if (player.flightTime == 1 && self.input[0].y >= 0)
-                    {
-                        player.ay += 0.5f;
-                    }
-                    if (player.flightTime <= player.upFlightTime / 1.5f)
-                    {
-                        player.ay += (self.input[0].x == 0 ? 2f : 1.5f) * (self.input[0].y >= 0 ? 1f : -1f) * ss * t * 0.925f;
-                    }
-                    else
-                    {/*
-                        player.ay *= 0.85f;
-                        player.ay = Mathf.Max(player.ay - (self.input[0].x == 0 ? 1f : 0.5f) * (self.input[0].y >= 0 ? 0.75f : 1f) * ss,
-                                              self.input[0].y >= 0 ? 0f : -5f);*/
-
-                        player.ay = self.input[0].y >= 0 ? 0f : -1f;
-                        if (self.input[0].y >= 0)
-                            self.bodyChunks[0].vel.y += (self.input[0].x == 0 ? 1.25f : 1.65f) * self.room.gravity;
-                        else if (self.input[0].x != 0)
-                        {
-                            player.ax += 1.2f * sv * self.input[0].x;
-                            self.bodyChunks[0].vel.x *= 1.1f;
-                            self.bodyChunks[1].vel.x *= 0.9f;
-                            self.bodyChunks[0].vel.y -= 1f * self.room.gravity;
-                            self.bodyChunks[1].vel.y += 1f * self.room.gravity;
-                        }
-
-                        if (player.ay < 0f && self.input[1].y < 0 && self.input[0].y >= 0)//拍翅动画
-                        {
-                            player.flutterTimeAdd = 0f;
-                        }
-                    }
-
-                    #region 额外修正
-                    //修正(空翻)
-                    if (self.input[0].y > 0 && self.input[0].x == 0)
-                    {
-                        if (self.input[1].x != 0 && player.flightTime <= 2f * player.upFlightTime)//拍翅动画
-                        {
-                            player.flutterTimeAdd = 0f;
-                        }
-
-                        if (player.ax > 0)
-                        {
-                            player.ax = Mathf.Max(player.ax - 2f * ss, 0f);
-                        }
-                        else if (player.ax < 0)
-                        {
-                            player.ax = Mathf.Min(player.ax + 2f * ss, 0f);
-                        }
-                        player.ay += 2f * ss * Mathf.Max(0f, Mathf.Abs(self.bodyChunks[0].vel.x) - 1f) * 0.05f;
-                        self.bodyChunks[0].vel.x = Mathf.Sign(self.bodyChunks[0].vel.x) * Mathf.Max(Mathf.Abs(self.bodyChunks[0].vel.x) - 1f * ss, 0f);
-                    }
-
-                    //俯冲
-                    if (self.bodyChunks[0].vel.y < 0 && 
-                        player.flightTime >= player.upFlightTime / 2f)
-                    {
-                        //注意，self.bodyChunks[0].vel.y是负数，因此下面都进行了变号
-                        if (self.input[0].x > 0)
-                        {
-                            player.ax -= sv * self.bodyChunks[0].vel.y * 0.25f;
-                            player.ay += sv * ss;
-                        }
-                        else if (self.input[0].x < 0)
-                        {
-                            player.ax += sv * self.bodyChunks[0].vel.y * 0.25f;
-                            player.ay += sv * ss;
-                        }
-                    }
-                    #endregion
-                    
-                    if (player.flightTime == 0)
-                    {
-                        if (player.ax * self.bodyChunks[0].vel.x < 0)
-                            self.bodyChunks[0].vel.x /= 2.5f;
-                        if ((self.bodyChunks[0].vel.y >= 0 && self.input[0].y < 0) || 
-                            (self.bodyChunks[0].vel.y < 0 && self.input[0].y >= 0))
-                            self.bodyChunks[0].vel.y /= 5f;
+                        axHighG += sv * vyHighG * 0.25f;
+                        ayHighG += sv * ss;
                     }
                 }
+                #endregion
+
+                if (player.flightTime == 0)
+                {
+                    if (axHighG * vxHighG < 0)
+                        vxHighG /= 2.5f;
+                    if ((vyHighG >= 0 && self.input[0].y < 0) ||
+                        (vyHighG < 0 && self.input[0].y >= 0))
+                        vyHighG /= 5f;
+                }
+                
+                player.ax = Mathf.Lerp(axHighG, axLowG, lowGravityFac);
+                player.ay = Mathf.Lerp(ayHighG, ayLowG, lowGravityFac);
+                self.bodyChunks[0].vel.x = Mathf.Lerp(vxHighG, vxLowG, lowGravityFac);
+                self.bodyChunks[0].vel.y = Mathf.Lerp(vyHighG, vyLowG, lowGravityFac);
             }
             else
             {

@@ -34,6 +34,7 @@ namespace TheOutsider.MothPup_Hooks
             On.Player.CanEatMeat += Player_CanEatMeat;
             On.Player.ThrownSpear += Player_ThrownSpear;
             On.Player.ShortCutColor += Player_ShortCutColor;
+            //On.Player.NewRoom += Player_NewRoom;
 
             Hook hook = new Hook(typeof(Player).GetProperty(nameof(Player.isSlugpup), PlayerHooks.propFlags).GetGetMethod(), typeof(PlayerHooks).GetMethod(nameof(Player_get_isSlugpup), PlayerHooks.methodFlags));
         }
@@ -175,6 +176,35 @@ namespace TheOutsider.MothPup_Hooks
             }
         }
         #endregion
+
+        private static void Player_NewRoom(On.Player.orig_NewRoom orig, Player self, Room newRoom)
+        {
+            orig(self, newRoom);
+
+            if (Player_Hooks.PlayerHooks.PlayerData.TryGetValue(self, out var outsider) && outsider.isMothNPC)
+            {
+                if (newRoom.game.world.loadingRooms.Count > 0)
+                {
+                    for (int n = 0; n < 1; n++)
+                    {
+                        for (int num = newRoom.game.world.loadingRooms.Count - 1; num >= 0; num--)
+                        {
+                            if (newRoom.game.world.loadingRooms[num].done)
+                            {
+                                newRoom.game.world.loadingRooms.RemoveAt(num);
+                            }
+                            else
+                            {
+                                while (!newRoom.game.world.loadingRooms[num].done)
+                                {
+                                    newRoom.game.world.loadingRooms[num].Update();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         private static void Player_NPCStats_ctor(On.Player.NPCStats.orig_ctor orig, Player.NPCStats self, Player player)
         {
