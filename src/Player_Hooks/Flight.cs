@@ -392,44 +392,16 @@ namespace TheOutsider.Player_Hooks
         //自定义飞行按键
         private static bool FlyKeyCode(Player self)
         {
-            if (ModManager.CoopAvailable)
+            int i = self.playerState.playerNumber;
+            if (i > Plugin.optionsMenuInstance.flyKeyCode.Length || i < 0)
+                return self.wantToJump > 0;
+            if (Plugin.optionsMenuInstance.flyKeyCode[i].Value == KeyCode.None || self.isNPC)
             {
-                int i = -1;
-                RainWorldGame game = Custom.rainWorld.processManager.currentMainLoop as RainWorldGame;
-                if (game != null && game.Players != null)
-                {
-                    for (int j = 0; j < game.Players.Count; j++) 
-                    {
-                        if(self.abstractCreature == game.Players[j])
-                        {
-                            i = j;
-                            break;
-                        }
-                    }
-                }
-                if (i == -1)
-                    i = self.playerState.playerNumber;
-                if (i > Plugin.optionsMenuInstance.flyKeyCode.Length || i < 0)
-                    return self.wantToJump > 0;
-                if (Plugin.optionsMenuInstance.flyKeyCode[i].Value == KeyCode.None || self.isNPC)
-                {
-                    return self.wantToJump > 0;
-                }
-                else
-                {
-                    return Input.GetKey(Plugin.optionsMenuInstance.flyKeyCode[i].Value);
-                }
+                return self.wantToJump > 0;
             }
             else
             {
-                if (Plugin.optionsMenuInstance.flyKeyCode[0].Value == KeyCode.None || self.isNPC)
-                {
-                    return self.wantToJump > 0;
-                }
-                else
-                {
-                    return Input.GetKey(Plugin.optionsMenuInstance.flyKeyCode[0].Value);
-                }
+                return Input.GetKey(Plugin.optionsMenuInstance.flyKeyCode[i].Value);
             }
         }
     }

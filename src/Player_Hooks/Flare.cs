@@ -116,47 +116,18 @@ namespace TheOutsider.Player_Hooks
             {
                 AIwantFlare = player.AIwantFlare;
             }
-            if (ModManager.CoopAvailable)
+            int i = self.playerState.playerNumber;
+            if (i > Plugin.optionsMenuInstance.flareKeyCode.Length || i < 0)
+                return (!self.input[1].jmp || !self.input[1].pckp) &&
+                    self.input[0].jmp && self.input[0].pckp && AIwantFlare;
+            if (Plugin.optionsMenuInstance.flareKeyCode[i].Value == KeyCode.None || self.isNPC)
             {
-                int i = -1;
-                RainWorldGame game = Custom.rainWorld.processManager.currentMainLoop as RainWorldGame;
-                if (game != null && game.Players != null)
-                {
-                    for (int j = 0; j < game.Players.Count; j++)
-                    {
-                        if (self.abstractCreature == game.Players[j])
-                        {
-                            i = j;
-                            break;
-                        }
-                    }
-                }
-                if (i == -1)
-                    i = self.playerState.playerNumber;
-                if (self.playerState.playerNumber > Plugin.optionsMenuInstance.flareKeyCode.Length || i < 0)
-                    return (!self.input[1].jmp || !self.input[1].pckp) &&
-                        self.input[0].jmp && self.input[0].pckp && AIwantFlare;
-                if (Plugin.optionsMenuInstance.flareKeyCode[self.playerState.playerNumber].Value == KeyCode.None || self.isNPC)
-                {
-                    return (!self.input[1].jmp || !self.input[1].pckp) &&
-                        self.input[0].jmp && self.input[0].pckp && AIwantFlare;
-                }
-                else
-                {
-                    return Input.GetKey(Plugin.optionsMenuInstance.flareKeyCode[self.playerState.playerNumber].Value);
-                }
+                return (!self.input[1].jmp || !self.input[1].pckp) &&
+                    self.input[0].jmp && self.input[0].pckp && AIwantFlare;
             }
             else
             {
-                if (Plugin.optionsMenuInstance.flareKeyCode[0].Value == KeyCode.None || self.isNPC)
-                {
-                    return (!self.input[1].jmp || !self.input[1].pckp) &&
-                        self.input[0].jmp && self.input[0].pckp && AIwantFlare;
-                }
-                else
-                {
-                    return Input.GetKey(Plugin.optionsMenuInstance.flareKeyCode[0].Value);
-                }
+                return Input.GetKey(Plugin.optionsMenuInstance.flareKeyCode[i].Value);
             }
         }
     }

@@ -81,7 +81,7 @@ namespace TheOutsider
     {
         public IntroText2(Room room) : base(room, new Message[]
             {
-                Message.NewMessage("While stand on the ground, Tap jump and pick-up together to flare at the cost of consuming food.", 120, 180)
+                Message.NewMessage("While stand on the ground, tap jump and pick-up together to flare at the cost of consuming food.", 120, 180)
             })
 
         {

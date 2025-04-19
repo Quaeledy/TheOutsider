@@ -25,7 +25,7 @@ using TheOutsider.World_Hooks;
 
 namespace TheOutsider
 {
-    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.17")]
+    [BepInPlugin("Quaeledy.outsider", "The Outsider", "0.2.18")]
     public class Plugin : BaseUnityPlugin
     {
         public static readonly string MOD_ID = "Quaeledy.outsider";
