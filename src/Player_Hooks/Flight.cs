@@ -313,7 +313,7 @@ namespace TheOutsider.Player_Hooks
 
                     ayHighG = self.input[0].y >= 0 ? 0f : -1f;
                     if (self.input[0].y >= 0)
-                        vyHighG += (self.input[0].x == 0 ? 1.45f : 1.75f) * self.room.gravity;
+                        vyHighG += (self.input[0].x == 0 ? 1.45f : 1.65f) * self.room.gravity;
                     else if (self.input[0].x != 0)
                     {
                         axHighG += 1.2f * sv * self.input[0].x;
@@ -392,13 +392,44 @@ namespace TheOutsider.Player_Hooks
         //自定义飞行按键
         private static bool FlyKeyCode(Player self)
         {
-            if (Plugin.optionsMenuInstance.flyKeyCode.Value == KeyCode.None || self.isNPC)
+            if (ModManager.CoopAvailable)
             {
-                return self.wantToJump > 0;
+                int i = -1;
+                RainWorldGame game = Custom.rainWorld.processManager.currentMainLoop as RainWorldGame;
+                if (game != null && game.Players != null)
+                {
+                    for (int j = 0; j < game.Players.Count; j++) 
+                    {
+                        if(self.abstractCreature == game.Players[j])
+                        {
+                            i = j;
+                            break;
+                        }
+                    }
+                }
+                if (i == -1)
+                    i = self.playerState.playerNumber;
+                if (i > Plugin.optionsMenuInstance.flyKeyCode.Length || i < 0)
+                    return self.wantToJump > 0;
+                if (Plugin.optionsMenuInstance.flyKeyCode[i].Value == KeyCode.None || self.isNPC)
+                {
+                    return self.wantToJump > 0;
+                }
+                else
+                {
+                    return Input.GetKey(Plugin.optionsMenuInstance.flyKeyCode[i].Value);
+                }
             }
             else
             {
-                return Input.GetKey(Plugin.optionsMenuInstance.flyKeyCode.Value);
+                if (Plugin.optionsMenuInstance.flyKeyCode[0].Value == KeyCode.None || self.isNPC)
+                {
+                    return self.wantToJump > 0;
+                }
+                else
+                {
+                    return Input.GetKey(Plugin.optionsMenuInstance.flyKeyCode[0].Value);
+                }
             }
         }
     }

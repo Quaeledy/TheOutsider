@@ -1,4 +1,5 @@
-﻿using MonoMod.RuntimeDetour;
+﻿using DressMySlugcat;
+using MonoMod.RuntimeDetour;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -46,6 +47,7 @@ namespace TheOutsider
                     case "TAIL":
                     case "PIXEL":
                     case "WING":
+                    case "SWALLOWTAIL":
                         result = DressMySlugcat.Utils.DefaultBodyColor(slugcat);
                         break;
                     case "ANTENNAE1":
@@ -55,6 +57,7 @@ namespace TheOutsider
                         break;
                     case "WINGGRADIENT":
                     case "SPECKLE":
+                    case "SWALLOWTAILSPECKLE":
                         result = TheOutsider.LightBlue;
                         break;
                     default:
@@ -115,6 +118,22 @@ namespace TheOutsider
                 Description = "Speckle",
                 GallerySprite = "Pebble5",
                 RequiredSprites = { "Pebble5" },
+                Slugcats = { "Outsider", "Mothpup" }
+            });
+            DressMySlugcat.SpriteDefinitions.AvailableSprites.Add(new DressMySlugcat.SpriteDefinitions.AvailableSprite
+            {
+                Name = "SWALLOWTAIL",
+                Description = "SwallowTail",
+                GallerySprite = "MothSwallowTailA",
+                RequiredSprites = new List<string>{ "MothSwallowTailA" },
+                Slugcats = { "Outsider", "Mothpup" }
+            });
+            DressMySlugcat.SpriteDefinitions.AvailableSprites.Add(new DressMySlugcat.SpriteDefinitions.AvailableSprite
+            {
+                Name = "SWALLOWTAILSPECKLE",
+                Description = "SwallowTailSpeckle",
+                GallerySprite = "MothSwallowTailB",
+                RequiredSprites = new List<string> { "MothSwallowTailB" },
                 Slugcats = { "Outsider", "Mothpup" }
             });
         }

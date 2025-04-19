@@ -291,7 +291,7 @@ namespace TheOutsider
             Vector2 inputHG = new Vector2(0f, self.input[0].y == 0 ? 1f : self.input[0].y).normalized;
             Vector2 inputLG = new Vector2(self.input[0].x, self.input[0].y).normalized;
             Vector2 input = Vector2.Lerp(inputLG, inputHG, self.room.gravity);
-            Vector2 vel = (self.bodyChunks[0].vel.normalized + input).normalized * 4f;
+            Vector2 vel = (self.bodyChunks[0].vel.normalized + input).normalized * 5f;
             self.bodyChunks[0].vel = vel;
         }
 

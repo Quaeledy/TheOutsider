@@ -23,7 +23,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
 
         public SwallowTails(PlayerGraphics self, TheOutsider outsider) : base(self, outsider)
         {
-            swallowtailSpriteLength = 2;
+            swallowtailSpriteLength = 4;
 
             if (isPup)
             {
@@ -75,7 +75,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                 var foregroundContainer = rCam.ReturnFContainer("Foreground");
                 var midgroundContainer = newContatiner != null ? newContatiner : rCam.ReturnFContainer("Midground");
                 //让凤尾移到臀部后
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < swallowtailSpriteLength; i++)
                 {
                     var sprite = sLeaser.sprites[swallowtailSprite + i];
                     foregroundContainer.RemoveChild(sprite);
@@ -94,7 +94,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
             Array.Resize(ref sLeaser.sprites, swallowtailSprite + swallowtailSpriteLength);
 
             //凤尾
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < swallowtailSpriteLength; i++)
             {
                 TriangleMesh.Triangle[] tris;
                 if (self.player.playerState.isPup)
@@ -149,9 +149,43 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         new TriangleMesh.Triangle(23, 24, 25)
                     };//一个带状mesh 结尾为三角
                 }
+                TriangleMesh triangleMesh = null;
+                if (i < 2)
+                    triangleMesh = new TriangleMesh("MothSwallowTailA", tris, true, true);
+                else
+                    triangleMesh = new TriangleMesh("MothSwallowTailB", tris, true, true);
 
-                TriangleMesh triangleMesh = new TriangleMesh("Futile_White", tris, true, false);
                 sLeaser.sprites[swallowtailSprite + i] = triangleMesh;
+
+                TriangleMesh tail = sLeaser.sprites[swallowtailSprite + i] as TriangleMesh;
+                float uvYOffset = 0f;
+                float scaleFac = 1f;
+                for (int vertex = tail.vertices.Length - 1; vertex >= 0; vertex--)
+                {
+                    float interpolation = (float)vertex / 2f / ((float)tail.vertices.Length / 2f);
+                    bool flag = vertex % 2 == 0;
+                    Vector2 uvInterpolation;
+                    if (flag)
+                    {
+                        uvInterpolation = new Vector2(interpolation, 0f);
+                    }
+                    else
+                    {
+                        bool flag2 = vertex == tail.vertices.Length - 1;
+                        if (flag2)
+                        {
+                            uvInterpolation = new Vector2(1f, 0f);
+                        }
+                        else
+                        {
+                            uvInterpolation = new Vector2(interpolation, 1f);
+                        }
+                    }
+                    Vector2 uv;
+                    uv.x = Mathf.Lerp(tail.element.uvBottomLeft.x, tail.element.uvTopRight.x, uvInterpolation.x);
+                    uv.y = Mathf.Lerp(tail.element.uvBottomLeft.y + uvYOffset, tail.element.uvTopRight.y / scaleFac + uvYOffset, uvInterpolation.y);
+                    tail.UVvertices[vertex] = uv;
+                }
             }
         }
 
@@ -282,7 +316,27 @@ namespace TheOutsider.PlayerGraphics_Hooks
             //凤尾着色
             int fadeLength = self.player.playerState.isPup ? 9 : 15;
             int speckleLength = self.player.playerState.isPup ? 12 : 24;
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < swallowtailSpriteLength; i++)
+            {
+                var mesh = sLeaser.sprites[swallowtailSprite + i] as TriangleMesh;
+                if (i < 2)
+                {
+                    for (int j = 0; j < fadeLength; j++)
+                        mesh.verticeColors[j] = Color.Lerp(outsider.GetAntennaeColor(), sLeaser.sprites[0].color, Mathf.Pow(j / (float)(fadeLength - 1), 0.5f));
+                    for (int j = fadeLength; j < mesh.verticeColors.Length; j++)
+                    {
+                            mesh.verticeColors[j] = sLeaser.sprites[0].color;
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < mesh.verticeColors.Length; j++)
+                    {
+                        mesh.verticeColors[j] = outsider.GetSpeckleColor();
+                    }
+                }
+            }/*
+            for (int i = 0; i < swallowtailSpriteLength; i++)
             {
                 var mesh = sLeaser.sprites[swallowtailSprite + i] as TriangleMesh;
                 for (int j = 0; j < fadeLength; j++)
@@ -298,7 +352,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
                         mesh.verticeColors[j] = outsider.GetSpeckleColor();
                     }
                 }
-            }
+            }*/
         }
 
         //设置图层
@@ -310,7 +364,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
             //俯冲
             if (bodyRotation < -1.6f || bodyRotation > 1.6f)
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < swallowtailSpriteLength; i++)
                 {
                     //让凤尾移到身体后
                     sLeaser.sprites[swallowtailSprite + i].MoveBehindOtherNode(sLeaser.sprites[0]);
@@ -319,16 +373,18 @@ namespace TheOutsider.PlayerGraphics_Hooks
             //侧身
             if (bodyRotation < -0.3f)
             {
-                sLeaser.sprites[swallowtailSprite + 1].MoveBehindOtherNode(sLeaser.sprites[outsider.wings.WingSprite(1, 1)]);
+                for (int i = 1; i < swallowtailSpriteLength; i += 2)
+                    sLeaser.sprites[swallowtailSprite + i].MoveBehindOtherNode(sLeaser.sprites[outsider.wings.WingSprite(1, 1)]);
             }
             else if (bodyRotation > 0.3f)
             {
-                sLeaser.sprites[swallowtailSprite].MoveBehindOtherNode(sLeaser.sprites[outsider.wings.WingSprite(0, 1)]);
+                for (int i = 0; i < swallowtailSpriteLength; i += 2)
+                    sLeaser.sprites[swallowtailSprite + i].MoveBehindOtherNode(sLeaser.sprites[outsider.wings.WingSprite(0, 1)]);
             }
             //平飞
             else
             {
-                for (int i = 0; i < 2; i++)
+                for (int i = 0; i < swallowtailSpriteLength; i++)
                 {
                     //让凤尾移到身体后
                     sLeaser.sprites[swallowtailSprite + i].MoveBehindOtherNode(sLeaser.sprites[0]);
@@ -359,15 +415,15 @@ namespace TheOutsider.PlayerGraphics_Hooks
             int startSprite = swallowtailSprite;
 
             //实际显示
-            for (int k = 0; k < swallowtail.GetLength(0); k++)
+            for (int k = 0; k < swallowtailSpriteLength; k++)
             {
                 var dir = Custom.DirVec(self.drawPositions[0, 0], self.drawPositions[1, 0]).normalized;
                 var rootPos = Vector2.Lerp(self.owner.bodyChunks[1].pos, self.owner.bodyChunks[0].pos, 0.35f) +
-                    (k == 0 ? -1 : 1) * Custom.PerpendicularVector(dir).normalized * nowSwallowTailSpacing + dir; //dir * -0.2f;
+                    (k % 2 == 0 ? -1 : 1) * Custom.PerpendicularVector(dir).normalized * nowSwallowTailSpacing + dir; //dir * -0.2f;
 
                 var lastDir = Custom.DirVec(self.drawPositions[0, 1], self.drawPositions[1, 1]).normalized;
                 Vector2 lastRootPos = Vector2.Lerp(self.owner.bodyChunks[1].lastPos, self.owner.bodyChunks[0].lastPos, 0.35f) +
-                    (k == 0 ? -1 : 1) * Custom.PerpendicularVector(lastDir).normalized * nowSwallowTailSpacing + lastDir;// lastDir * 5f;
+                    (k % 2 == 0 ? -1 : 1) * Custom.PerpendicularVector(lastDir).normalized * nowSwallowTailSpacing + lastDir;// lastDir * 5f;
                 Vector2 nowRootPos = Vector2.Lerp(lastRootPos, rootPos, timeStacker);
                 //Vector2 lastSegPos = (nowRootPos * 3f + rootPos) / 4f;
                 Vector2 lastSegPos = nowRootPos;
@@ -380,7 +436,7 @@ namespace TheOutsider.PlayerGraphics_Hooks
 
                 for (int i = 0; i < swallowtail.GetLength(1); i++)
                 {
-                    Vector2 segPos = Vector2.Lerp(swallowtail[k, i].lastPos, swallowtail[k, i].pos, timeStacker);
+                    Vector2 segPos = Vector2.Lerp(swallowtail[k % 2, i].lastPos, swallowtail[k % 2, i].pos, timeStacker);
                     Vector2 normalized = (segPos - lastSegPos).normalized;
                     Vector2 widthDir = Custom.PerpendicularVector(normalized);
                     float dist = Vector2.Distance(segPos, lastSegPos) / 5f;
@@ -404,14 +460,14 @@ namespace TheOutsider.PlayerGraphics_Hooks
                     }*/
                     if (i < swallowtail.GetLength(1) - 1)
                     {
-                        swallowTail.MoveVertice(i * 4 + 2, segPos - widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);//swallowTail.MoveVertice(i * 4 + 2, segPos - widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);
-                        swallowTail.MoveVertice(i * 4 + 3, segPos + widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);//swallowTail.MoveVertice(i * 4 + 3, segPos + widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos); 
+                        swallowTail.MoveVertice(i * 4 + 2, segPos - widthDir * swallowtail[k % 2, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);//swallowTail.MoveVertice(i * 4 + 2, segPos - widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);
+                        swallowTail.MoveVertice(i * 4 + 3, segPos + widthDir * swallowtail[k % 2, i].StretchedRad * swallowTailWidth - normalized * dist - camPos);//swallowTail.MoveVertice(i * 4 + 3, segPos + widthDir * swallowtail[k, i].StretchedRad * swallowTailWidth - normalized * dist - camPos); 
                     }
                     else
                     {
                         swallowTail.MoveVertice(i * 4 + 2, segPos - camPos);
                     }
-                    lastDist = swallowtail[k, i].StretchedRad;//swallowtail[k, i].StretchedRad;
+                    lastDist = swallowtail[k % 2, i].StretchedRad;//swallowtail[k, i].StretchedRad;
                     lastSegPos = segPos;
                     /*
                     //防止穿模

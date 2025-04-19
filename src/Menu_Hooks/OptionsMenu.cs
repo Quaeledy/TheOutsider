@@ -12,8 +12,14 @@ namespace TheOutsider.Menu_Hooks
             infiniteFlight = config.Bind("Quaeledy_Outsider_Bool_InfiniteFlight", false);
             immuneSporeCloud = config.Bind("Quaeledy_Outsider_Bool_ImmuneSporeCloud", false);
             neverFlare = config.Bind("Quaeledy_Outsider_Bool_NeverFlare", false);
-            flareKeyCode = config.Bind("Quaeledy_Outsider_KeyCode_FlareKeyCode", new KeyCode());
-            flyKeyCode = config.Bind("Quaeledy_Outsider_KeyCode_FlyKeyCode", new KeyCode());
+            flareKeyCode[0] = config.Bind("Quaeledy_Outsider_KeyCode_FlareKeyCode1", new KeyCode());
+            flareKeyCode[1] = config.Bind("Quaeledy_Outsider_KeyCode_FlareKeyCode2", new KeyCode());
+            flareKeyCode[2] = config.Bind("Quaeledy_Outsider_KeyCode_FlareKeyCode3", new KeyCode());
+            flareKeyCode[3] = config.Bind("Quaeledy_Outsider_KeyCode_FlareKeyCode4", new KeyCode());
+            flyKeyCode[0] = config.Bind("Quaeledy_Outsider_KeyCode_FlyKeyCode1", new KeyCode());
+            flyKeyCode[1] = config.Bind("Quaeledy_Outsider_KeyCode_FlyKeyCode2", new KeyCode());
+            flyKeyCode[2] = config.Bind("Quaeledy_Outsider_KeyCode_FlyKeyCode3", new KeyCode());
+            flyKeyCode[3] = config.Bind("Quaeledy_Outsider_KeyCode_FlyKeyCode4", new KeyCode());
 
             // Tab 2
             hideFlare = config.Bind("Quaeledy_Outsider_Bool_HideFlare", false);
@@ -37,10 +43,12 @@ namespace TheOutsider.Menu_Hooks
 
             OpContainer tab1Container = new OpContainer(new Vector2(0, 0));
             opTab1.AddItems(tab1Container);
-
             // Tab 1：能力
-            UIelement[] UIArrayElements = new UIelement[] //create an array of ui elements
+            UIelement[] UIArrayElements = null;
+            if (ModManager.CoopAvailable)
             {
+                UIArrayElements = new UIelement[] //create an array of ui elements
+                {
                 new OpLabel(10f, 550f, Custom.rainWorld.inGameTranslator.Translate("Capacity"), true),
                 new OpLabel(180f, 550f, Custom.rainWorld.inGameTranslator.Translate("These options mainly exist for the gaming experience.")),
                 //飞行不消耗食物
@@ -53,12 +61,50 @@ namespace TheOutsider.Menu_Hooks
                 new OpCheckBox(neverFlare, 50, 400),
                 new OpLabel(80, 400, Custom.rainWorld.inGameTranslator.Translate("Disable Flare")),
                 //自定义飞行按键
-                new OpKeyBinder(flyKeyCode, new Vector2(50,250), new Vector2(120,20)),
+                new OpLabel(50, 290, Custom.rainWorld.inGameTranslator.Translate("Set a Key Code to Fly")),
+                new OpKeyBinder(flyKeyCode[0], new Vector2(50,220), new Vector2(100,20)),
+                new OpLabel(80, 260, Custom.rainWorld.inGameTranslator.Translate("Player 1")),
+                new OpKeyBinder(flyKeyCode[1], new Vector2(180,220), new Vector2(100,20)),
+                new OpLabel(210, 260, Custom.rainWorld.inGameTranslator.Translate("Player 2")),
+                new OpKeyBinder(flyKeyCode[2], new Vector2(310,220), new Vector2(100,20)),
+                new OpLabel(340, 260, Custom.rainWorld.inGameTranslator.Translate("Player 3")),
+                new OpKeyBinder(flyKeyCode[3], new Vector2(440,220), new Vector2(100,20)),
+                new OpLabel(470, 260, Custom.rainWorld.inGameTranslator.Translate("Player 4")),
+                //自定义闪光按键
+                new OpLabel(50, 150, Custom.rainWorld.inGameTranslator.Translate("Set a Key Code to Flare")),
+                new OpKeyBinder(flareKeyCode[0], new Vector2(50,80), new Vector2(100,20)),
+                new OpLabel(80, 120, Custom.rainWorld.inGameTranslator.Translate("Player 1")),
+                new OpKeyBinder(flareKeyCode[1], new Vector2(180,80), new Vector2(100,20)),
+                new OpLabel(210, 120, Custom.rainWorld.inGameTranslator.Translate("Player 2")),
+                new OpKeyBinder(flareKeyCode[2], new Vector2(310,80), new Vector2(100,20)),
+                new OpLabel(340, 120, Custom.rainWorld.inGameTranslator.Translate("Player 3")),
+                new OpKeyBinder(flareKeyCode[3], new Vector2(440,80), new Vector2(100,20)),
+                new OpLabel(470, 120, Custom.rainWorld.inGameTranslator.Translate("Player 4")),
+                };
+            }
+            else
+            {
+                UIArrayElements = new UIelement[] //create an array of ui elements
+                {
+                new OpLabel(10f, 550f, Custom.rainWorld.inGameTranslator.Translate("Capacity"), true),
+                new OpLabel(180f, 550f, Custom.rainWorld.inGameTranslator.Translate("These options mainly exist for the gaming experience.")),
+                //飞行不消耗食物
+                new OpCheckBox(infiniteFlight, 50, 500),
+                new OpLabel(80, 500, Custom.rainWorld.inGameTranslator.Translate("Flight Does not Consume Food")),
+                //免疫烟雾果
+                new OpCheckBox(immuneSporeCloud, 50, 450),
+                new OpLabel(80, 450, Custom.rainWorld.inGameTranslator.Translate("Immune Spore Cloud")),
+                //禁用闪光
+                new OpCheckBox(neverFlare, 50, 400),
+                new OpLabel(80, 400, Custom.rainWorld.inGameTranslator.Translate("Disable Flare")),
+                //自定义飞行按键
+                new OpKeyBinder(flyKeyCode[0], new Vector2(50,250), new Vector2(120,20)),
                 new OpLabel(50, 290, Custom.rainWorld.inGameTranslator.Translate("Set a Key Code to Fly")),
                 //自定义闪光按键
-                new OpKeyBinder(flareKeyCode, new Vector2(50,150), new Vector2(120,20)),
+                new OpKeyBinder(flareKeyCode[0], new Vector2(50,150), new Vector2(120,20)),
                 new OpLabel(50, 190, Custom.rainWorld.inGameTranslator.Translate("Set a Key Code to Flare")),
-            };
+                };
+            }
             opTab1.AddItems(UIArrayElements);
 
 
@@ -112,8 +158,8 @@ namespace TheOutsider.Menu_Hooks
         public readonly Configurable<bool> infiniteFlight;
         public readonly Configurable<bool> immuneSporeCloud;
         public readonly Configurable<bool> neverFlare;
-        public readonly Configurable<KeyCode> flareKeyCode;
-        public readonly Configurable<KeyCode> flyKeyCode;
+        public readonly Configurable<KeyCode>[] flyKeyCode = new Configurable<KeyCode>[4];
+        public readonly Configurable<KeyCode>[] flareKeyCode = new Configurable<KeyCode>[4];
         // Tab 2
         public readonly Configurable<bool> hideFlare;
         public readonly Configurable<bool> hideSwallowTail;
